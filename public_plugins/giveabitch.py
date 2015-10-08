@@ -14,9 +14,12 @@ def action(message, send_message_callback):
     else:
         gift = ' ' + gift
 
-    if "what do you give a" in message.content.lower():
-        target = message.content.split()[-1].replace('?', '')
-        send_message_callback(message.channel, 'GIVE THAT ' + target.upper() + ' A' + gift + '. ' + target.upper() + 'S LOVE ' + plural + '.')
+    if "what do you give a " in message.content.lower():
+        split_message = message.content.lower().split('what do you give a ')
+
+        if len(split_message) > 1:
+            target = split_message[-1].replace('?', '')
+            send_message_callback(message.channel, 'GIVE THAT ' + target.upper() + ' A' + gift + '. ' + target.upper() + 'S LOVE ' + plural + '.')
 
 
 def pluralize(singular):
