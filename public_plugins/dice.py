@@ -5,7 +5,7 @@ def action(message, send_message_callback):
     split_content = message.content.split()
     rolls = []
 
-    if split_content[0] == "!roll":
+    if split_content[0] == "!dice":
         # send_message_callback(message.channel, "I've seen your message publicly: " + message.content)
         if len(split_content) > 1:
             try:

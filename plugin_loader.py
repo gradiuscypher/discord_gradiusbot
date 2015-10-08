@@ -21,8 +21,11 @@ class PluginLoader:
 
             if not os.path.isdir(location):
                 plugin_name = plugin.replace('.py', '')
-                self.public_plugins.append(import_module(self.public_plugin_dir + "." + plugin_name))
-                count += 1
+                if "_" in plugin_name[0]:
+                    print("ignoring this plugin: " + plugin_name)
+                else:
+                    self.public_plugins.append(import_module(self.public_plugin_dir + "." + plugin_name))
+                    count += 1
 
         print("Loaded " + str(count) + " public plugins.")
 
@@ -35,7 +38,10 @@ class PluginLoader:
 
             if not os.path.isdir(location):
                 plugin_name = plugin.replace('.py', '')
-                self.private_plugins.append(import_module(self.private_plugin_dir + "." + plugin_name))
-                count += 1
+                if "_" in plugin_name[0]:
+                    print("ignoring this plugin: " + plugin_name)
+                else:
+                    self.private_plugins.append(import_module(self.private_plugin_dir + "." + plugin_name))
+                    count += 1
 
         print("Loaded " + str(count) + " private plugins.")

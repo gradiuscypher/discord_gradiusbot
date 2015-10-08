@@ -3,6 +3,8 @@
 import discord
 import configparser
 import json
+import traceback
+from threading import Thread
 from plugin_loader import PluginLoader
 
 
@@ -37,18 +39,22 @@ def on_message(message):
 
     if message.channel.is_private:
         if not message.author.name == selfname:
-            # print("===== PRIVATE MESSAGE START =====")
             for plugin in p_loader.private_plugins:
-                plugin.action(message, client.send_message)
-            # print("===== MESSAGE END =====")
-            # print()
+                try:
+                    t = Thread(target=plugin.action, args=(message, client.send_message))
+                    t.start()
+                except:
+                    print("There was an error with: " + str(plugin))
+                    print(traceback.format_exc())
 
     else:
         if not message.author.name == selfname and message.channel.name in permitted_channels:
-            # print("===== PUBLIC MESSAGE START =====")
             for plugin in p_loader.public_plugins:
-                plugin.action(message, client.send_message)
-            # print("===== MESSAGE END =====")
-            # print()
+                try:
+                    t = Thread(target=plugin.action, args=(message, client.send_message))
+                    t.start()
+                except:
+                    print("There was an error with: " + str(plugin))
+                    print(traceback.format_exc())
 
 client.run()
