@@ -35,7 +35,6 @@ def on_message(message):
         if not message.author.name == selfname:
             # print("===== PRIVATE MESSAGE START =====")
             for plugin in p_loader.private_plugins:
-                print("Running plugins.")
                 plugin.action(message, client.send_message)
             # print("===== MESSAGE END =====")
             # print()
@@ -43,10 +42,8 @@ def on_message(message):
     else:
         if not message.author.name == selfname and message.channel.name in permitted_channels:
             # print("===== PUBLIC MESSAGE START =====")
-            # for plugin in p_loader.public_plugins:
-            #     print("Running plugins.")
-            #     plugin.action(message, client.send_message)
-            print("CHANNEL NAME:", message.channel.name)
+            for plugin in p_loader.public_plugins:
+                plugin.action(message, client.send_message)
             # print("===== MESSAGE END =====")
             # print()
 
