@@ -24,8 +24,12 @@ p_loader.load_plugins()
 @client.event
 def on_ready():
     print("Connected")
-    print(client.servers)
-    print(client.servers[0].channels)
+
+    for s in client.servers:
+        chan_names = []
+        for c in s.channels:
+            chan_names.append(c.name)
+        print(s.name + str(chan_names))
 
 
 @client.event

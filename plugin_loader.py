@@ -13,7 +13,6 @@ class PluginLoader:
 
     def load_plugins(self):
         # Load public plugins
-        print("Loading public plugins from " + self.public_plugin_dir)
         count = 0
         possible_plugins = os.listdir('public_plugins')
 
@@ -28,7 +27,6 @@ class PluginLoader:
         print("Loaded " + str(count) + " public plugins.")
 
         # Load private plugins
-        print("Loading private plugins from " + self.private_plugin_dir)
         count = 0
         possible_plugins = os.listdir('private_plugins')
 
