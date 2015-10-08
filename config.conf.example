@@ -1,4 +1,6 @@
 [Discord]
 username =
 password =
-selfname =
+selfname = GradiusBot
+permitted_channels = ["testgradius", "general"]
+
