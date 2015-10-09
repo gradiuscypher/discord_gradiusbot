@@ -23,11 +23,15 @@ class Character:
     def __init__(self, name):
         self.inventory = Inventory()
         self.name = name
+        self.xp = 0
+        self.gear = {'head': None, 'chest': None, 'arms': None, 'hands': None, 'legs': None, 'feet': None,
+                     'l_hand': None, 'r_hand': None}
 
 
 class Inventory:
     def __init__(self):
         self.items = {}
+        self.equipment = {}
 
     def add_item(self, item_id, count):
         if item_id in self.items.keys():
@@ -79,3 +83,45 @@ class ItemDb:
     def save_item_db(self):
         pickle.dump(self.items, open('data/item_db.dat', 'wb'))
 
+
+class Equipment:
+    def __init__(self, equip_id, name, cost, slot, attack, defense):
+        self.equip_id = equip_id
+        self.name = name
+        self.cost = cost
+        self.slot = slot
+        self.attack = attack
+        self.defense = defense
+
+
+class EquipDB:
+    def __init__(self):
+        self.equip = {}
+
+    def create_equip(self, equip_id, name, cost, slot, attack, defense):
+        self.load_equip_db()
+        new_equip = Equipment(equip_id, name, cost, slot, attack, defense)
+        self.equip[equip_id] = new_equip
+        self.save_equip_db()
+
+    def delete_equip(self, equip_id):
+        self.load_equip_db()
+        self.save_equip_db()
+
+    def get_equip(self, equip_id):
+        self.load_equip_db()
+        if equip_id in self.equip.keys():
+            return self.equip[equip_id]
+
+    def equip_exists(self, equip_id):
+        self.load_equip_db()
+        if equip_id in self.equip.keys():
+            return True
+        else:
+            return False
+
+    def load_equip_db(self):
+        self.equip = pickle.load(open('data/equip_db.dat', 'rb'))
+
+    def save_equip_db(self):
+        pickle.dump(self.equip, open('data/equip_db.dat', 'wb'))
