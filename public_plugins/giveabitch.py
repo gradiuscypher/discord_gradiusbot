@@ -3,7 +3,7 @@ import random
 vowels = set('aeiou')
 
 
-def action(message, send_message_callback):
+def action(message, client):
     words = [line.strip() for line in open('data/items.data')]
     gift = random.choice(words).upper()
 
@@ -19,7 +19,7 @@ def action(message, send_message_callback):
 
         if len(split_message) > 1:
             target = split_message[-1].replace('?', '')
-            send_message_callback(message.channel, 'GIVE THAT ' + target.upper() + ' A' + gift + '. ' + target.upper() + 'S LOVE ' + plural + '.')
+            client.send_message(message.channel, 'GIVE THAT ' + target.upper() + ' A' + gift + '. ' + target.upper() + 'S LOVE ' + plural + '.')
 
 
 def pluralize(singular):

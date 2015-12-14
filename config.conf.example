@@ -2,5 +2,8 @@
 username =
 password =
 selfname = GradiusBot
-permitted_channels = ["testgradius", "general"]
+permitted_channels = ["gradiusbot", "general"]
+
+[Settings]
+bot_channel = gradiusbot
 

@@ -4,9 +4,11 @@ import discord
 import configparser
 import json
 import traceback
+import logging
 from threading import Thread
 from plugin_loader import PluginLoader
 
+# logging.basicConfig(level=logging.DEBUG)
 
 config = configparser.RawConfigParser()
 config.read('config.conf')
@@ -41,7 +43,7 @@ def on_message(message):
         if not message.author.name == selfname:
             for plugin in p_loader.private_plugins:
                 try:
-                    t = Thread(target=plugin.action, args=(message, client.send_message))
+                    t = Thread(target=plugin.action, args=(message, client))
                     t.start()
                 except:
                     print("There was an error with: " + str(plugin))
@@ -51,7 +53,7 @@ def on_message(message):
         if not message.author.name == selfname and message.channel.name in permitted_channels:
             for plugin in p_loader.public_plugins:
                 try:
-                    t = Thread(target=plugin.action, args=(message, client.send_message))
+                    t = Thread(target=plugin.action, args=(message, client))
                     t.start()
                 except:
                     print("There was an error with: " + str(plugin))
