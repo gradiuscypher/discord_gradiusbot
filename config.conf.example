@@ -9,3 +9,6 @@ bot_channel = gradiusbot
 public_plugins = ["dice.py", "giveabitch.py", "help.py", "help_channel_autodelete.py", "namecolor.py"]
 private_plugins = ["example.py"]
 
+[Loot]
+chest_min_currency = 10
+chest_max_currency = 1000
