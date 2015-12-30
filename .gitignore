@@ -1,9 +1,10 @@
 #Gradius Ignores
 .idea/
-venv/
+venv3/
 *.conf
 *.db
 *.db-journal
+*.swp
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,6 +1,9 @@
 import random
+import asyncio
 
+print("[Public Plugin] <dice.py>: This plugin rolls dice.")
 
+@asyncio.coroutine
 def action(message, client):
     split_content = message.content.split()
     rolls = []
@@ -15,8 +18,7 @@ def action(message, client):
                 for roll in range(0, dice_count):
                     rolls.append(random.randint(1, dice_value))
 
-                client.send_message(message.channel, "Your dice rolls: " + str(rolls) + " and your total is " + str(sum(rolls)))
+                yield from client.send_message(message.channel, "Your dice rolls: " + str(rolls) + " and your total is " + str(sum(rolls)))
             except:
                 print("error")
                 pass
-

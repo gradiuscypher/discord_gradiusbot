@@ -1,5 +1,4 @@
 import os
-import configparser
 import json
 from importlib import import_module
 
@@ -9,16 +8,17 @@ class PluginLoader:
     def __init__(self):
         self.public_plugins = []
         self.private_plugins = []
-        self.methods = []
         self.public_plugin_dir = 'public_plugins'
         self.private_plugin_dir = 'private_plugins'
+        self.config = None
+        self.public_plugin_config = None
+        self.private_plugin_config = None
 
-        config = configparser.RawConfigParser()
-        config.read('config.conf')
-        self.public_plugin_config = json.loads(config.get('Settings', 'public_plugins'))
-        self.private_plugin_config = json.loads(config.get('Settings', 'private_plugins'))
+    def load_plugins(self, config):
+        self.config = config
+        self.public_plugin_config = json.loads(self.config.get('BotSettings', 'public_plugins'))
+        self.private_plugin_config = json.loads(self.config.get('BotSettings', 'private_plugins'))
 
-    def load_plugins(self):
         # Load public plugins
         count = 0
 

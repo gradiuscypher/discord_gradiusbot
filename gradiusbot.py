@@ -1,62 +1,57 @@
-#!venv/bin/python
+#! venv3/bin/python
 
-import discord
-import configparser
-import json
-import traceback
-import logging
-from threading import Thread
 from plugin_loader import PluginLoader
-
-# logging.basicConfig(level=logging.DEBUG)
+import discord
+import asyncio
+import configparser
+import traceback
+import json
+import sys
 
 config = configparser.RawConfigParser()
-config.read('config.conf')
-
-username = config.get('Discord', 'username')
-password = config.get('Discord', 'password')
-selfname = config.get('Discord', 'selfname')
-permitted_channels = json.loads(config.get('Discord', 'permitted_channels'))
-
 client = discord.Client()
-client.login(username, password)
-
-p_loader = PluginLoader()
-p_loader.load_plugins()
+plugins = PluginLoader()
 
 
-@client.event
+@client.async_event
 def on_ready():
-    print("Connected")
-
-    for s in client.servers:
-        chan_names = []
-        for c in s.channels:
-            chan_names.append(c.name)
-        print(s.name + str(chan_names))
+    print('Logged in as: ', client.user.name, 'with ID:', client.user.id)
 
 
-@client.event
+@client.async_event
 def on_message(message):
+    selfname = config.get("BotSettings", "self_name")
+    permitted_channels = json.loads(config.get('BotSettings', 'permitted_channels'))
+    server_id = config.get("BotSettings", "server_id")
 
     if message.channel.is_private:
         if not message.author.name == selfname:
-            for plugin in p_loader.private_plugins:
+            for plugin in plugins.private_plugins:
                 try:
-                    t = Thread(target=plugin.action, args=(message, client))
-                    t.start()
+                    asyncio.async(plugin.action(message, client))
                 except:
                     print("There was an error with: " + str(plugin))
                     print(traceback.format_exc())
 
     else:
-        if not message.author.name == selfname and message.channel.name in permitted_channels:
-            for plugin in p_loader.public_plugins:
-                try:
-                    t = Thread(target=plugin.action, args=(message, client))
-                    t.start()
-                except:
-                    print("There was an error with: " + str(plugin))
-                    print(traceback.format_exc())
+        if (message.server.id == server_id) or (server_id == ""):
+            if not message.author.name == selfname and message.channel.name in permitted_channels:
+                for plugin in plugins.public_plugins:
+                    try:
+                        asyncio.async(plugin.action(message, client))
+                    except:
+                        print("There was an error with: " + str(plugin))
+                        print(traceback.format_exc())
 
-client.run()
+
+def main_task(config_file):
+    config.read(config_file)
+    email = config.get("Account", "email")
+    password = config.get("Account", "password")
+
+    plugins.load_plugins(config)
+    client.run(email, password)
+
+
+if __name__ == "__main__":
+    main_task(sys.argv[1])

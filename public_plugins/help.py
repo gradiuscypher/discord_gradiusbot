@@ -1,4 +1,7 @@
 import configparser
+import asyncio
+
+print("[Public Plugin] <help.py>: This plugin helps you with commands.")
 
 
 config = configparser.RawConfigParser()
@@ -14,8 +17,9 @@ __**Available Commands**__:
 """
 
 
+@asyncio.coroutine
 def action(message, client):
     split_content = message.content.split()
 
-    if split_content[0] == "help" and message.channel.name == config.get('Settings', 'bot_channel'):
-        client.send_message(message.author, help_message)
+    if split_content[0] == "help" and message.channel.name == config.get('BotSettings', 'bot_channel'):
+        yield from client.send_message(message.author, help_message)
