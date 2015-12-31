@@ -9,6 +9,7 @@ permitted_channels = []
 public_plugins = ["help.py", "sleep.py"]
 private_plugins = []
 bot_channel =
+lol_api =
 
 [Loot]
 chest_min_currency = 10
