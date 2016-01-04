@@ -9,6 +9,8 @@ config.read('config.conf')
 
 @asyncio.coroutine
 def action(message, client):
+    new_roles = []
+
     if message.channel.name == config.get('BotSettings', 'bot_channel'):
         split_content = message.content.split()
 
@@ -26,16 +28,20 @@ def action(message, client):
             if len(split_content) == 2:
                 if split_content[1] in avail_colors.keys():
                     for role in message.author.roles:
-                        if role.name.split("_")[0] == "namecolor":
-                            yield from client.remove_roles(message.author, role)
+                        if not role.name.split("_")[0] == "namecolor":
+                            new_roles.append(role)
+
+                    yield from client.replace_roles(message.author, *new_roles)
                     yield from client.add_roles(message.author, avail_colors[split_content[1]])
                     yield from client.send_message(message.author, "Adding your new name color.")
+
                 else:
                     yield from client.send_message(message.author, "namecolor command format: namecolor [color]")
                     name_color_str = ""
                     for color in avail_colors.keys():
                         name_color_str += color + " "
                     yield from client.send_message(message.author, "Available name colors: " + name_color_str)
+
             else:
                 yield from client.send_message(message.author, "namecolor command format: namecolor [color]")
                 name_color_str = ""
