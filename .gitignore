@@ -1,6 +1,7 @@
 #Gradius Ignores
 .idea/
 venv3/
+venv/
 *.conf
 *.db
 *.db-journal
