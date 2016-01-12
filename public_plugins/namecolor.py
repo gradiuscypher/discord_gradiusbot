@@ -28,10 +28,10 @@ def action(message, client):
             if len(split_content) == 2:
                 if split_content[1] in avail_colors.keys():
                     for role in message.author.roles:
-                        if not role.name.split("_")[0] == "namecolor":
-                            new_roles.append(role)
+                        if role.name.split("_")[0] == "namecolor":
+                            print("Removed ", split_content[1])
+                            yield from client.remove_roles(message.author, role)
 
-                    yield from client.replace_roles(message.author, *new_roles)
                     yield from client.add_roles(message.author, avail_colors[split_content[1]])
                     yield from client.send_message(message.author, "Adding your new name color.")
 
