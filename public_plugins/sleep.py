@@ -4,6 +4,7 @@ from threading import Thread
 
 print("[Public Plugin] <sleep.py>: This plugin makes your bot sleep for a period of time.")
 
+
 @asyncio.coroutine
 def action(message, client):
     split_content = message.content.split()

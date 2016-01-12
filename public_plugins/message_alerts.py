@@ -12,7 +12,7 @@ for line in target_file:
 
 es = elasticsearch.Elasticsearch()
 
-print("Message alerting enabled.")
+print("[Public Plugin] <message_alerts.py>: Send alerts to console and to an ElasticSearch instance.")
 
 
 # TODO: Alert on deleted messages

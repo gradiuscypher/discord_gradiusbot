@@ -5,7 +5,7 @@ import elasticsearch
 
 es = elasticsearch.Elasticsearch()
 
-print("ElasticSearch logging enabled.")
+print("[Public Plugin] <log_messages.py>: Log messages to ElasticSearch.")
 
 
 def setup_index():

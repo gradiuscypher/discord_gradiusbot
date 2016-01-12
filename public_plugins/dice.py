@@ -3,6 +3,7 @@ import asyncio
 
 print("[Public Plugin] <dice.py>: This plugin rolls dice.")
 
+
 @asyncio.coroutine
 def action(message, client):
     split_content = message.content.split()
