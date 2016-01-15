@@ -3,6 +3,7 @@ email =
 password =
 
 [BotSettings]
+debug = False
 server_id =
 self_name =
 permitted_channels = []

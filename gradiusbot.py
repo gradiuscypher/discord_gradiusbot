@@ -7,6 +7,7 @@ import configparser
 import traceback
 import json
 import sys
+import logging
 
 config = configparser.RawConfigParser()
 client = discord.Client()
@@ -48,6 +49,9 @@ def main_task(config_file):
     config.read(config_file)
     email = config.get("Account", "email")
     password = config.get("Account", "password")
+
+    if config.getboolean("BotSettings", "debug"):
+        logging.basicConfig(level=logging.DEBUG)
 
     plugins.load_plugins(config)
     client.run(email, password)
