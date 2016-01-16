@@ -8,10 +8,11 @@ import traceback
 import json
 import sys
 import logging
+import time
 
 config = configparser.RawConfigParser()
-client = discord.Client()
 plugins = PluginLoader()
+client = discord.Client()
 
 
 @client.async_event
@@ -54,8 +55,10 @@ def main_task(config_file):
         logging.basicConfig(level=logging.DEBUG)
 
     plugins.load_plugins(config)
-    client.run(email, password)
 
+    client.login(email, password)
+    client.connect()
+    # client.run(email, password)
 
 if __name__ == "__main__":
     main_task(sys.argv[1])
