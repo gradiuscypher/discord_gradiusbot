@@ -4,6 +4,7 @@ import gradiusbot
 import sys
 import traceback
 import time
+import asyncio
 
 
 if __name__ == "__main__":
@@ -12,7 +13,8 @@ if __name__ == "__main__":
     while tried <= reconnect:
 
         try:
-            gradiusbot.main_task(sys.argv[1])
+            loop = asyncio.get_event_loop()
+            gradiusbot.main_task(sys.argv[1], loop)
 
         except:
             print(traceback.print_exc())

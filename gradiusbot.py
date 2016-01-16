@@ -47,6 +47,9 @@ def on_message(message):
 
 
 def main_task(config_file):
+
+    loop = asyncio.get_event_loop()
+
     config.read(config_file)
     email = config.get("Account", "email")
     password = config.get("Account", "password")
@@ -56,9 +59,27 @@ def main_task(config_file):
 
     plugins.load_plugins(config)
 
-    client.login(email, password)
-    client.connect()
-    # client.run(email, password)
+    while True:
+        try:
+            print("Logging in...")
+            loop.run_until_complete(client.login(email, password))
+            # time.sleep(5)
+            client.wait_until_login()
+            print("Connecting...")
+            client.wait_until_ready()
+            print("Ready!")
+            loop.run_until_complete(client.connect())
+        except KeyboardInterrupt:
+            loop.run_until_complete(client.logout())
+            print("logging out.")
+            time.sleep(3)
+        except:
+            print(traceback.print_exc())
 
+        print("Logging out...")
+        loop.run_until_complete(client.logout())
+        print("Closing...")
+        print("Ended.")
+        time.sleep(2)
 if __name__ == "__main__":
-    main_task(sys.argv[1])
+        main_task(sys.argv[1])
