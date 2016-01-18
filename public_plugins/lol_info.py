@@ -7,17 +7,13 @@ from cassiopeia.type.api.exception import APIError
 
 print("[Public Plugin] <lol_info.py>: This plugin gives you LoL information.")
 
-config = configparser.RawConfigParser()
-config.read('config.conf')
-
-api_key = config.get("BotSettings", "lol_api")
-
-riotapi.set_region("NA")
-riotapi.set_api_key(api_key)
-
 
 @asyncio.coroutine
-def action(message, client):
+def action(message, client, config):
+    api_key = config.get("BotSettings", "lol_api")
+    riotapi.set_region("NA")
+    riotapi.set_api_key(api_key)
+
     split_message = message.content.split()
 
     if split_message[0] == "!lol":

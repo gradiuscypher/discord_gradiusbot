@@ -4,9 +4,6 @@ import asyncio
 print("[Public Plugin] <help.py>: This plugin helps you with commands.")
 
 
-config = configparser.RawConfigParser()
-config.read('config.conf')
-
 help_message = """
 Commands must be sent to the bot channel where they will be removed afterwards.
 
@@ -18,7 +15,7 @@ __**Available Commands**__:
 
 
 @asyncio.coroutine
-def action(message, client):
+def action(message, client, config):
     split_content = message.content.split()
 
     if split_content[0] == "help" and message.channel.name == config.get('BotSettings', 'bot_channel'):

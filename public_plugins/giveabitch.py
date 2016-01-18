@@ -7,7 +7,7 @@ print("[Public Plugin] <giveabitch.py>: This plugin tells you what to give a bit
 
 
 @asyncio.coroutine
-def action(message, client):
+def action(message, client, config):
     words = [line.strip() for line in open('data/items.data')]
     gift = random.choice(words).upper()
 

@@ -3,12 +3,9 @@ import asyncio
 
 print("[Public Plugin] <namecolor.py>: This plugin lets users change their namecolor.")
 
-config = configparser.RawConfigParser()
-config.read('config.conf')
-
 
 @asyncio.coroutine
-def action(message, client):
+def action(message, client, config):
     new_roles = []
 
     if message.channel.name == config.get('BotSettings', 'bot_channel'):

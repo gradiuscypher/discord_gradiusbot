@@ -6,7 +6,7 @@ print("[Public Plugin] <sleep.py>: This plugin makes your bot sleep for a period
 
 
 @asyncio.coroutine
-def action(message, client):
+def action(message, client, config):
     split_content = message.content.split()
 
     if split_content[0] == "!sleep":

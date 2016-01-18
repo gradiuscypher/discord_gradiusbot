@@ -30,7 +30,7 @@ def on_message(message):
         if not message.author.name == selfname:
             for plugin in plugins.private_plugins:
                 try:
-                    asyncio.async(plugin.action(message, client))
+                    asyncio.async(plugin.action(message, client, config))
                 except:
                     print("There was an error with: " + str(plugin))
                     print(traceback.format_exc())
@@ -40,7 +40,7 @@ def on_message(message):
             if not message.author.name == selfname and message.channel.name in permitted_channels:
                 for plugin in plugins.public_plugins:
                     try:
-                        asyncio.async(plugin.action(message, client))
+                        asyncio.async(plugin.action(message, client, config))
                     except:
                         print("There was an error with: " + str(plugin))
                         print(traceback.format_exc())

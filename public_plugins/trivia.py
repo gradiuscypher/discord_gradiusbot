@@ -13,7 +13,7 @@ trivia_answer = "taco"
 
 
 @asyncio.coroutine
-def action(message, client):
+def action(message, client, config):
 
     global filling_teams
     global trivia_game

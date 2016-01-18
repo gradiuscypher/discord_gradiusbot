@@ -5,7 +5,7 @@ print("[Public Plugin] <dice.py>: This plugin rolls dice.")
 
 
 @asyncio.coroutine
-def action(message, client):
+def action(message, client, config):
     split_content = message.content.split()
     rolls = []
 

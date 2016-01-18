@@ -41,7 +41,7 @@ def setup_index():
 
 
 @asyncio.coroutine
-def action(message, client):
+def action(message, client, config):
     time = datetime.now()
 
     for word in target_set:

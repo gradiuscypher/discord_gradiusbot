@@ -32,7 +32,7 @@ def setup_index():
 
 
 @asyncio.coroutine
-def action(message, client):
+def action(message, client, config):
     try:
         author = str(message.author)
         content = message.clean_content
