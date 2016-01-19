@@ -1,5 +1,7 @@
 # TODO: Finish implementation
 # TODO: Add validation table to keep track of when someone validates a song, to encourage voting
+# TODO: Add a report table to track reported bad songs.
+# TODO: Add a column that tracks whether a song has been reported.
 
 import sqlite3
 
