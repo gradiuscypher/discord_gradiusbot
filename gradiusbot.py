@@ -45,9 +45,6 @@ def on_message(message):
                         print("There was an error with: " + str(plugin))
                         print(traceback.format_exc())
 
-        if message.content.startswith("!"):
-            yield from client.delete_message(message)
-
 
 def main_task(config_file):
     config.read(config_file)
