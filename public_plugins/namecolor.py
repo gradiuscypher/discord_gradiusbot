@@ -23,17 +23,17 @@ def action(message, client, config):
                 avail_colors[split_name[1]] = r
 
         if len(split_content) == 2:
-            if split_content[1] in avail_colors.keys():
+            if split_content[1].lower() in avail_colors.keys():
                 for role in message.author.roles:
                     if not role.name.split("_")[0] == "namecolor":
                         new_roles.append(role)
 
                 yield from client.replace_roles(message.author, *new_roles)
                 yield from asyncio.sleep(.5)
-                yield from client.add_roles(message.author, avail_colors[split_content[1]])
+                yield from client.add_roles(message.author, avail_colors[split_content[1].lower()])
                 yield from client.send_message(message.author, "Adding your new name color.")
 
-            elif split_content[1] == "random":
+            elif split_content[1].lower() == "random":
                 for role in message.author.roles:
                     if not role.name.split("_")[0] == "namecolor":
                         new_roles.append(role)

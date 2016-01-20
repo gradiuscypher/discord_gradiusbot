@@ -11,6 +11,8 @@ __**Available Commands**__:
 
 !namecolor *[color]* - grants your user a different color name. Use it without a color to see a list of colors.
                     If your desired color does not exist, speak to a chat admin.
+
+                    Can also use !namecolor random to pick a random color.
 """
 
 
