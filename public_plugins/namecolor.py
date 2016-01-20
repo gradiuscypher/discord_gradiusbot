@@ -8,48 +8,41 @@ print("[Public Plugin] <namecolor.py>: This plugin lets users change their namec
 def action(message, client, config):
     new_roles = []
 
-    if message.channel.name == config.get('BotSettings', 'bot_channel'):
-        split_content = message.content.split()
+    split_content = message.content.split()
 
-        if split_content[0] == "namecolor":
-            server = message.server
+    if split_content[0] == "!namecolor":
+        yield from client.delete_message(message)
+        server = message.server
 
-            # Build a list of available roles that are namecolors
-            avail_colors = {}
-            for r in server.roles:
-                split_name = r.name.split('_')
+        # Build a list of available roles that are namecolors
+        avail_colors = {}
+        for r in server.roles:
+            split_name = r.name.split('_')
 
-                if split_name[0] == "namecolor":
-                    avail_colors[split_name[1]] = r
+            if split_name[0] == "namecolor":
+                avail_colors[split_name[1]] = r
 
-            if len(split_content) == 2:
-                if split_content[1] in avail_colors.keys():
-                    for role in message.author.roles:
-                        if not role.name.split("_")[0] == "namecolor":
-                            new_roles.append(role)
+        if len(split_content) == 2:
+            if split_content[1] in avail_colors.keys():
+                for role in message.author.roles:
+                    if not role.name.split("_")[0] == "namecolor":
+                        new_roles.append(role)
 
-                    yield from client.replace_roles(message.author, *new_roles)
-                    yield from asyncio.sleep(.5)
-                    yield from client.add_roles(message.author, avail_colors[split_content[1]])
-                    yield from client.send_message(message.author, "Adding your new name color.")
+                yield from client.replace_roles(message.author, *new_roles)
+                yield from asyncio.sleep(.5)
+                yield from client.add_roles(message.author, avail_colors[split_content[1]])
+                yield from client.send_message(message.author, "Adding your new name color.")
 
-                elif split_content[1] == "random":
-                    for role in message.author.roles:
-                        if not role.name.split("_")[0] == "namecolor":
-                            new_roles.append(role)
+            elif split_content[1] == "random":
+                for role in message.author.roles:
+                    if not role.name.split("_")[0] == "namecolor":
+                        new_roles.append(role)
 
-                    yield from client.replace_roles(message.author, *new_roles)
-                    yield from asyncio.sleep(.5)
-                    yield from client.add_roles(message.author, avail_colors[random.choice(list(avail_colors.keys()))])
-                    yield from client.send_message(message.author, "Adding your new name color.")
+                yield from client.replace_roles(message.author, *new_roles)
+                yield from asyncio.sleep(.5)
+                yield from client.add_roles(message.author, avail_colors[random.choice(list(avail_colors.keys()))])
+                yield from client.send_message(message.author, "Adding your new name color.")
 
-
-                else:
-                    yield from client.send_message(message.author, "namecolor command format: namecolor [color]")
-                    name_color_str = ""
-                    for color in avail_colors.keys():
-                        name_color_str += color + " "
-                    yield from client.send_message(message.author, "Available name colors: " + name_color_str)
 
             else:
                 yield from client.send_message(message.author, "namecolor command format: namecolor [color]")
@@ -57,3 +50,10 @@ def action(message, client, config):
                 for color in avail_colors.keys():
                     name_color_str += color + " "
                 yield from client.send_message(message.author, "Available name colors: " + name_color_str)
+
+        else:
+            yield from client.send_message(message.author, "namecolor command format: namecolor [color]")
+            name_color_str = ""
+            for color in avail_colors.keys():
+                name_color_str += color + " "
+            yield from client.send_message(message.author, "Available name colors: " + name_color_str)

@@ -1,15 +1,15 @@
-import configparser
 import asyncio
 
 print("[Public Plugin] <help.py>: This plugin helps you with commands.")
 
 
 help_message = """
-Commands must be sent to the bot channel where they will be removed afterwards.
 
 __**Available Commands**__:
 
-**namecolor** *[color]* - grants your user a different color name. Use it without a color to see a list of colors.
+!help - prints this message.
+
+!namecolor *[color]* - grants your user a different color name. Use it without a color to see a list of colors.
                     If your desired color does not exist, speak to a chat admin.
 """
 
@@ -18,5 +18,6 @@ __**Available Commands**__:
 def action(message, client, config):
     split_content = message.content.split()
 
-    if split_content[0] == "help" and message.channel.name == config.get('BotSettings', 'bot_channel'):
+    if split_content[0] == "!help":
+        yield from client.delete_message(message)
         yield from client.send_message(message.author, help_message)
