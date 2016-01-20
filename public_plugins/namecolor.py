@@ -11,7 +11,6 @@ def action(message, client, config):
     split_content = message.content.split()
 
     if split_content[0] == "!namecolor":
-        yield from client.delete_message(message)
         server = message.server
 
         # Build a list of available roles that are namecolors

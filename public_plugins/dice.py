@@ -20,7 +20,6 @@ def action(message, client, config):
                     rolls.append(random.randint(1, dice_value))
 
                 yield from client.send_message(message.channel, "Your " + str(dice_count) + "d" + str(dice_value) + " rolled " + str(rolls) + " and your total is " + str(sum(rolls)))
-                yield from client.delete_message(message)
             except:
                 print("error")
                 pass

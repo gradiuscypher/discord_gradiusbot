@@ -21,5 +21,4 @@ def action(message, client, config):
     split_content = message.content.split()
 
     if split_content[0] == "!help":
-        yield from client.delete_message(message)
         yield from client.send_message(message.author, help_message)
