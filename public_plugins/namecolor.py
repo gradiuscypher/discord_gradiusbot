@@ -1,5 +1,5 @@
-import configparser
 import asyncio
+import random
 
 print("[Public Plugin] <namecolor.py>: This plugin lets users change their namecolor.")
 
@@ -32,6 +32,17 @@ def action(message, client, config):
                     yield from asyncio.sleep(.5)
                     yield from client.add_roles(message.author, avail_colors[split_content[1]])
                     yield from client.send_message(message.author, "Adding your new name color.")
+
+                elif split_content[1] == "random":
+                    for role in message.author.roles:
+                        if not role.name.split("_")[0] == "namecolor":
+                            new_roles.append(role)
+
+                    yield from client.replace_roles(message.author, *new_roles)
+                    yield from asyncio.sleep(.5)
+                    yield from client.add_roles(message.author, avail_colors[random.choice(list(avail_colors.keys()))])
+                    yield from client.send_message(message.author, "Adding your new name color.")
+
 
                 else:
                     yield from client.send_message(message.author, "namecolor command format: namecolor [color]")
