@@ -48,11 +48,14 @@ def action(message, client, config):
                 name_color_str = ""
                 for color in avail_colors.keys():
                     name_color_str += color + " "
-                yield from client.send_message(message.author, "Available name colors: " + name_color_str)
+                yield from client.send_message(message.author, "Available name colors: " + name_color_str + "\n" +
+                                               "Color screenshot: http://i.imgur.com/ysjlBI6.png")
 
         else:
             yield from client.send_message(message.author, "namecolor command format: namecolor [color]")
             name_color_str = ""
             for color in avail_colors.keys():
                 name_color_str += color + " "
-            yield from client.send_message(message.author, "Available name colors: " + name_color_str)
+            yield from client.send_message(message.author, "Available name colors: " + name_color_str + "\n" +
+                                               "Color screenshot: http://i.imgur.com/ysjlBI6.png")
+
