@@ -1,7 +1,6 @@
 #! venv3/bin/python
 
 from plugin_loader import PluginLoader
-from copy import deepcopy
 import discord
 import asyncio
 import configparser
@@ -23,8 +22,6 @@ def on_ready():
 
 @client.async_event
 def on_message(message):
-    message_copy = deepcopy(message)
-
     selfname = config.get("BotSettings", "self_name")
     permitted_channels = json.loads(config.get('BotSettings', 'permitted_channels'))
     server_id = config.get("BotSettings", "server_id")
@@ -33,7 +30,7 @@ def on_message(message):
         if not message.author.name == selfname:
             for plugin in plugins.private_plugins:
                 try:
-                    asyncio.async(plugin.action(message_copy, client, config))
+                    asyncio.async(plugin.action(message, client, config))
                 except:
                     print("There was an error with: " + str(plugin))
                     print(traceback.format_exc())
@@ -43,7 +40,7 @@ def on_message(message):
             if not message.author.name == selfname and message.channel.name in permitted_channels:
                 for plugin in plugins.public_plugins:
                     try:
-                        asyncio.async(plugin.action(message_copy, client, config))
+                        asyncio.async(plugin.action(message, client, config))
                     except:
                         print("There was an error with: " + str(plugin))
                         print(traceback.format_exc())
