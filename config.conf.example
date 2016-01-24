@@ -11,6 +11,13 @@ public_plugins = ["help.py", "sleep.py"]
 private_plugins = []
 bot_channel =
 lol_api =
+twitter_alert =
+
+[Twitter]
+access_key =
+access_secret =
+consumer_key =
+consumer_secret =
 
 [Loot]
 chest_min_currency = 10

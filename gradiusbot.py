@@ -8,6 +8,7 @@ import traceback
 import json
 import sys
 import logging
+import twitter
 
 
 config = configparser.RawConfigParser()
@@ -64,6 +65,16 @@ def main_task(config_file):
     except:
         print("There was an exception:")
         print(traceback.print_exc())
+
+    if config.getboolean("BotSettings", "twitter_alert"):
+        access_key = config.get("Twitter", "access_key")
+        access_secret = config.get("Twitter", "access_secret")
+        consumer_key = config.get("Twitter", "consumer_key")
+        consumer_secret = config.get("Twitter", "consumer_secret")
+        tapi = twitter.Twitter(auth=twitter.OAuth(access_key, access_secret, consumer_key, consumer_secret))
+
+        tapi.statuses.update(status="@RiotGradius, I'm no longer in Discord.")
+
 
 if __name__ == "__main__":
         main_task(sys.argv[1])
