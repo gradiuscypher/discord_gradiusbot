@@ -4,6 +4,7 @@ cassiopeia==0.0.10
 chardet==2.3.0
 decorator==4.0.6
 discord.py==0.10.0-alpha
+elasticsearch==2.1.0
 ipython==4.0.1
 ipython-genutils==0.1.0
 path.py==8.1.2
@@ -13,5 +14,6 @@ ptyprocess==0.5
 simplegeneric==0.8.1
 termcolor==1.1.0
 traitlets==4.0.0
+twitter==1.17.1
 urllib3==1.14
 websockets==2.7
