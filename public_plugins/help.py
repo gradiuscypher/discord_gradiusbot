@@ -19,6 +19,7 @@ __**Available Commands**__:
 @asyncio.coroutine
 def action(message, client, config):
     split_content = message.content.split()
+    bot_channel = config.get("BotSettings", "bot_channel")
 
-    if split_content[0] == "!help":
+    if split_content[0] == "!help" and message.channel.name == bot_channel:
         yield from client.send_message(message.author, help_message)

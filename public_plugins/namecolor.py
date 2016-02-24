@@ -7,10 +7,11 @@ print("[Public Plugin] <namecolor.py>: This plugin lets users change their namec
 @asyncio.coroutine
 def action(message, client, config):
     new_roles = []
+    bot_channel = config.get("BotSettings", "bot_channel")
 
     split_content = message.content.split()
 
-    if split_content[0] == "!namecolor":
+    if split_content[0] == "!namecolor" and message.channel.name == bot_channel:
         server = message.server
 
         # Build a list of available roles that are namecolors
