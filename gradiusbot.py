@@ -47,6 +47,48 @@ def on_message(message):
                         print(traceback.format_exc())
 
 
+@client.async_event
+def on_message_delete(message):
+    selfname = config.get("BotSettings", "self_name")
+    permitted_channels = json.loads(config.get('BotSettings', 'permitted_channels'))
+    server_id = config.get("BotSettings", "server_id")
+
+    if message.channel.is_private:
+        if not message.author.name == selfname:
+            # TODO: Implement for private messages
+            pass
+    else:
+        if (message.server.id == server_id) or (server_id == ""):
+            if not message.author.name == selfname and message.channel.name in permitted_channels:
+                for plugin in plugins.event_plugins:
+                    try:
+                        asyncio.async(plugin.action(message, client, config, "delete"))
+                    except:
+                        print("There was an error with: " + str(plugin))
+                        print(traceback.format_exc())
+
+
+@client.async_event
+def on_message_edit(message, message_after):
+    selfname = config.get("BotSettings", "self_name")
+    permitted_channels = json.loads(config.get('BotSettings', 'permitted_channels'))
+    server_id = config.get("BotSettings", "server_id")
+
+    if message.channel.is_private:
+        if not message.author.name == selfname:
+            # TODO: Implement for private messages
+            pass
+    else:
+        if (message.server.id == server_id) or (server_id == ""):
+            if not message.author.name == selfname and message.channel.name in permitted_channels:
+                for plugin in plugins.event_plugins:
+                    try:
+                        asyncio.async(plugin.action(message, client, config, "edit", message_after=message_after))
+                    except:
+                        print("There was an error with: " + str(plugin))
+                        print(traceback.format_exc())
+
+
 def main_task(config_file):
     config.read(config_file)
     email = config.get("Account", "email")

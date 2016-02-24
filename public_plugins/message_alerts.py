@@ -15,18 +15,17 @@ es = elasticsearch.Elasticsearch()
 print("[Public Plugin] <message_alerts.py>: Send alerts to console and to an ElasticSearch instance.")
 
 
-# TODO: Alert on deleted messages
 def setup_index():
     elastic = elasticsearch.Elasticsearch()
     try:
         mapping = {
             "discord_alert": {
                 "properties": {
+                    "author_id": {"type": "string"},
                     "alert": {"type": "string"},
-                    "message_id": {"type": "string"},
                     "server": {"type": "string"},
                     "author": {"type": "string", "index": "not_analyzed"},
-                    "channel": {"type": "string"},
+                    "channel": {"type": "string", "index": "not_analyzed"},
                     "content": {"type": "string"},
                     "timestamp": {"type": "date"},
                 }
@@ -55,10 +54,10 @@ def action(message, client, config):
             content = message.content
             server = str(message.server)
             channel = str(message.channel)
-            message_id = str(message.id)
             timestamp = datetime.utcnow()
+            author_id = str(message.author.id)
 
-            body = {"alert": alert_message, "message_id": message_id, "server": server, "author": author,
+            body = {"alert": alert_message, "author_id": author_id, "server": server, "author": author,
                     "channel": channel, "content": content, "timestamp": timestamp}
 
             es.index(index='discord_alerts', doc_type='alert', body=body)

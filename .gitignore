@@ -2,6 +2,7 @@
 .idea/
 venv3/
 venv/
+services/
 *.conf
 *.db
 *.db-journal

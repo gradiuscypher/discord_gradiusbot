@@ -14,12 +14,12 @@ def setup_index():
         mapping = {
             "chat_message": {
                 "properties": {
-                    "message_id": {"type": "string"},
                     "server": {"type": "string"},
                     "author": {"type": "string", "index": "not_analyzed"},
-                    "channel": {"type": "string"},
+                    "channel": {"type": "string", "index": "not_analyzed"},
                     "content": {"type": "string"},
                     "timestamp": {"type": "date"},
+                    "author_id": {"type": "string"},
                 }
             }
         }
@@ -38,10 +38,10 @@ def action(message, client, config):
         content = message.clean_content
         server = str(message.server)
         channel = str(message.channel)
-        message_id = str(message.id)
         timestamp = datetime.utcnow()
+        author_id = str(message.author.id)
 
-        body = {"message_id": message_id, "server": server, "author": author, "channel": channel, "content": content,
+        body = {"author_id": author_id, "server": server, "author": author, "channel": channel, "content": content,
                 "timestamp": timestamp}
 
         es.index(index='discord_chat', doc_type='chat_message', body=body)
