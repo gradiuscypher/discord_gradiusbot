@@ -57,9 +57,9 @@ def action(object_before, client, config, event_type, object_after=None):
                     "channel": channel, "content": content, "timestamp": timestamp, "author_id": author_id}
 
     if event_type == "member_update":
-        author = object_after.name
+        author = object_before.name
         author_id = object_before.id
-        event_message = object_before.name
+        event_message = object_after.name
         content = "namechange"
 
         if object_before.name != object_after.name:
