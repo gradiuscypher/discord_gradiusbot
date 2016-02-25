@@ -45,8 +45,9 @@ def action(object_before, client, config, event_type, object_after=None):
         channel = str(object_before.channel)
         content = object_before.content
         author_id = str(object_before.author.id)
+        bot_channel = config.get("BotSettings", "bot_channel")
 
-        if event_type == "delete":
+        if event_type == "delete" and channel != bot_channel:
             body = {"event_type": event_type, "server": server, "author": author, "event_message": event_message,
                     "channel": channel, "content": content, "timestamp": timestamp, "author_id": author_id}
 
