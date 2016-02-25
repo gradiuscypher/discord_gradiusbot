@@ -34,25 +34,36 @@ def setup_index():
 
 
 @asyncio.coroutine
-def action(message, client, config, event_type, message_after=None):
-    author = str(message.author)
-    content = message.content
-    server = str(message.server)
-    channel = str(message.channel)
+def action(object_before, client, config, event_type, object_after=None):
+    server = str(object_before.server)
     timestamp = datetime.utcnow()
-    author_id = str(message.author.id)
     event_message = None
     body = None
 
-    if event_type == "delete":
-        body = {"event_type": event_type, "server": server, "author": author, "event_message": event_message,
-                "channel": channel, "content": content, "timestamp": timestamp, "author_id": author_id}
+    if event_type == ("delete" or "edit"):
+        author = str(object_before.author)
+        channel = str(object_before.channel)
+        content = object_before.content
+        author_id = str(object_before.author.id)
 
-    if event_type == "edit":
-        event_message = content + " > " + message_after.content
-        body = {"event_type": event_type, "server": server, "author": author, "event_message": event_message,
-                "channel": channel, "content": content, "timestamp": timestamp, "author_id": author_id}
+        if event_type == "delete":
+            body = {"event_type": event_type, "server": server, "author": author, "event_message": event_message,
+                    "channel": channel, "content": content, "timestamp": timestamp, "author_id": author_id}
+
+        if event_type == "edit":
+            event_message = content + " > " + object_after.content
+            body = {"event_type": event_type, "server": server, "author": author, "event_message": event_message,
+                    "channel": channel, "content": content, "timestamp": timestamp, "author_id": author_id}
+
+    if event_type == "member_update":
+        author = object_after.name
+        author_id = object_before.id
+        event_message = object_before.name
+        content = "namechange"
+
+        if object_before.name != object_after.name:
+            body = {"event_type": event_type, "server": server, "author": author, "event_message": event_message,
+                    "channel": None, "content": content, "timestamp": timestamp, "author_id": author_id}
 
     if body is not None:
         es.index(index='discord_events', doc_type='discord_event', body=body)
-

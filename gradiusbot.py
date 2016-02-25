@@ -83,10 +83,22 @@ def on_message_edit(message, message_after):
             if not message.author.name == selfname and message.channel.name in permitted_channels:
                 for plugin in plugins.event_plugins:
                     try:
-                        asyncio.async(plugin.action(message, client, config, "edit", message_after=message_after))
+                        asyncio.async(plugin.action(message, client, config, "edit", object_after=message_after))
                     except:
                         print("There was an error with: " + str(plugin))
                         print(traceback.format_exc())
+
+
+@client.async_event
+def on_member_update(member_before, member_after):
+    server_id = config.get("BotSettings", "server_id")
+    if (member_after.server.id == server_id) or (server_id == ""):
+        for plugin in plugins.event_plugins:
+            try:
+                asyncio.async(plugin.action(member_before, client, config, "member_update", object_after=member_after))
+            except:
+                print("There was an error with: " + str(plugin))
+                print(traceback.format_exc())
 
 
 def main_task(config_file):
@@ -108,14 +120,14 @@ def main_task(config_file):
         print("There was an exception:")
         print(traceback.print_exc())
 
-    if config.getboolean("BotSettings", "twitter_alert"):
-        access_key = config.get("Twitter", "access_key")
-        access_secret = config.get("Twitter", "access_secret")
-        consumer_key = config.get("Twitter", "consumer_key")
-        consumer_secret = config.get("Twitter", "consumer_secret")
-        tapi = twitter.Twitter(auth=twitter.OAuth(access_key, access_secret, consumer_key, consumer_secret))
+        if config.getboolean("BotSettings", "twitter_alert"):
+            access_key = config.get("Twitter", "access_key")
+            access_secret = config.get("Twitter", "access_secret")
+            consumer_key = config.get("Twitter", "consumer_key")
+            consumer_secret = config.get("Twitter", "consumer_secret")
+            tapi = twitter.Twitter(auth=twitter.OAuth(access_key, access_secret, consumer_key, consumer_secret))
 
-        tapi.statuses.update(status="@RiotGradius, I'm no longer in Discord.")
+            tapi.statuses.update(status="@RiotGradius, I'm no longer in Discord.")
 
 
 if __name__ == "__main__":

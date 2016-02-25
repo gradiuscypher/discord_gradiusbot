@@ -8,4 +8,5 @@ def action(message, client, config):
     config.get("BotSettings", "bot_channel")
 
     if message.channel.name == config.get('BotSettings', 'bot_channel'):
+        yield from asyncio.sleep(1)
         yield from client.delete_message(message)
