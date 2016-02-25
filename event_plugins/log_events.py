@@ -40,7 +40,7 @@ def action(object_before, client, config, event_type, object_after=None):
     event_message = None
     body = None
 
-    if event_type == ("delete" or "edit"):
+    if event_type == "delete" or event_type == "edit":
         author = str(object_before.author)
         channel = str(object_before.channel)
         content = object_before.content
