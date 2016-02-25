@@ -52,7 +52,7 @@ def action(object_before, client, config, event_type, object_after=None):
                     "channel": channel, "content": content, "timestamp": timestamp, "author_id": author_id}
 
         if event_type == "edit":
-            event_message = content + " > " + object_after.content
+            event_message = object_after.content
             body = {"event_type": event_type, "server": server, "author": author, "event_message": event_message,
                     "channel": channel, "content": content, "timestamp": timestamp, "author_id": author_id}
 
