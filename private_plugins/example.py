@@ -4,7 +4,7 @@ print("[Private Plugin] <example.py>: This plugin echoes details back to the sen
 
 
 @asyncio.coroutine
-def action(message, client):
+def action(message, client, config):
     print("This is a private message")
     print("This is the sender:", message.author)
     print("This is the message:", message.content)
