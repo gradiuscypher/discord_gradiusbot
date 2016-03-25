@@ -38,8 +38,8 @@ def action(message, client, config):
                 yield from client.send_message(message.author, "!join groupname or !leave groupname")
                 groups_str = ""
                 for group in optional_groups.keys():
-                    groups_str += group + " "
-                yield from client.send_message(message.author, "Available groups: " + groups_str)
+                    groups_str += group + "\n"
+                yield from client.send_message(message.author, "**Available groups:**\n" + groups_str)
 
         if split_content[0] == "!leave":
             if len(split_content) == 2:
@@ -56,8 +56,15 @@ def action(message, client, config):
                     yield from client.send_message(message.author, "Removing you from the group.")
 
             else:
+                current_roles = {}
+                for r in target_user.roles:
+                    split_name = r.name.split('_')
+
+                    if split_name[0] == "opt":
+                        current_roles[split_name[1]] = r
+
                 yield from client.send_message(message.author, "!join groupname or !leave groupname")
                 groups_str = ""
-                for group in optional_groups.keys():
-                    groups_str += group + " "
-                yield from client.send_message(message.author, "Available groups: " + groups_str)
+                for group in current_roles.keys():
+                    groups_str += group + "\n"
+                yield from client.send_message(message.author, "**Available groups:**\n" + groups_str)
