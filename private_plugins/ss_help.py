@@ -25,6 +25,8 @@ __**Available Commands**__:
 
 **!leave** *group* - allows you to leave optional groups.
                 You can use !leave without a group to see a list of leavable groups.
+
+**!guide** - allows you to search and update guides. Use !guides to see more detailed help.
 """
 
 
