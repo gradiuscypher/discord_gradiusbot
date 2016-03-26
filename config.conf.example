@@ -13,6 +13,7 @@ event_plugins = []
 bot_channel =
 lol_api =
 twitter_alert =
+guide_group =
 
 [Twitter]
 access_key =
