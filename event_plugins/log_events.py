@@ -43,7 +43,7 @@ def action(object_before, client, config, event_type, object_after=None):
     if event_type == "delete" or event_type == "edit":
         author = str(object_before.author)
         channel = str(object_before.channel)
-        content = object_before.content
+        content = object_before.clean_content
         author_id = str(object_before.author.id)
         bot_channel = config.get("BotSettings", "bot_channel")
 
@@ -51,8 +51,8 @@ def action(object_before, client, config, event_type, object_after=None):
             body = {"event_type": event_type, "server": server, "author": author, "event_message": event_message,
                     "channel": channel, "content": content, "timestamp": timestamp, "author_id": author_id}
 
-        if (event_type == "edit") and (content != object_after.content):
-            event_message = object_after.content
+        if (event_type == "edit") and (content != object_after.clean_content):
+            event_message = object_after.clean_content
             body = {"event_type": event_type, "server": server, "author": author, "event_message": event_message,
                     "channel": channel, "content": content, "timestamp": timestamp, "author_id": author_id}
 
