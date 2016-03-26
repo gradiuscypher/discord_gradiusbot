@@ -46,12 +46,12 @@ def action(message, client, config):
     for word in target_set:
         if word in message.content:
             alert_tag = colored("[Alert Text]", 'white', 'on_red', attrs=['bold'])
-            alert_text = "[" + str(time) + "] <" + str(message.author) + "> : " + message.content
+            alert_text = "[" + str(time) + "] <" + str(message.author) + "> : " + message.clean_content
             print(alert_tag + " " + alert_text)
 
             alert_message = "wordlist"
             author = str(message.author)
-            content = message.content
+            content = message.clean_content
             server = str(message.server)
             channel = str(message.channel)
             timestamp = datetime.utcnow()
