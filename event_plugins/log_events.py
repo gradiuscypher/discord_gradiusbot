@@ -22,6 +22,7 @@ def setup_index():
                     "timestamp": {"type": "date"},
                     "event_type": {"type": "string"},
                     "event_message": {"type": "string"},
+                    "attachments": {"type": "string", "index": "not_analyzed"},
                 }
             }
         }
@@ -39,6 +40,7 @@ def action(object_before, client, config, event_type, object_after=None):
     timestamp = datetime.utcnow()
     event_message = None
     body = None
+    attachment = None
 
     if event_type == "delete" or event_type == "edit":
         author = str(object_before.author)
@@ -48,13 +50,18 @@ def action(object_before, client, config, event_type, object_after=None):
         bot_channel = config.get("BotSettings", "bot_channel")
 
         if event_type == "delete" and channel != bot_channel:
+            if len(object_before.attachments) > 0:
+                attachment = str(object_before.attachments[0]['proxy_url'])
+
             body = {"event_type": event_type, "server": server, "author": author, "event_message": event_message,
-                    "channel": channel, "content": content, "timestamp": timestamp, "author_id": author_id}
+                    "channel": channel, "content": content, "timestamp": timestamp, "author_id": author_id,
+                    "attachments": attachment}
 
         if (event_type == "edit") and (content != object_after.clean_content):
             event_message = object_after.clean_content
             body = {"event_type": event_type, "server": server, "author": author, "event_message": event_message,
-                    "channel": channel, "content": content, "timestamp": timestamp, "author_id": author_id}
+                    "channel": channel, "content": content, "timestamp": timestamp, "author_id": author_id,
+                    "attachments": attachment}
 
     if event_type == "member_update":
         author = object_before.name
@@ -64,7 +71,8 @@ def action(object_before, client, config, event_type, object_after=None):
 
         if object_before.name != object_after.name:
             body = {"event_type": event_type, "server": server, "author": author, "event_message": event_message,
-                    "channel": None, "content": content, "timestamp": timestamp, "author_id": author_id}
+                    "channel": None, "content": content, "timestamp": timestamp, "author_id": author_id,
+                    "attachments": None}
 
     if body is not None:
         es.index(index='discord_events', doc_type='discord_event', body=body)
