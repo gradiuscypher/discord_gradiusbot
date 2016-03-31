@@ -4,6 +4,7 @@ password =
 
 [BotSettings]
 debug = False
+logfile = False
 server_id =
 self_name =
 permitted_channels = []
