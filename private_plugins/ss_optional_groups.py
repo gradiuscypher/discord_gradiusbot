@@ -78,8 +78,8 @@ def action(message, client, config):
         server_id = config.get('BotSettings', 'server_id')
         server = client.get_server(server_id)
         target_user = server.get_member(message.author.id)
-        author_name = target_user.name
-        author_id = target_user.id
+        author_name = repr(target_user)
+        author_id = repr(target_user)
         error_message = "Problem executing ss_optional_groups function"
         author_message = message.clean_content
         tb = traceback.print_exc()
