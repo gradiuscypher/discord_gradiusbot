@@ -98,7 +98,7 @@ def action(message, client, config):
                         yield from client.send_message(message.author, "**Available groups:**\n" + groups_str)
         else:
             print("++ Name None Traceback ++")
-            print(traceback.format_exc())
+            print(traceback.print_exc())
             server_id = config.get('BotSettings', 'server_id')
             server = client.get_server(server_id)
             target_user = server.get_member(message.author.id)
