@@ -16,7 +16,7 @@ print("[Private Plugin] {}".format(note))
 
 @asyncio.coroutine
 def action(message, client, config):
-    yield from asyncio.sleep(.5)
+    yield from asyncio.sleep(1)
 
     try:
         server_id = config.get('BotSettings', 'server_id')
@@ -98,6 +98,7 @@ def action(message, client, config):
                         yield from client.send_message(message.author, "**Available groups:**\n" + groups_str)
         else:
             print("++ Name None Traceback ++")
+            print("{} : {}".format(message.author, message.clean_content))
             print(traceback.print_exc())
             server_id = config.get('BotSettings', 'server_id')
             server = client.get_server(server_id)
