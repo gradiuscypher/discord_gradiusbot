@@ -97,6 +97,8 @@ def action(message, client, config):
                             groups_str += group + "\n"
                         yield from client.send_message(message.author, "**Available groups:**\n" + groups_str)
         else:
+            print("++ Name None Traceback ++")
+            print(traceback.format_exc())
             server_id = config.get('BotSettings', 'server_id')
             server = client.get_server(server_id)
             target_user = server.get_member(message.author.id)
@@ -104,7 +106,7 @@ def action(message, client, config):
             author_id = repr(target_user)
             error_message = "Problem executing ss_optional_groups function. Target user returned None."
             author_message = message.clean_content
-            tb = traceback.print_exc()
+            tb = ""
             app = "ss_optional_groups.py"
             error_type = "exception"
             timestamp = datetime.now()
