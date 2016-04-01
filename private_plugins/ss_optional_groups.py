@@ -46,6 +46,17 @@ def action(message, client, config):
         new_roles = []
 
         split_content = message.content.split()
+
+        retry_count = 0
+
+        while target_user is None:
+            if retry_count > 10:
+                print("Tried to get user and reached retry limit")
+                break
+            target_user = server.get_member(message.author.id)
+            retry_count += 1
+            yield from asyncio.sleep(1)
+
         if target_user is not None:
             if len(split_content) > 0:
                 if split_content[0] == "!join" or split_content[0] == "!leave":
