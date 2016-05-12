@@ -1,12 +1,12 @@
-bot_dir=
+bot_dir=/home/gradius/code/discord_gradiusbot
 
 while true; do
-	gradiusbot_count=`pgrep -f gradiusbot.conf -c`
+	gradiusbot_count=`pgrep -f config.conf -c`
 
 	if [ $gradiusbot_count = 0 ]; then
 		echo "Running gradiusbot"
 		cd $bot_dir
-		venv3/bin/python gradiusbot.py gradiusbot.conf
+		venv3/bin/python gradiusbot.py config.conf
 	fi
 	echo "Gradiusbot Discord loop ended. Sleeping."
 	sleep 60
