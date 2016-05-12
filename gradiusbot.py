@@ -103,8 +103,7 @@ def on_member_update(member_before, member_after):
 
 def main_task(config_file):
     config.read(config_file)
-    email = config.get("Account", "email")
-    password = config.get("Account", "password")
+    token = config.get("Account", "token")
 
     if config.getboolean("BotSettings", "debug"):
         logging.basicConfig(level=logging.DEBUG)
@@ -120,7 +119,7 @@ def main_task(config_file):
 
     try:
         print("Running client...")
-        client.run(email, password)
+        client.run(token)
     except KeyboardInterrupt:
         print("Killed by keboard!")
     except:
