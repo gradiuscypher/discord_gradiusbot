@@ -9,6 +9,8 @@ import json
 import sys
 import logging
 import twitter
+import random
+from time import sleep
 
 
 config = configparser.RawConfigParser()
@@ -17,8 +19,19 @@ client = discord.Client()
 
 
 @client.async_event
+def pick_random_status():
+    while not client.is_closed:
+        status_set = json.loads(config.get("BotSettings", "statuses"))
+        status = random.choice(status_set)
+        game = discord.Game(name=status)
+        asyncio.async(client.change_status(game))
+        yield from asyncio.sleep(60)
+
+
+@client.async_event
 def on_ready():
     print('Logged in as: ', client.user.name, 'with ID:', client.user.id)
+    asyncio.async(pick_random_status())
 
 
 @client.async_event

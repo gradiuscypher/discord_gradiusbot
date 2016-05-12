@@ -11,6 +11,7 @@ permitted_channels = []
 public_plugins = ["help.py", "sleep.py"]
 private_plugins = []
 event_plugins = []
+statuses = ["PM me !help for more info", "Bug @RiotGradius on Twitter about me!"]
 bot_channel =
 lol_api =
 twitter_alert =
