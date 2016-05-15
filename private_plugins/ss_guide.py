@@ -12,7 +12,7 @@ This plugin will not function properly on a bot that's a member of more than one
 print("[Private Plugin] <ss_guide.py>: This plugin allows users to look up and add guides/links along with tags.")
 print("[Private Plugin] {}".format(note))
 
-help_text = """
+help_message = """
 __*guide help*__
 
 **!guide**- show this text

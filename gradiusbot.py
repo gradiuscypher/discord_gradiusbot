@@ -25,7 +25,7 @@ def pick_random_status():
         status = random.choice(status_set)
         game = discord.Game(name=status)
         asyncio.async(client.change_status(game))
-        yield from asyncio.sleep(60)
+        yield from asyncio.sleep(15)
 
 
 @client.async_event
@@ -42,6 +42,17 @@ def on_message(message):
 
     if message.channel.is_private:
         if not message.author.name == selfname:
+            if message.content.lower() == "!help" or message.content.lower() == "help":
+                for plugin in plugins.private_plugins:
+                    try:
+                        yield from client.send_message(message.author, plugin.help_message)
+                    except:
+                        print("No help for plugin")
+                for plugin in plugins.public_plugins:
+                    try:
+                        yield from client.send_message(message.author, plugin.help_message)
+                    except:
+                        print("No help for plugin")
             for plugin in plugins.private_plugins:
                 try:
                     asyncio.async(plugin.action(message, client, config))

@@ -13,6 +13,15 @@ This plugin will not function properly on a bot that's a member of more than one
 print("[Private Plugin] <ss_optional_groups.py>: This plugin sets the optional groups of the user via PM.")
 print("[Private Plugin] {}".format(note))
 
+help_message = """
+__*optional groups help*__
+
+**!join** *group* - allows you to join optional groups.
+                You can use !join without a group to see a list of joinable groups.
+**!leave** *group* - allows you to leave optional groups.
+                You can use !leave without a group to see a list of leavable groups.
+"""
+
 
 @asyncio.coroutine
 def action(message, client, config):

@@ -9,6 +9,17 @@ This plugin will not function properly on a bot that's a member of more than one
 print("[Private Plugin] <ss_namecolor.py>: This plugin sets the namecolor of the user via PM.")
 print("[Private Plugin] {}".format(note))
 
+help_message = """
+__*namecolor help*__
+
+**!namecolor** *color* - grants your user a different color name.
+                    Use it without a color to see a list of colors.
+
+                    If your desired color does not exist, speak to a chat admin.
+
+                    You can also use **!namecolor** *random* to pick a random color.
+"""
+
 
 @asyncio.coroutine
 def action(message, client, config):
