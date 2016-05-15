@@ -47,12 +47,12 @@ def on_message(message):
                     try:
                         yield from client.send_message(message.author, plugin.help_message)
                     except:
-                        print("No help for plugin")
+                        pass
                 for plugin in plugins.public_plugins:
                     try:
                         yield from client.send_message(message.author, plugin.help_message)
                     except:
-                        print("No help for plugin")
+                        pass
             for plugin in plugins.private_plugins:
                 try:
                     asyncio.async(plugin.action(message, client, config))
