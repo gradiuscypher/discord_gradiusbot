@@ -3,6 +3,17 @@ import random
 
 print("[Public Plugin] <namecolor.py>: This plugin lets users change their namecolor.")
 
+help_message = """
+__*namecolor help*__
+
+**!namecolor** *color* - grants your user a different color name.
+                    Use it without a color to see a list of colors.
+
+                    If your desired color does not exist, speak to a chat admin.
+
+                    You can also use **!namecolor** *random* to pick a random color.
+"""
+
 
 @asyncio.coroutine
 def action(message, client, config):
