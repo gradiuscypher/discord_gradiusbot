@@ -24,8 +24,6 @@ If your desired color does not exist, speak to a chat admin.
 
 @asyncio.coroutine
 def action(message, client, config):
-    target_user_id = message.author.id
-
     split_content = message.content.split()
 
     if split_content[0] == '!namecolor':
