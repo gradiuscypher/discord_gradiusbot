@@ -3,7 +3,7 @@ import random
 import discord
 
 
-print("[Private Plugin] <ss_namecolor.py>: This plugin sets the namecolor of the user via PM.")
+print("[Private Plugin] <namecolor.py>: This plugin sets the namecolor of the user via PM.")
 
 help_message = """
 __*namecolor help*__
