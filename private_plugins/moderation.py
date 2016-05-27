@@ -48,6 +48,17 @@ def action(message, client, config):
 
                     if punished_user is not None:
                         if split_content[1] == "punish":
+                            """
+                            ## Punishment tiers
+                                1. Warning via PM with REASON_MESSAGE
+                                2. 1 hour kick+ban from chat
+                                3. 24 hour kick+ban from chat
+                                4. 3 day kick+ban from chat
+                                5. 7 day kick+ban from chat
+                                6. 15 day kick+ban from chat
+                                7. 30 day kick+ban from chat
+                                8. 30 day kick+ban and account marked for perma-ban review
+                            """
                             # Auto scaling punishment for breaking a rule. Escalates up the moderation punishment scale.
                             # Send message to moderation_log about punishment and details
                             # Send message to offender about punishment details
