@@ -1,6 +1,5 @@
 [Account]
-email =
-password =
+token =
 
 [BotSettings]
 debug = False
@@ -8,11 +7,12 @@ logfile = False
 server_id =
 self_name =
 permitted_channels = []
-public_plugins = ["help.py", "sleep.py"]
+public_plugins = []
 private_plugins = []
 event_plugins = []
-statuses = ["PM me !help for more info", "@RiotGradius on Twitter"]
+statuses = ["PM me !help for more info", "@RiotGradius on Twitter", "status1", "status2"]
 bot_channel =
+alert_channel =
 lol_api =
 twitter_alert =
 guide_group =
