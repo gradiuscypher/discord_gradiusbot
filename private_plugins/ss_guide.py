@@ -112,4 +112,4 @@ def action(message, client, config):
                     else:
                         yield from client.send_message(message.author, "You don't have permissions.")
             else:
-                yield from client.send_message(message.author, help_text)
+                yield from client.send_message(message.author, help_message)
