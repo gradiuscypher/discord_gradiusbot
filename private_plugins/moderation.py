@@ -7,8 +7,6 @@ print("[Private Plugin] <moderation.py>: This plugin provides moderation tools."
 
 help_message = """
 __*moderation help*__
-INSERT DOCS HERE
-
 Always use the full user name including unique ID.
 
 !mod punish USERNAME REASON_MESSAGE
@@ -28,19 +26,20 @@ def action(message, client, config):
     split_content = message.content.split()
     default_server = sm.get_default_server(author_id)
     target_server = client.get_server(default_server)
-    target_user = target_server.get_member(message.author.id)
 
-    is_mod = False
+    if split_content[0] == '!mod':
+        if target_server is None:
+            yield from client.send_message(message.author, "Please set your default server ID with !server before using this command.")
+        else:
+            target_user = target_server.get_member(message.author.id)
 
-    for r in target_user.roles:
-        if required_group == r.name:
-            is_mod = True
+            is_mod = False
 
-    if is_mod:
-        if split_content[0] == '!mod':
-            if target_server is None:
-                yield from client.send_message(message.author, "Please set your default server ID with !server before using this command.")
-            else:
+            for r in target_user.roles:
+                if required_group == r.name:
+                    is_mod = True
+
+            if is_mod:
                 if len(split_content) >= 4:
                     punished_user_name = split_content[2].split("#")[0]
                     punished_user_discriminator = split_content[2].split("#")[1]
@@ -59,13 +58,13 @@ def action(message, client, config):
                             # Send message to moderation_log about punishment and details
                             # Send message to offender about punishment details
                             # Execute punishment
-                            pass
+                            yield from client.send_message(message.author, "I'mma timeout {} for you with the message {}".format(punished_user.name, mod_message))
                         elif split_content[1] == "ban":
                             # Instant permaban for instances where it's required
                             # Send message to moderation_log about punishment and details
                             # Send message to offender about punishment details
                             # Execute punishment
-                            pass
+                            yield from client.send_message(message.author, "I'mma ban {} for you with the message {}".format(punished_user.name, mod_message))
                         else:
                             yield from client.send_message(message.author, "Please verify your command. Use !help")
                     else:
