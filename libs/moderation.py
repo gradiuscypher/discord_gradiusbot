@@ -35,16 +35,33 @@ class Moderation:
         self.session = self.session_obj()
         Base.metadata.create_all(self.engine)
 
-    def punish(self, user_id):
+    def punish(self, user_id, user_name, comment, moderator_id, moderator_name):
         # Adds one to punish level and returns current punish level
         query = self.session.query(PunishStats).filter(PunishStats.user_id == user_id)
 
         if query.count() == 0:
             # User was previously never punished, create an entry
-            pass
+            punishment = PunishStats(user_id=user_id, level=1)
+            self.session.add(punishment)
+            self.session.commit()
+            # Add an entry to the punishment log
+            punish_log = PunishLog(user_id=user_id, user_name=user_name, comment=comment, moderator_id=moderator_id,
+                                   moderator_name=moderator_name, new_level=1)
+            self.session.add(punish_log)
+            self.session.commit()
+            return 1
         else:
+            # Increase punishment level by 1
             result = query.one()
-            timestamp = result.last_used
+            old_level = result.level
+            result.level = old_level + 1
+            self.session.commit()
+            # Add an entry to the punishment log
+            punish_log = PunishLog(user_id=user_id, user_name=user_name, comment=comment, moderator_id=moderator_id,
+                                   moderator_name=moderator_name, new_level=old_level+1)
+            self.session.add(punish_log)
+            self.session.commit()
+            return old_level+1
 
     def clean_up(self):
         # Cleans up punishment DBs:

@@ -1,4 +1,5 @@
 from libs.server_management import ServerManagement
+from libs.moderation import Moderation
 import asyncio
 import discord
 
@@ -17,6 +18,7 @@ Always use the full user name including unique ID.
 """
 
 sm = ServerManagement()
+moderation = Moderation()
 
 
 @asyncio.coroutine
@@ -59,11 +61,19 @@ def action(message, client, config):
                                 7. 30 day kick+ban from chat
                                 8. 30 day kick+ban and account marked for perma-ban review
                             """
-                            # Auto scaling punishment for breaking a rule. Escalates up the moderation punishment scale.
+                            # Update Moderation databases
+                            moderation.punish(punished_user.id, punished_user.name, mod_message, message.author.id,
+                                              message.author.name)
+
                             # Send message to moderation_log about punishment and details
+                            punish_message = "**Punishment**\n**User:** {}\n**UserID:** {}\n**Reason:** {}" \
+                                             "\n**Moderator:** {}".format(punished_user_name, punished_user.id,
+                                                                          mod_message, message.author.name)
+                            # TODO: Change this to send to moderation channel
+                            yield from client.send_message(message.author, punish_message)
+
                             # Send message to offender about punishment details
                             # Execute punishment
-                            yield from client.send_message(message.author, "I'mma punish {} for you with the message {}".format(punished_user.name, mod_message))
                         elif split_content[1] == "timeout":
                             # Auto scaling timeout for breaking a rule. Escalates up the moderation timeout scale.
                             # Send message to moderation_log about punishment and details
