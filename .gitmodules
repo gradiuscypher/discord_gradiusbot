@@ -1,3 +1,0 @@
-[submodule "libs/discord_libs"]
-	path = libs/discord_libs
-	url = git@github.com:gradiuscypher/discord_libs.git
