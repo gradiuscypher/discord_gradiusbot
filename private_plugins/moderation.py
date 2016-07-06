@@ -23,7 +23,7 @@ moderation = Moderation()
 
 @asyncio.coroutine
 def action(message, client, config):
-    required_group = config.get('BotSettings', 'mod_group')
+    required_group = config.get('AdminSettings', 'mod_group')
     author_id = message.author.id
     split_content = message.content.split()
     default_server = sm.get_default_server(author_id)
@@ -31,7 +31,7 @@ def action(message, client, config):
 
     if split_content[0] == '!mod':
         if target_server is None:
-            yield from client.send_message(message.author, "Please set your default server ID with !server before using this command.")
+            yield from client.send_message(message.author, "Please set your default server ID with !servers before using this command.")
         else:
             target_user = target_server.get_member(message.author.id)
 

@@ -17,6 +17,9 @@ lol_api =
 twitter_alert =
 guide_group =
 
+[AdminSettings]
+mod_group =
+
 [Twitter]
 access_key =
 access_secret =

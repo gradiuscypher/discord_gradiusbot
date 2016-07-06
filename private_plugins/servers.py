@@ -12,6 +12,7 @@ List the servers that you and the bots have in common. These are the servers use
 
 Examples:
 !servers
+Lists the servers you share with the bot, and gives you their ID.
 
 !servers set SERVER_ID
 Sets the default server ID so you don't have to type it every time for commands related to servers.
