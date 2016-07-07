@@ -9,7 +9,6 @@ ipython-genutils==0.1.0
 path.py==8.2.1
 pexpect==4.2.0
 pickleshare==0.7.2
-pkg-resources==0.0.0
 ptyprocess==0.5.1
 simplegeneric==0.8.1
 SQLAlchemy==1.0.13
