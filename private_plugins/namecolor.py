@@ -9,8 +9,6 @@ print("[Private Plugin] <namecolor.py>: This plugin sets the namecolor of the us
 help_message = """
 __**!namecolor help**__
 
-ID - server ID you want to set your name color on.
-
 !namecolor *color* - grants your user a different color name.
 !namecolor list - see the list of namecolors.
 !namecolor random - pick a random namecolor.
