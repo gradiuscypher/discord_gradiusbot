@@ -6,7 +6,7 @@ import discord
 print("[Private Plugin] <servers.py>: This plugin lists the servers and their IDs for command interaction.")
 
 help_message = """
-__**!servers help**__
+__**!servers help** (PM Only)__
 
 List the servers that you and the bots have in common. These are the servers use can use commands with.
 

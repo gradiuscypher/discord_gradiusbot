@@ -9,7 +9,7 @@ from libs.ratelimiter import Ratelimiter
 print("[Public Plugin] <lol_info.py>: This plugin gives you LoL information.")
 
 help_message = """
-__*lol_info help*__
+__**!lol help** (Public Channels Only)__
 Gives you LoL related info.
 
 !lol tip - gives you a random LoL tip.

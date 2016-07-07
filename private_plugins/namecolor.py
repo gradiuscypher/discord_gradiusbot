@@ -7,7 +7,7 @@ sm = ServerManagement()
 print("[Private Plugin] <namecolor.py>: This plugin sets the namecolor of the user via PM.")
 
 help_message = """
-__**!namecolor help**__
+__**!namecolor help** (PM Only)__
 
 !namecolor *color* - grants your user a different color name.
 !namecolor list - see the list of namecolors.
