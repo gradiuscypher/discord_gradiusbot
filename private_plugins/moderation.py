@@ -7,7 +7,7 @@ import discord
 print("[Private Plugin] <moderation.py>: This plugin provides moderation tools.")
 
 help_message = """
-__*moderation help*__
+__**!mod help**__
 Always use the full user name including unique ID.
 
 !mod punish USERNAME REASON_MESSAGE

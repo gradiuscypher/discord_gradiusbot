@@ -11,7 +11,7 @@ rl = Ratelimiter()
 print("[Public Plugin] <giveabitch.py>: This plugin tells you what to give a bitch.")
 
 help_message = """
-__*give a bitch help*__
+__**give a bitch help**__
 Tells you what to give a bitch. Just ask the question, "what do you give a X?" where X is replaced by what you want to know.
 """
 
