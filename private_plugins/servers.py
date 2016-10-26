@@ -39,6 +39,12 @@ def action(message, client, config):
             for server in servers:
                 msg_string += "ID: {} Name: {}\n".format(server.id, server.name)
 
+            default_server = sm.get_default_server(target_user_id)
+
+            if default_server is None and len(servers) > 0:
+                sm.set_default_server(target_user_id, servers[0].id)
+                yield from client.send_message(message.author, "I've set your default server ID to {}".format(servers[0].id))
+
             yield from client.send_message(message.author, "Your default server ID is: {}".format(sm.get_default_server(target_user_id)))
             yield from client.send_message(message.author, msg_string)
 

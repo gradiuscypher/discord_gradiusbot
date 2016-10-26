@@ -53,6 +53,7 @@ def on_message(message):
                         yield from client.send_message(message.author, plugin.help_message)
                     except:
                         pass
+            #TODO: Make this an else to avoid looping over !help again
             for plugin in plugins.private_plugins:
                 try:
                     asyncio.async(plugin.action(message, client, config))
