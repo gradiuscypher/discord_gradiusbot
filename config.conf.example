@@ -29,3 +29,7 @@ consumer_secret =
 [Loot]
 chest_min_currency = 10
 chest_max_currency = 1000
+
+[developers]
+chance = 100
+permitted_channels = []
