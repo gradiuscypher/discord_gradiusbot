@@ -25,7 +25,7 @@ def pick_random_status():
         status_set = json.loads(config.get("BotSettings", "statuses"))
         status = random.choice(status_set)
         game = discord.Game(name=status)
-        asyncio.ensure_future(client.change_status(game))
+        asyncio.ensure_future(client.change_presence(game))
         yield from asyncio.sleep(15)
 
 
