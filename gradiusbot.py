@@ -32,7 +32,9 @@ def pick_random_status():
 @client.async_event
 def on_ready():
     print('Logged in as: ', client.user.name, 'with ID:', client.user.id)
-    asyncio.ensure_future(pick_random_status())
+
+    # TODO: re-implement with the right function call
+    # asyncio.ensure_future(pick_random_status())
 
 
 @client.async_event
