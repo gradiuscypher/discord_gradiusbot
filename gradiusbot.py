@@ -25,14 +25,14 @@ def pick_random_status():
         status_set = json.loads(config.get("BotSettings", "statuses"))
         status = random.choice(status_set)
         game = discord.Game(name=status)
-        asyncio.async(client.change_status(game))
+        asyncio.ensure_future(client.change_status(game))
         yield from asyncio.sleep(15)
 
 
 @client.async_event
 def on_ready():
     print('Logged in as: ', client.user.name, 'with ID:', client.user.id)
-    asyncio.async(pick_random_status())
+    asyncio.ensure_future(pick_random_status())
 
 
 @client.async_event
@@ -57,7 +57,7 @@ def on_message(message):
             #TODO: Make this an else to avoid looping over !help again
             for plugin in plugins.private_plugins:
                 try:
-                    asyncio.async(plugin.action(message, client, config))
+                    asyncio.ensure_future(plugin.action(message, client, config))
                 except:
                     print("There was an error with: " + str(plugin))
                     print(traceback.format_exc())
@@ -68,7 +68,7 @@ def on_message(message):
             if not message.author.name == selfname and message.channel.name in permitted_channels:
                 for plugin in plugins.public_plugins:
                     try:
-                        asyncio.async(plugin.action(message, client, config))
+                        asyncio.ensure_future(plugin.action(message, client, config))
                     except:
                         print("There was an error with: " + str(plugin))
                         print(traceback.format_exc())
@@ -90,7 +90,7 @@ def on_message_delete(message):
             if not message.author.name == selfname and message.channel.name in permitted_channels:
                 for plugin in plugins.event_plugins:
                     try:
-                        asyncio.async(plugin.action(message, client, config, "delete"))
+                        asyncio.ensure_future(plugin.action(message, client, config, "delete"))
                     except:
                         print("There was an error with: " + str(plugin))
                         print(traceback.format_exc())
@@ -112,7 +112,7 @@ def on_message_edit(message, message_after):
             if not message.author.name == selfname and message.channel.name in permitted_channels:
                 for plugin in plugins.event_plugins:
                     try:
-                        asyncio.async(plugin.action(message, client, config, "edit", object_after=message_after))
+                        asyncio.ensure_future(plugin.action(message, client, config, "edit", object_after=message_after))
                     except:
                         print("There was an error with: " + str(plugin))
                         print(traceback.format_exc())
@@ -125,7 +125,7 @@ def on_member_update(member_before, member_after):
     if (member_after.server.id == server_id) or (server_id == ""):
         for plugin in plugins.event_plugins:
             try:
-                asyncio.async(plugin.action(member_before, client, config, "member_update", object_after=member_after))
+                asyncio.ensure_future(plugin.action(member_before, client, config, "member_update", object_after=member_after))
             except:
                 print("There was an error with: " + str(plugin))
                 print(traceback.format_exc())
