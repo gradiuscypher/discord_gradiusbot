@@ -18,14 +18,13 @@ class ElasticLogging:
                         "server": {"type": "string", "index": "not_analyzed"},
                         "channel": {"type": "string", "index": "not_analyzed"},
                         "author": {"type": "string", "index": "not_analyzed"},
-                        "error_message": {"type": "string", "index": "not_analyzed"},
-                        "author_message": {"type": "string", "index": "not_analyzed"},
+                        "message": {"type": "string", "index": "not_analyzed"},
                         "traceback": {"type": "string", "index": "not_analyzed"},
                         "app": {"type": "string"},
                         "error_type": {"type": "string"},
                         "extra_data": {"type": "string"},
                         "author_id": {"type": "string"},
-                        "timestamp": {"type": "date"}
+                        "message_timestamp": {"type": "date"}
                     }
                 }
             }
@@ -36,11 +35,18 @@ class ElasticLogging:
         except:
             traceback.print_exc()
 
-    def log_message(self, server, channel, author, author_id, error_message, author_message, traceback, app, error_type, timestamp, extra_data):
+    def log_message(self, message, traceback, app, error_type, extra_data=""):
         try:
-            body = {"server": server, "channel": channel, "author": author, "error_message": error_message,
-                    "traceback": traceback, "app": app, "error_type": error_type, "author_id": author_id,
-                    "timestamp": timestamp}
+            server = message.server.name
+            channel = message.channel.name
+            author = message.author.name
+            author_id = message.author.id
+            message_content = message.content
+            timestamp = message.timestamp
+
+            body = {"server": server, "channel": channel, "author": author, "traceback": traceback, "app": app,
+                    "error_type": error_type, "author_id": author_id, "message_timestamp": timestamp,
+                    "message": message_content, "extra_data": extra_data}
             es.index(index='elastic_logs', doc_type='elastic_logger', body=body)
         except:
             traceback.print_exc()
