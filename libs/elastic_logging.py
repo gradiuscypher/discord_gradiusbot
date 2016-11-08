@@ -37,12 +37,12 @@ class ElasticLogging:
 
     def log_message(self, message, trace_string, app, error_type, extra_data=""):
         try:
-            if server is None:
+            if message.server is None:
                 server = "private"
             else:
                 server = message.server.name
 
-            if channel is None:
+            if message.channel is None:
                 channel = "private"
             else:
                 channel = message.channel.name
@@ -57,4 +57,4 @@ class ElasticLogging:
                     "message": message_content, "extra_data": extra_data}
             es.index(index='elastic_logs', doc_type='elastic_logger', body=body)
         except:
-            traceback.print_exc()
+            print(traceback.print_exc())

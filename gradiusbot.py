@@ -50,11 +50,13 @@ def on_message(message):
                     try:
                         yield from client.send_message(message.author, plugin.help_message)
                     except:
+                        print(traceback.format_exc())
                         elogging.log_message(message, traceback.format_exc(), "private on_message", "except")
                 for plugin in plugins.public_plugins:
                     try:
                         yield from client.send_message(message.author, plugin.help_message)
                     except:
+                        print(traceback.format_exc())
                         elogging.log_message(message, traceback.format_exc(), "private on_message", "except")
             #TODO: Make this an else to avoid looping over !help again
             for plugin in plugins.private_plugins:
