@@ -35,16 +35,24 @@ class ElasticLogging:
         except:
             traceback.print_exc()
 
-    def log_message(self, message, traceback, app, error_type, extra_data=""):
+    def log_message(self, message, trace_string, app, error_type, extra_data=""):
         try:
-            server = message.server.name
-            channel = message.channel.name
+            if server is None:
+                server = "private"
+            else:
+                server = message.server.name
+
+            if channel is None:
+                channel = "private"
+            else:
+                channel = message.channel.name
+
             author = message.author.name
             author_id = message.author.id
             message_content = message.content
             timestamp = message.timestamp
 
-            body = {"server": server, "channel": channel, "author": author, "traceback": traceback, "app": app,
+            body = {"server": server, "channel": channel, "author": author, "traceback": trace_string, "app": app,
                     "error_type": error_type, "author_id": author_id, "message_timestamp": timestamp,
                     "message": message_content, "extra_data": extra_data}
             es.index(index='elastic_logs', doc_type='elastic_logger', body=body)
