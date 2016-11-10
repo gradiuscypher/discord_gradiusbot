@@ -15,6 +15,7 @@ import random
 config = configparser.RawConfigParser()
 plugins = PluginLoader()
 client = discord.Client()
+elogging = ElasticLogging()
 
 
 @client.async_event
@@ -38,6 +39,7 @@ def on_ready():
 @client.async_event
 def on_message(message):
     selfname = config.get("BotSettings", "self_name")
+    elastic_logging = config.getboolean("BotSettings", "elastic_logging")
     permitted_channels = json.loads(config.get('BotSettings', 'permitted_channels'))
     server_id = config.get("BotSettings", "server_id")
 
@@ -84,6 +86,7 @@ def on_message(message):
 @client.async_event
 def on_message_delete(message):
     selfname = config.get("BotSettings", "self_name")
+    elastic_logging = config.getboolean("BotSettings", "elastic_logging")
     permitted_channels = json.loads(config.get('BotSettings', 'permitted_channels'))
     server_id = config.get("BotSettings", "server_id")
 
@@ -107,6 +110,7 @@ def on_message_delete(message):
 @client.async_event
 def on_message_edit(message, message_after):
     selfname = config.get("BotSettings", "self_name")
+    elastic_logging = config.getboolean("BotSettings", "elastic_logging")
     permitted_channels = json.loads(config.get('BotSettings', 'permitted_channels'))
     server_id = config.get("BotSettings", "server_id")
 
@@ -130,6 +134,7 @@ def on_message_edit(message, message_after):
 @client.async_event
 def on_member_update(member_before, member_after):
     server_id = config.get("BotSettings", "server_id")
+    elastic_logging = config.getboolean("BotSettings", "elastic_logging")
     if (member_after.server.id == server_id) or (server_id == ""):
         for plugin in plugins.event_plugins:
             try:
@@ -154,8 +159,6 @@ def main_task(config_file):
         logger.addHandler(handler)
     elastic_logging = config.getboolean("BotSettings", "elastic_logging")
 
-    if elastic_logging:
-        elogging = ElasticLogging()
 
     plugins.load_plugins(config)
 
