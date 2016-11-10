@@ -60,7 +60,7 @@ def action(message, client, config):
                     selected_id = int(split_content[2])
 
                     if selected_id in server_index:
-                        sm.set_default_server(target_user_id, servers[selected_id].name)
+                        sm.set_default_server(target_user_id, servers[selected_id].id)
                         yield from client.send_message(message.author, "I've set your default server to {}".format(servers[selected_id]))
                     else:
                         print("failed to find server id")
