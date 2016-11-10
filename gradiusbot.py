@@ -15,10 +15,6 @@ import random
 config = configparser.RawConfigParser()
 plugins = PluginLoader()
 client = discord.Client()
-elastic_logging = config.getboolean("BotSettings", "elastic_logging")
-
-if elastic_logging:
-    elogging = ElasticLogging()
 
 
 @client.async_event
@@ -156,6 +152,10 @@ def main_task(config_file):
         handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
         handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
         logger.addHandler(handler)
+    elastic_logging = config.getboolean("BotSettings", "elastic_logging")
+
+    if elastic_logging:
+        elogging = ElasticLogging()
 
     plugins.load_plugins(config)
 
