@@ -30,7 +30,7 @@ def action(message, client, config):
 
     if split_content[0] == '!namecolor':
         if target_server is None:
-            yield from client.send_message(message.author, "Please set your default server ID with !servers before using this command.")
+            yield from client.send_message(message.author, "Please set your default server ID with the `!servers` command before using this command.")
 
         if len(split_content) != 2:
             yield from client.send_message(message.author, "Please make sure your command format is correct. Use !help for help.")

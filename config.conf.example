@@ -4,6 +4,7 @@ token =
 [BotSettings]
 debug = False
 logfile = False
+elastic_logging = False
 server_id =
 self_name =
 permitted_channels = []
@@ -14,21 +15,9 @@ statuses = ["PM me !help for more info", "@RiotGradius on Twitter", "status1", "
 bot_channel =
 alert_channel =
 lol_api =
-twitter_alert =
-guide_group =
 
 [AdminSettings]
 mod_group =
-
-[Twitter]
-access_key =
-access_secret =
-consumer_key =
-consumer_secret =
-
-[Loot]
-chest_min_currency = 10
-chest_max_currency = 1000
 
 [developers]
 chance = 100

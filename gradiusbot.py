@@ -9,14 +9,16 @@ import traceback
 import json
 import sys
 import logging
-import twitter
 import random
 
 
 config = configparser.RawConfigParser()
 plugins = PluginLoader()
 client = discord.Client()
-elogging = ElasticLogging()
+elastic_logging = config.getboolean("BotSettings", "elastic_logging")
+
+if elastic_logging:
+    elogging = ElasticLogging()
 
 
 @client.async_event
@@ -51,13 +53,15 @@ def on_message(message):
                         yield from client.send_message(message.author, plugin.help_message)
                     except:
                         print(traceback.format_exc())
-                        elogging.log_message(message, traceback.format_exc(), "private on_message", "except")
+                        if elastic_logging:
+                            elogging.log_message(message, traceback.format_exc(), "private on_message", "except")
                 for plugin in plugins.public_plugins:
                     try:
                         yield from client.send_message(message.author, plugin.help_message)
                     except:
                         print(traceback.format_exc())
-                        elogging.log_message(message, traceback.format_exc(), "private on_message", "except")
+                        if elastic_logging:
+                            elogging.log_message(message, traceback.format_exc(), "private on_message", "except")
             #TODO: Make this an else to avoid looping over !help again
             for plugin in plugins.private_plugins:
                 try:
@@ -65,7 +69,8 @@ def on_message(message):
                 except:
                     print("There was an error with: " + str(plugin))
                     print(traceback.format_exc())
-                    elogging.log_message(message, traceback.format_exc(), "private on_message", "except")
+                    if elastic_logging:
+                        elogging.log_message(message, traceback.format_exc(), "private on_message", "except")
 
     else:
         if (message.server.id == server_id) or (server_id == ""):
@@ -76,7 +81,8 @@ def on_message(message):
                     except:
                         print("There was an error with: " + str(plugin))
                         print(traceback.format_exc())
-                        elogging.log_message(message, traceback.format_exc(), "public on_message", "except")
+                        if elastic_logging:
+                            elogging.log_message(message, traceback.format_exc(), "public on_message", "except")
 
 
 @client.async_event
@@ -98,7 +104,8 @@ def on_message_delete(message):
                     except:
                         print("There was an error with: " + str(plugin))
                         print(traceback.format_exc())
-                        elogging.log_message(message, traceback.format_exc(), "public on_message_delete", "except")
+                        if elastic_logging:
+                            elogging.log_message(message, traceback.format_exc(), "public on_message_delete", "except")
 
 
 @client.async_event
@@ -120,7 +127,8 @@ def on_message_edit(message, message_after):
                     except:
                         print("There was an error with: " + str(plugin))
                         print(traceback.format_exc())
-                        elogging.log_message(message, traceback.format_exc(), "public on_message_edit", "except")
+                        if elastic_logging:
+                            elogging.log_message(message, traceback.format_exc(), "public on_message_edit", "except")
 
 
 @client.async_event
@@ -159,16 +167,6 @@ def main_task(config_file):
     except:
         print("There was an exception:")
         print(traceback.print_exc())
-
-        if config.getboolean("BotSettings", "twitter_alert"):
-            access_key = config.get("Twitter", "access_key")
-            access_secret = config.get("Twitter", "access_secret")
-            consumer_key = config.get("Twitter", "consumer_key")
-            consumer_secret = config.get("Twitter", "consumer_secret")
-            tapi = twitter.Twitter(auth=twitter.OAuth(access_key, access_secret, consumer_key, consumer_secret))
-
-            tapi.statuses.update(status="@RiotGradius, I'm no longer in Discord.")
-
 
 if __name__ == "__main__":
         main_task(sys.argv[1])
