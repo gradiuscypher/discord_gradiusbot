@@ -60,5 +60,7 @@ class Inventory:
 
         if not user_inventory:
             user_inventory = InventoryDatabase(user_id=user_id)
+            self.session.add(user_inventory)
+            self.session.commit()
 
         return user_inventory.items
