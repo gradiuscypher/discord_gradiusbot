@@ -27,17 +27,22 @@ def action(message, client, config):
     split_content = content.split()
     items = inventory_manager.get_items(sender)
 
-    if split_content[0] == "!inventory":
-        inventory_string = "{} Inventory\n" \
-                           "==========\n".format(message.author.name)
-        for item in items:
-            item_details = item_manager.get_item_details(item.id)
-            inventory_string += "{} : {}\n".format(item_details['name'], item_details['description'])
+    if split_content[0] == "!item":
 
-        yield from client.send_message(message.channel, inventory_string)
+        if len(split_content) == 1:
+            inventory_string = "```Your Inventory\n" \
+                               "==============\n".format(message.author.name)
+            inv_index = 1
+            for item in items:
+                item_details = item_manager.get_item_details(item.item_id)
+                inventory_string += "{}) {} - {} : {}\n".format(inv_index, item_details['name'],
+                                                                item_details['description'],
+                                                                item_details['use'])
+                inv_index += 1
+            inventory_string += "```"
+            yield from client.send_message(message.channel, inventory_string)
 
         if len(split_content) == 3:
-            item_index = int(split_content[2])
             if split_content[1] == "use":
-                item_out = item_manager.get_item_details(items[item_index].id)['function']()
-                yield from client.send_message(message.channel, "DICE ROLL {}".format(item_out))
+                item_index = int(split_content[2]) - 1
+                yield from item_manager.get_item_details(items[item_index].id)[item_index]['function'](client, message, config)
