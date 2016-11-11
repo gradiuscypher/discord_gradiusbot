@@ -9,6 +9,9 @@ services/
 *.swp
 *.sqlite
 
+#Gradius Wants
+!item_definitions.sqlite
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
