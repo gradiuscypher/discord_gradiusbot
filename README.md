@@ -3,7 +3,7 @@ A gradiusbot for the Discord chat service. Both in-line documentation and these 
 
 ## Developer Documentation
 
-A link to the developer documentation can be found [HERE](DEVELOPER_README.md)
+A link to the developer documentation can be found [HERE](README_DEVELOPER.md)
 
 ## User Documentation
 
