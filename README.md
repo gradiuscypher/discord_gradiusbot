@@ -1,15 +1,16 @@
 # discord_gradiusbot
-A gradiusbot for the Discord chat service.
+A gradiusbot for the Discord chat service. Both in-line documentation and these files are a work in progress. Gradiusbot is a Python bot that runs on a plugin system. The plugins are also written in Python.
 
+## Developer Documentation
 
-## Plugins
+A link to the developer documentation can be found [HERE](DEVELOPER_README.md)
 
-Every file in the private_plugins and public_plugins folder are loaded as a module and is imported.
+## User Documentation
 
-After every message, each public message is sent to every public_plugin, and each private message is sent to every private_plugin.
+### Installation and Setup
 
-### Design
+TODO
 
-The plugin file should contain an action method that takes a [Discord Message](https://github.com/Rapptz/discord.py/blob/master/discord/message.py) and send message callback function.
+### Configuration and Usage
 
-The plugin will process the message and use the callback function to send messages if needed.
+TODO
