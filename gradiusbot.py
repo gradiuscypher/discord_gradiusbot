@@ -144,6 +144,32 @@ def on_member_update(member_before, member_after):
                 print(traceback.format_exc())
 
 
+# Fired when a member joins the server
+@client.async_event
+def on_member_join(member):
+    server_id = config.get("BotSettings", "server_id")
+    if (member.server.id == server_id) or (server_id == ""):
+        for plugin in plugins.event_plugins:
+            try:
+                asyncio.ensure_future(plugin.action(member, client, config, "member_join"))
+            except:
+                print("There was an error with: " + str(plugin))
+                print(traceback.format_exc())
+
+
+# Fired when a member leaves the server
+@client.async_event
+def on_member_remove(member):
+    server_id = config.get("BotSettings", "server_id")
+    if (member.server.id == server_id) or (server_id == ""):
+        for plugin in plugins.event_plugins:
+            try:
+                asyncio.ensure_future(plugin.action(member, client, config, "member_remove"))
+            except:
+                print("There was an error with: " + str(plugin))
+                print(traceback.format_exc())
+
+
 def main_task(config_file):
     config.read(config_file)
     token = config.get("Account", "token")
