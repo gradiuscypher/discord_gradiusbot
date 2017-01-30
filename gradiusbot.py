@@ -28,6 +28,7 @@ def pick_random_status():
         yield from asyncio.sleep(15)
 
 
+# When the client has successfully connected to Discord.
 @client.async_event
 def on_ready():
     print('Logged in as: ', client.user.name, 'with ID:', client.user.id)
@@ -36,6 +37,7 @@ def on_ready():
     # asyncio.ensure_future(pick_random_status())
 
 
+# When the client receives a message
 @client.async_event
 def on_message(message):
     selfname = config.get("BotSettings", "self_name")
@@ -83,6 +85,7 @@ def on_message(message):
                             elogging.log_message(message, traceback.format_exc(), "public on_message", "except")
 
 
+# This event is fired when a message was deleted from a server
 @client.async_event
 def on_message_delete(message):
     selfname = config.get("BotSettings", "self_name")
@@ -107,6 +110,7 @@ def on_message_delete(message):
                             elogging.log_message(message, traceback.format_exc(), "public on_message_delete", "except")
 
 
+# This event is fired when a message has been edited.
 @client.async_event
 def on_message_edit(message, message_after):
     selfname = config.get("BotSettings", "self_name")
@@ -131,6 +135,7 @@ def on_message_edit(message, message_after):
                             elogging.log_message(message, traceback.format_exc(), "public on_message_edit", "except")
 
 
+# This event is fired when a member changes their name/UUID
 @client.async_event
 def on_member_update(member_before, member_after):
     server_id = config.get("BotSettings", "server_id")
@@ -144,7 +149,7 @@ def on_member_update(member_before, member_after):
                 print(traceback.format_exc())
 
 
-# Fired when a member joins the server
+# This event is fired when a member joins the server
 @client.async_event
 def on_member_join(member):
     server_id = config.get("BotSettings", "server_id")
@@ -170,6 +175,7 @@ def on_member_remove(member):
                 print(traceback.format_exc())
 
 
+# Main processing loop
 def main_task(config_file):
     config.read(config_file)
     token = config.get("Account", "token")
