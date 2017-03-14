@@ -12,14 +12,11 @@ def action(message, client, config, event_type, object_after=None):
 
         if is_streaming is None and object_after.game is not None:
             if object_after.game.url is not None:
-                print("PUT ME IN COACH")
                 yield from client.add_roles(message, role)
 
         if is_streaming is not None and object_after.game is not None:
             if object_after.game.url is None:
-                print("TAKE ME OUT COACH, IM NOT STREAMING")
                 yield from client.remove_roles(message, role)
 
         if is_streaming is not None and object_after.game is None:
-            print("TAKE ME OUT COACH, IM NOT GAMING")
             yield from client.remove_roles(message, role)
