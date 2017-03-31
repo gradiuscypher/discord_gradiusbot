@@ -25,7 +25,7 @@ def action(message, client, config):
         good_morning_count += 1
         users_morning.append(clean_user)
 
-        if good_morning_count >= 2:
+        if good_morning_count >= 3:
             users_morning = []
             good_morning_count = 0
             yield from client.send_message(message.channel, "Good morning!")
