@@ -51,6 +51,8 @@ def on_message(message):
                 for plugin in plugins.private_plugins:
                     try:
                         yield from client.send_message(message.author, plugin.help_message)
+                    except AttributeError:
+                        pass
                     except:
                         print(traceback.format_exc())
                         if elastic_logging:
@@ -58,6 +60,8 @@ def on_message(message):
                 for plugin in plugins.public_plugins:
                     try:
                         yield from client.send_message(message.author, plugin.help_message)
+                    except AttributeError:
+                        pass
                     except:
                         print(traceback.format_exc())
                         if elastic_logging:
