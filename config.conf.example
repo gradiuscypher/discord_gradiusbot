@@ -22,3 +22,6 @@ mod_group =
 [developers]
 chance = 100
 permitted_channels = []
+
+[Steam]
+api =
