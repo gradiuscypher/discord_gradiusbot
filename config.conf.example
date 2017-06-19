@@ -1,5 +1,8 @@
 [Account]
+is_user_account =
 token =
+username =
+password =
 
 [BotSettings]
 debug = False

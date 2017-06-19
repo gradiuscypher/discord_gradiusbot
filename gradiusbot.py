@@ -182,7 +182,7 @@ def on_member_remove(member):
 # Main processing loop
 def main_task(config_file):
     config.read(config_file)
-    token = config.get("Account", "token")
+    is_user_account = config.getboolean("Account", "is_user_account")
 
     if config.getboolean("BotSettings", "debug"):
         logging.basicConfig(level=logging.DEBUG)
@@ -195,12 +195,17 @@ def main_task(config_file):
         logger.addHandler(handler)
     elastic_logging = config.getboolean("BotSettings", "elastic_logging")
 
-
     plugins.load_plugins(config)
 
     try:
         print("Running client...")
-        client.run(token)
+        if is_user_account:
+            username = config.get("Account", "username")
+            password = config.get("Account", "password")
+            client.run(username, password)
+        else:
+            token = config.get("Account", "token")
+            client.run(token)
     except KeyboardInterrupt:
         print("Killed by keboard!")
     except:
