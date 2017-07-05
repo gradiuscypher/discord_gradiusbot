@@ -18,8 +18,21 @@ class TournamentManager:
     def build_db(self):
         Base.metadata.create_all(self.engine)
 
+    def get_active_tournaments(self):
+        """
+        Return a list of active Tournaments
+        :return: list of Tournament
+        """
+        tournament_list = []
+        session = self.DBSession()
+        query = session.query(Tournament).filter(Tournament.completed==False)
+
+        for result in query:
+            tournament_list.append(result)
+
+        return tournament_list
+
     def start_tournament(self, name, provider_id, tournament_id, extra=""):
-        # query = self.session.query(PunishStats).filter(PunishStats.user_id == user_id)
         session = self.DBSession()
         query = session.query(Tournament).filter(Tournament.completed==False)
 
@@ -29,19 +42,8 @@ class TournamentManager:
             session.add(new_tournament)
             session.commit()
         else:
+            # TODO: Make this more actionable than just a print statement
             print("There is already an active tournament.")
-
-    def complete_tournament(self):
-        pass
-
-    def create_game(self):
-        pass
-
-    def join_game(self):
-        pass
-
-    def store_game(self):
-        pass
 
 
 class Tournament(Base):
@@ -54,6 +56,60 @@ class Tournament(Base):
     provider_id = Column(Integer)
     participants = relationship('Participant')
     game_instances = relationship('GameInstance')
+
+    def complete_tournament(self):
+        """
+        Marks the Tournament as complete.
+        :return:
+        """
+        session = DBSession()
+        self.completed = True
+        session.commit()
+
+    def clean_stale_games(self):
+        """
+        Cleans up games that are starting but don't have enough players. Compares create_date vs a timeout period.
+        :return:
+        """
+        pass
+
+    def create_game(self, creator_discord_id, map_name):
+        """
+        When a user requests a new game is created. Creates an GameInstance. Will only start if map type isn't
+        already starting
+        :param creator_discord_id:
+        :param map_name:
+        :return:
+        """
+        session = DBSession()
+        now = datetime.now()
+        new_game = GameInstance(tournament_id=self.id, creator_discord_id=creator_discord_id, map_name=map_name,
+                                create_date=now)
+        session.add(new_game)
+        session.commit()
+
+    def get_active_games(self):
+        """
+        Return a list of active Games
+        :return: list of GameInstance
+        """
+        game_list = []
+        session = self.DBSession()
+        query = session.query(GameInstance).filter(GameInstance.finish_date is not None)
+
+        for result in query:
+            game_list.append(result)
+
+        return game_list
+
+    def join_game(self):
+        pass
+
+    def start_game(self):
+        pass
+
+    def finish_game(self):
+        pass
 
     def join_season(self, discord_id):
         session = DBSession()
@@ -74,6 +130,7 @@ class GameInstance(Base):
     finish_date = Column(DateTime)
     creator_discord_id = Column(String)
     tournament_id = Column(Integer, ForeignKey('tournaments.id'))
+    map_name = Column(String)
     eog_json = Column(String)
 
 
