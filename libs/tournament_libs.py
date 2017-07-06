@@ -75,13 +75,11 @@ class Tournament(Base):
         :param map_name:
         :return:
         """
-        session = sessionmaker(bind=engine)()
         now = datetime.now()
         new_game = GameInstance(tournament_id=self.id, creator_discord_id=creator_discord_id, map_name=map_name,
                                 create_date=now)
         session.add(new_game)
         session.commit()
-        session.close()
 
     def get_active_games(self):
         """
@@ -89,7 +87,6 @@ class Tournament(Base):
         :return: list of GameInstance
         """
         game_list = []
-        session = self.DBSession()
         query = session.query(GameInstance).filter(GameInstance.finish_date is not None)
 
         for result in query:
@@ -107,11 +104,9 @@ class Tournament(Base):
         pass
 
     def join_season(self, discord_id):
-        session = sessionmaker(bind=engine)()
         new_participant = Participant(discord_id=discord_id, tournament_id=self.id)
         session.add(new_participant)
         session.commit()
-        session.close()
 
     def __repr__(self):
         return "<Tournament(id={} tournament_id={} extra={} name={} completed={} provider_id={} map_type={})>"\
