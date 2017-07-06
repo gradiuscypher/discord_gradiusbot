@@ -7,16 +7,12 @@ Base = declarative_base()
 engine = create_engine('sqlite:///tournament.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
+session = DBSession()
 
 
 class TournamentManager:
-    def __init__(self):
-        self.engine = create_engine('sqlite:///tournament.db')
-        Base.metadata.bind = self.engine
-        self.DBSession = sessionmaker(bind=self.engine)
-
     def build_db(self):
-        Base.metadata.create_all(self.engine)
+        Base.metadata.create_all(engine)
 
     def get_active_tournaments(self):
         """
@@ -24,7 +20,6 @@ class TournamentManager:
         :return: list of Tournament
         """
         tournament_list = []
-        session = self.DBSession()
         query = session.query(Tournament).filter(Tournament.completed==False)
 
         for result in query:
@@ -32,13 +27,12 @@ class TournamentManager:
 
         return tournament_list
 
-    def start_tournament(self, name, provider_id, tournament_id, extra=""):
-        session = self.DBSession()
-        query = session.query(Tournament).filter(Tournament.completed==False)
+    def start_tournament(self, name, provider_id, tournament_id, map_type, extra=""):
+        query = session.query(Tournament).filter(Tournament.completed==False).filter(Tournament.map_type==map_type)
 
         if query.count() == 0:
-            new_tournament = Tournament(tournament_id=tournament_id, extra=extra, name=name, completed=False,
-                                        provider_id=provider_id)
+            new_tournament = Tournament(tournament_id=tournament_id, extra=extra, name=name, map_type=map_type,
+                                        completed=False, provider_id=provider_id)
             session.add(new_tournament)
             session.commit()
         else:
@@ -54,6 +48,7 @@ class Tournament(Base):
     name = Column(String)
     completed = Column(Boolean)
     provider_id = Column(Integer)
+    map_type = Column(String)
     participants = relationship('Participant')
     game_instances = relationship('GameInstance')
 
@@ -62,7 +57,6 @@ class Tournament(Base):
         Marks the Tournament as complete.
         :return:
         """
-        session = DBSession()
         self.completed = True
         session.commit()
 
@@ -81,12 +75,13 @@ class Tournament(Base):
         :param map_name:
         :return:
         """
-        session = DBSession()
+        session = sessionmaker(bind=engine)()
         now = datetime.now()
         new_game = GameInstance(tournament_id=self.id, creator_discord_id=creator_discord_id, map_name=map_name,
                                 create_date=now)
         session.add(new_game)
         session.commit()
+        session.close()
 
     def get_active_games(self):
         """
@@ -112,14 +107,15 @@ class Tournament(Base):
         pass
 
     def join_season(self, discord_id):
-        session = DBSession()
+        session = sessionmaker(bind=engine)()
         new_participant = Participant(discord_id=discord_id, tournament_id=self.id)
         session.add(new_participant)
         session.commit()
+        session.close()
 
     def __repr__(self):
-        return "<Tournament(id={} tournament_id={} extra={} name={} completed={} provider_id={})>"\
-            .format(self.id, self.tournament_id, self.extra, self.name, self.completed, self.provider_id)
+        return "<Tournament(id={} tournament_id={} extra={} name={} completed={} provider_id={} map_type={})>"\
+            .format(self.id, self.tournament_id, self.extra, self.name, self.completed, self.provider_id, self.map_type)
 
 
 class GameInstance(Base):
