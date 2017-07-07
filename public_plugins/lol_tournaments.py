@@ -20,8 +20,14 @@ def action(message, client, config):
     split_content = message.content.split()
 
     if split_content[0] == "!tournament":
+
+        # Season management - Admin Only
         if split_content[1] == "seasonstart":
             pass
+        if split_content[1] == "seasonend":
+            pass
+
+        # Game management - All Users
         if split_content[1] == "join":
             if split_content[2] == "season":
                 pass

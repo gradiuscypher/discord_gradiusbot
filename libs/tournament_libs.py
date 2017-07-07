@@ -28,6 +28,15 @@ class TournamentManager:
         return tournament_list
 
     def start_tournament(self, name, provider_id, tournament_id, map_type, extra=""):
+        """
+        Starts a new Tournament. Will not start if an active tournament (completed==False) already exists.
+        :param name: The tournament name. User-friendly value.
+        :param provider_id: The Tournament API Provider ID
+        :param tournament_id: The Tournament API Tournament ID
+        :param map_type: The map type: SUMMONERS_RIFT, HOWLING_ABYSS
+        :param extra: Any extra data about the tournament. Can be empty.
+        :return: boolean if creation succeeds or fails
+        """
         query = session.query(Tournament).filter(Tournament.completed==False).filter(Tournament.map_type==map_type)
 
         if query.count() == 0:
@@ -35,9 +44,10 @@ class TournamentManager:
                                         completed=False, provider_id=provider_id)
             session.add(new_tournament)
             session.commit()
+            return True
         else:
-            # TODO: Make this more actionable than just a print statement
             print("There is already an active tournament.")
+            return False
 
 
 class Tournament(Base):
