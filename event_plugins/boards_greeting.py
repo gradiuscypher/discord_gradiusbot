@@ -9,7 +9,7 @@ Welcome to the Boards Events Discord server! Here we use Summoner Name validatio
 
 To validate your summoner name, please visit this forum post here {} and post this randomized message: `{}`
 
-Once this has been posted, please reply to this message with !validate and a direct link to your post. You can find your post's direct link by INSTRUCTIONS_HERE.
+Once this has been posted, reply to this message with !validate and a direct link to your post. You can find your post's direct link by INSTRUCTIONS_HERE.
 
 For example a correct reply to this would be: 
 `!validate INSERT_EXAMPLE_VALIDATION_LINK_HERE`
