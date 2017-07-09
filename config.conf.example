@@ -28,3 +28,6 @@ permitted_channels = []
 
 [Steam]
 api =
+
+[GeneralDiscussion]
+validation_post_url = http://www.google.com
