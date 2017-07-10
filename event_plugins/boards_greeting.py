@@ -1,6 +1,7 @@
 import asyncio
 import random
 import string
+from libs.custom_games.libs import members as members
 
 print("[Event Plugin] <boards_greeting.py>: This plugin greets users and tells them how to validate their account.")
 
@@ -14,11 +15,25 @@ Once this has been posted, our robots should get you put into the right Discord 
 If you're having trouble, don't hesitate to PM a moderator on this server.
 """
 
+return_greeting = """
+Looks like you've been here before, thanks for coming back! If you've already posted your validation string, our helpful robots should be putting you in the right groups shortly.
+
+To remind you, your validation string is: `{}` and you should post it in this thread here if you haven't already: {}
+"""
+
 
 @asyncio.coroutine
 def action(event_object, client, config, event_type, object_after=None):
-    validation_url = config.get('GeneralDiscussion', 'validation_post_url')
-    random_message = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
 
     if event_type == "member_join":
-        yield from client.send_message(event_object, greeting.format(validation_url, random_message))
+        validation_url = config.get('GeneralDiscussion', 'validation_post_url')
+        discord_name = (event_object.name + "#" + event_object.discriminator)
+
+        # Returns a bool, random_string. bool tells if member has already started the validation process
+        validation = members.start_validation(event_object.id, discord_name)
+
+        if validation[0]:
+            yield from client.send_message(event_object, greeting.format(validation_url, validation[1]))
+        else:
+            yield from client.send_message(event_object, return_greeting.format(validation[1], validation_url))
+
