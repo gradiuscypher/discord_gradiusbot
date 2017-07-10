@@ -1,0 +1,3 @@
+[submodule "libs/custom_games"]
+	path = libs/custom_games
+	url = https://github.com/gradiuscypher/custom_games.git
