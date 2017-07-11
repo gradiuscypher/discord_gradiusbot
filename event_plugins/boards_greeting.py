@@ -1,6 +1,4 @@
 import asyncio
-import random
-import string
 from libs.custom_games.libs import members as members
 
 print("[Event Plugin] <boards_greeting.py>: This plugin greets users and tells them how to validate their account.")
