@@ -9,19 +9,23 @@ class PluginLoader:
         self.public_plugins = []
         self.private_plugins = []
         self.event_plugins = []
+        self.scheduled_tasks = []
         self.public_plugin_dir = 'public_plugins'
         self.private_plugin_dir = 'private_plugins'
         self.event_plugin_dir = 'event_plugins'
+        self.scheduled_tasks_dir = 'scheduled_tasks'
         self.config = None
         self.public_plugin_config = None
         self.private_plugin_config = None
         self.event_plugin_config = None
+        self.scheduled_tasks_config = None
 
     def load_plugins(self, config):
         self.config = config
         self.public_plugin_config = json.loads(self.config.get('BotSettings', 'public_plugins'))
         self.private_plugin_config = json.loads(self.config.get('BotSettings', 'private_plugins'))
         self.event_plugin_config = json.loads(self.config.get('BotSettings', 'event_plugins'))
+        self.scheduled_tasks_config = json.loads(self.config.get('BotSettings', 'scheduled_tasks'))
 
         # Load public plugins
         count = 0
@@ -61,3 +65,16 @@ class PluginLoader:
                 count += 1
 
         print("Loaded " + str(count) + " event plugins.")
+
+        # Load scheduled tasks
+        count = 0
+
+        for plugin in self.scheduled_tasks_config:
+            location = os.path.join(self.scheduled_tasks_dir, plugin)
+
+            if not os.path.isdir(location):
+                plugin_name = plugin.replace('.py', '')
+                self.scheduled_tasks.append(import_module(self.scheduled_tasks_dir + "." + plugin_name))
+                count += 1
+
+        print("Loaded " + str(count) + " scheduled tasks.")

@@ -19,6 +19,16 @@ elogging = ElasticLogging()
 
 
 @client.async_event
+def background_tasks():
+    for task in plugins.scheduled_tasks:
+        try:
+            asyncio.ensure_future(task.action(client, config))
+        except:
+            print("There was an error with: " + str(task))
+            print(traceback.format_exc())
+
+
+@client.async_event
 def pick_random_status():
     while not client.is_closed:
         status_set = json.loads(config.get("BotSettings", "statuses"))
@@ -205,6 +215,7 @@ def main_task(config_file):
             client.run(username, password)
         else:
             token = config.get("Account", "token")
+            client.loop.create_task(background_tasks())
             client.run(token)
     except KeyboardInterrupt:
         print("Killed by keboard!")
