@@ -32,3 +32,5 @@ api =
 
 [GeneralDiscussion]
 validation_post_url = http://www.google.com
+validated_group = member
+not_validated_group = not_validated
