@@ -15,8 +15,13 @@ If you have any follow up questions, please message the mods.
 def action(client, config):
     not_validated_group_name = config.get("GeneralDiscussion", "not_validated_group")
     validated_group_name = config.get("GeneralDiscussion", "validated_group")
+    forum_location = config.get("GeneralDiscussion", "forum_location")
+    forum_post = config.get("GeneralDiscussion", "forum_post")
 
     while True:
+        # Grab the validation forums and check for new validations
+        memberslib.check_for_validation(forum_location, forum_post)
+
         if client.is_logged_in:
             # Get the active server
             # TODO: This needs to be modified for multi-server implementations
