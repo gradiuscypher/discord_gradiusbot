@@ -7,6 +7,8 @@ print("[Scheduled Task] <move_validated_users.py>: Moves validated users from 'n
 validation_message = """
 I've now properly confirmed your validation message, thank you! You should now have access to the proper chat channels.
 
+Your nickname on the server now matches your summoner name: {}
+
 If you have any follow up questions, please message the mods.
 """
 
@@ -20,7 +22,7 @@ def action(client, config):
 
     while True:
         # Grab the validation forums and check for new validations
-        memberslib.check_for_validation(forum_location, forum_post)
+        memberslib.check_for_validation(forum_location, forum_post, forum_location='oce')
 
         if client.is_logged_in:
             # Get the active server
@@ -40,7 +42,10 @@ def action(client, config):
 
                     # If they've validated via the Board forums
                     if validated:
+                        nickname = memberslib.generate_discord_nickname(member.id)
+
                         yield from client.replace_roles(member, validated_role)
-                        yield from client.send_message(member, validation_message)
+                        yield from client.change_nickname(member, nickname)
+                        yield from client.send_message(member, validation_message.format(nickname))
 
         yield from asyncio.sleep(5)

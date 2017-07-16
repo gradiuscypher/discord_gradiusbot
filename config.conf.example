@@ -31,7 +31,6 @@ permitted_channels = []
 api =
 
 [GeneralDiscussion]
-override_api_url =
 validation_post_url = http://www.google.com
 validated_group = member
 not_validated_group = not_validated
