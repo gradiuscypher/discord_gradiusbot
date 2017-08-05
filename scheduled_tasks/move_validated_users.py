@@ -22,7 +22,7 @@ def action(client, config):
 
     while True:
         # Grab the validation forums and check for new validations
-        memberslib.check_for_validation(forum_location, forum_post, forum_location='oce')
+        memberslib.check_for_validation(forum_location, forum_post, forum_location='na')
 
         if client.is_logged_in:
             # Get the active server
