@@ -48,4 +48,4 @@ def action(client, config):
                         yield from client.change_nickname(member, nickname)
                         yield from client.send_message(member, validation_message.format(nickname))
 
-        yield from asyncio.sleep(5)
+        yield from asyncio.sleep(60)
