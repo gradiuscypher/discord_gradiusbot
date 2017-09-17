@@ -54,3 +54,30 @@ def action(message, client, config):
             else:
                 yield from client.add_roles(target_user, not_validated_role)
                 yield from client.send_message(author, return_greeting.format(validation[1], validation_url))
+
+    # TODO: I don't believe this achieves anything... review and test
+    # This method allows someone to update their summoner name to what's saved in the database
+    if split_content[0] == "!rename":
+        author = message.author
+        validation_url = config.get('GeneralDiscussion', 'validation_post_url')
+        not_validated_group_name = config.get("GeneralDiscussion", "not_validated_group")
+        discord_name = (author.name + "#" + author.discriminator)
+        default_server = sm.get_default_server(author.id)
+        target_server = client.get_server(default_server)
+
+        if target_server is None:
+            yield from client.send_message(message.author, "Please set your default server ID with the `!servers` command before using this command.")
+
+        else:
+            # Returns a bool, random_string. bool tells if member has already started the validation process
+            not_validated_role = discord.utils.get(target_server.roles, name=not_validated_group_name)
+            validation = members.start_validation(author.id, discord_name)
+            server = target_server
+            target_user = server.get_member(message.author.id)
+
+            if validation[0]:
+                yield from client.add_roles(target_user, not_validated_role)
+                yield from client.send_message(author, greeting.format(validation_url, validation[1]))
+            else:
+                yield from client.add_roles(target_user, not_validated_role)
+                yield from client.send_message(author, return_greeting.format(validation[1], validation_url))
