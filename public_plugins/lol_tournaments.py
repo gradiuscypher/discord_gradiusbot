@@ -2,7 +2,7 @@
 # TODO: tournament_start, tournament_join, tournament_end, game_start, game_join, game_end, game_stats
 # TODO: Use reactions rather than chat commands to join the game
 import asyncio
-from libs.custom_games.libs.tournament_libs import TournamentManager
+from lol_customs.tournament_libs import TournamentManager
 from libs import permissions
 
 print("[Public Plugin] <lol_tournaments.py>: This plugin manages LoL custom tournaments.")
