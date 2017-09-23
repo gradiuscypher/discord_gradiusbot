@@ -1,6 +1,6 @@
 import asyncio
 import discord
-from libs.custom_games.libs import members as members
+from lol_customs import members
 from libs.server_management import ServerManagement
 
 

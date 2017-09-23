@@ -1,6 +1,6 @@
 import asyncio
 import discord
-import libs.custom_games.libs.members as memberslib
+from lol_customs import members as memberslib
 
 print("[Scheduled Task] <move_validated_users.py>: Moves validated users from 'not_validated' to 'member'.")
 

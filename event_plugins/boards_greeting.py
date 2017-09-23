@@ -1,6 +1,7 @@
 import asyncio
 import discord
-from libs.custom_games.libs import members as members
+from lol_customs import members
+
 
 print("[Event Plugin] <boards_greeting.py>: This plugin greets users and tells them how to validate their account.")
 
