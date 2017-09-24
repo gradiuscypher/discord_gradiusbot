@@ -20,12 +20,6 @@ Manages LoL Custom Tournaments
 manager = TournamentManager()
 
 
-def tournament_end():
-    tournament = manager.get_active_tournaments()[0]
-    ended = tournament.complete_tournament()
-    return ended
-
-
 @asyncio.coroutine
 def action(message, client, config):
     split_content = message.content.split()
@@ -51,18 +45,21 @@ def action(message, client, config):
                         fail_message = "Tournament failed to start, there may already be one running."
                         yield from client.send_message(message.channel, fail_message)
             if split_content[1] == "end":
-                stopped = tournament_end()
+                active_tournaments = manager.get_active_tournaments()
 
-                if stopped:
-                    start_message = f'Ended Tournament successfully.'
-                    yield from client.send_message(message.channel, start_message)
+                if len(active_tournaments) > 0:
+                    stopped = active_tournaments[0].complete_tournament()
 
-                    if announce_channel is not None:
-                        announce_message = f'@here: {message.author.name} has closed the current Customs season.'
-                        yield from client.send_message(announce_channel, announce_message)
-                else:
-                    fail_message = "Tournament failed to end."
-                    yield from client.send_message(message.channel, fail_message)
+                    if stopped:
+                        start_message = f'Ended Tournament successfully.'
+                        yield from client.send_message(message.channel, start_message)
+
+                        if announce_channel is not None:
+                            announce_message = f'@here: {message.author.name} has closed the current Customs season.'
+                            yield from client.send_message(announce_channel, announce_message)
+                    else:
+                        fail_message = "Tournament failed to end."
+                        yield from client.send_message(message.channel, fail_message)
 
             if split_content[1] == "list":
                 tournaments = manager.get_active_tournaments()
