@@ -2,6 +2,7 @@
 # TODO: tournament_start, tournament_join, tournament_end, game_start, game_join, game_end, game_stats
 # TODO: Use reactions rather than chat commands to join the game
 import asyncio
+import discord.utils
 from lol_customs.tournament_libs import TournamentManager
 from libs import permissions
 
@@ -19,11 +20,6 @@ Manages LoL Custom Tournaments
 manager = TournamentManager()
 
 
-def start_tournament(name):
-    started = manager.start_tournament(name)
-    return started
-
-
 def tournament_end():
     tournament = manager.get_active_tournaments()[0]
     ended = tournament.complete_tournament()
@@ -33,18 +29,24 @@ def tournament_end():
 @asyncio.coroutine
 def action(message, client, config):
     split_content = message.content.split()
+    announce_channel_str = config.get("Tournament", "announce_channel")
+    announce_channel = discord.utils.get(message.server.channels, name=announce_channel_str)
 
-    if split_content[0] == "!tournament":
+    if split_content[0] == "!season":
 
         # Season management - Admin Only
         if (permissions.has_admin(message.author)) is not None:
             if len(split_content) == 3:
                 if split_content[1] == "start":
                     name = split_content[2]
-                    started = start_tournament(name)
+                    started = manager.start_tournament(name)
                     if started:
                         start_message = f'Started {name} Tournament successfully.'
                         yield from client.send_message(message.channel, start_message)
+
+                        if announce_channel is not None:
+                            announce_message = f'@here: {message.author.name} has opened a new Customs season: [{name}]'
+                            yield from client.send_message(announce_channel, announce_message)
                     else:
                         fail_message = "Tournament failed to start, there may already be one running."
                         yield from client.send_message(message.channel, fail_message)
@@ -54,14 +56,24 @@ def action(message, client, config):
                 if stopped:
                     start_message = f'Ended Tournament successfully.'
                     yield from client.send_message(message.channel, start_message)
+
+                    if announce_channel is not None:
+                        announce_message = f'@here: {message.author.name} has closed the current Customs season.'
+                        yield from client.send_message(announce_channel, announce_message)
                 else:
                     fail_message = "Tournament failed to end."
                     yield from client.send_message(message.channel, fail_message)
 
             if split_content[1] == "list":
-                tournament = manager.get_active_tournaments()[0]
-                tourney_message = f"The current active tournament is {tournament.name}."
-                yield from client.send_message(message.channel, tourney_message)
+                tournaments = manager.get_active_tournaments()
+
+                if len(tournaments) > 0:
+                    tournament = tournaments[0]
+                    tourney_message = f"The current active tournament is {tournament.name}."
+                    yield from client.send_message(message.channel, tourney_message)
+                else:
+                    tourney_message = 'There are no active tournaments.'
+                    yield from client.send_message(message.channel, tourney_message)
 
     if split_content[0] == "!game":
         # Game management - All Users

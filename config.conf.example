@@ -30,6 +30,10 @@ forum_location =
 forum_post =
 
 [Tournament]
-#provider_id = 1258
-provider_id = 648
+provider_id =
 developer = True
+announce_channel =
+
+[RiotAPI]
+api_key =
+
