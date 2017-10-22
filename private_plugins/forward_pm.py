@@ -26,6 +26,5 @@ def action(message, client, config):
         if len(message.embeds) > 0:
             message_embed = message.embeds[0]
             message_json = json.dumps(message_embed)
-            print(repr(message_json))
 
             yield from client.send_message(forward_target_obj, message_json)
