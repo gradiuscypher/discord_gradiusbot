@@ -69,5 +69,5 @@ def action(message, client, config):
             message_content = '<@&' + target_role.id + '>'
             yield from client.send_message(target_channel, message_content)
 
-        # yield from client.send_message(target_channel, embed=pokemon_embed)
+        yield from client.send_message(target_channel, embed=pokemon_embed)
         # yield from client.send_message(message.author, embed=pokemon_embed)
