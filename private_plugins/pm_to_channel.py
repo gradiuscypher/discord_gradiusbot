@@ -1,5 +1,6 @@
 import asyncio
 import discord
+import datetime
 import json
 from discord import Embed, Color
 
@@ -57,10 +58,16 @@ def action(message, client, config):
         target_channel = discord.utils.get(client.get_all_channels(), name=forward_chan)
         target_role = discord.utils.get(target_channel.server.roles, name="rares")
 
+        # Check if we're in quiet time
+        now = datetime.datetime.utcnow()
+        quiet_start = datetime.datetime(now.year, now.month, now.day, 5)
+        quiet_end = datetime.datetime(now.year, now.month, now.day, 11)
+        quiet_time = quiet_start < now < quiet_end
+
         # Notification For 100% IV
-        if pokemon_iv_percent == '100%':
+        if pokemon_iv_percent == '100%' and not quiet_time:
             message_content = '<@&' + target_role.id + '>'
             yield from client.send_message(target_channel, message_content)
 
-        yield from client.send_message(target_channel, embed=pokemon_embed)
+        # yield from client.send_message(target_channel, embed=pokemon_embed)
         # yield from client.send_message(message.author, embed=pokemon_embed)
