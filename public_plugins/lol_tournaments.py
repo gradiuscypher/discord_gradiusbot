@@ -35,11 +35,11 @@ def action(message, client, config):
                     name = split_content[2]
                     started = manager.start_tournament(name)
                     if started:
-                        start_message = f'Started {name} Tournament successfully.'
+                        start_message = 'Started {} Tournament successfully.'.format(name)
                         yield from client.send_message(message.channel, start_message)
 
                         if announce_channel is not None:
-                            announce_message = f'@here: {message.author.name} has opened a new Customs season: [{name}]'
+                            announce_message = '@here: {} has opened a new Customs season: [{}]'.format(message.author.name, name)
                             yield from client.send_message(announce_channel, announce_message)
                     else:
                         fail_message = "Tournament failed to start, there may already be one running."
@@ -51,11 +51,11 @@ def action(message, client, config):
                     stopped = active_tournaments[0].complete_tournament()
 
                     if stopped:
-                        start_message = f'Ended Tournament successfully.'
+                        start_message = 'Ended Tournament successfully.'
                         yield from client.send_message(message.channel, start_message)
 
                         if announce_channel is not None:
-                            announce_message = f'@here: {message.author.name} has closed the current Customs season.'
+                            announce_message = '@here: {} has closed the current Customs season.'.format(message.author.name)
                             yield from client.send_message(announce_channel, announce_message)
                     else:
                         fail_message = "Tournament failed to end."
@@ -66,13 +66,8 @@ def action(message, client, config):
 
                 if len(tournaments) > 0:
                     tournament = tournaments[0]
-                    tourney_message = f"The current active tournament is {tournament.name}."
+                    tourney_message = "The current active tournament is {}.".format(tournament.name)
                     yield from client.send_message(message.channel, tourney_message)
                 else:
                     tourney_message = 'There are no active tournaments.'
                     yield from client.send_message(message.channel, tourney_message)
-
-    if split_content[0] == "!game":
-        # Game management - All Users
-        if split_content[1] == "join":
-            yield from client.send_message(message.channel, "JOIN")
