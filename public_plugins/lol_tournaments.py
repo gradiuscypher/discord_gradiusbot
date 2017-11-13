@@ -44,6 +44,7 @@ def action(message, client, config):
                     else:
                         fail_message = "Tournament failed to start, there may already be one running."
                         yield from client.send_message(message.channel, fail_message)
+
             if split_content[1] == "end":
                 active_tournaments = manager.get_active_tournaments()
 
