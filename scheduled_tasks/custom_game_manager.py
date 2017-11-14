@@ -80,7 +80,6 @@ def action(client, config):
         if (aram_embed is None) or (sr_embed is None):
 
             if embed_channel:
-                print("Clearing channel and setting embeds...")
                 yield from client.purge_from(embed_channel, check=is_embed)
 
                 # Get the current games to build both embeds
@@ -97,7 +96,6 @@ def action(client, config):
         new_aram_players = game_dict['HOWLING_ABYSS'].get_players_in_lobby()
 
         if set(new_aram_players) != set(players_aram) and aram_embed is not None:
-            print("ARAM PLAYER UPDATE")
             # Update ARAM players
             new_aram_embed = build_embed("ARAM Custom", new_aram_players, game_dict["HOWLING_ABYSS"].tournament_code, Color.dark_blue())
             yield from client.purge_from(embed_channel, check=is_aram)
@@ -106,7 +104,6 @@ def action(client, config):
             players_aram = new_aram_players
 
         if set(new_sr_players) != set(players_sr) and sr_embed is not None:
-            print("SR PLAYER UPDATE")
             # Update SR players
             new_sr_embed = build_embed("Summoner's Rift Custom", new_sr_players, game_dict["SUMMONERS_RIFT"].tournament_code, Color.dark_green())
             yield from client.purge_from(embed_channel, check=is_summoners)
@@ -115,7 +112,26 @@ def action(client, config):
             players_sr = new_sr_players
 
         # Check to see if a game has started, if it has, alert the channel - get_lobby_status
+        # TODO: Complete game start notification message
+        # TODO: Add debug strings that get sent to a chat channel - send message when doing any actions
+
+        sr_start = game_dict["SUMMONERS_RIFT"].is_game_started()
+        aram_start = game_dict["HOWLING_ABYSS"].is_game_started()
+
+        if sr_start:
+            print("SUMMONERS RIFT HAS STARTED!")
+        if aram_start:
+            print("ARAM HAS STARTED!")
+
+        # TODO: To check finished games, you can't check the game in the list, you have to get the running but not finished game
         # Check to see if a game has completed, if it has alert the channel - check_game_status
+        # sr_finished = game_dict["SUMMONERS_RIFT"].is_game_finished()
+        # aram_finished = game_dict["HOWLING_ABYSS"].is_game_finished()
+        #
+        # if sr_finished:
+        #     print("SUMMONERS RIFT HAS FINISHED!")
+        # if aram_finished:
+        #     print("ARAM HAS FINISHED!")
 
         # Sleep for the wait period before running these loops again
         yield from asyncio.sleep(5)
