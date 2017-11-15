@@ -1,9 +1,11 @@
 import asyncio
 import discord
 import traceback
+import json
 from discord import Embed, Color, utils
 from lol_customs import tournament_libs
 
+# TODO: Add debug strings that get sent to a chat channel - send message when doing any actions
 print("[Scheduled Task] <custom_game_manager.py>: Helps manage and update custom games and their chat alerts.")
 
 tm = tournament_libs.TournamentManager()
@@ -55,10 +57,14 @@ def action(client, config):
     players_sr = []
     embed_channel_name = config.get("Tournament", "embed_channel")
     embed_channel = None
+    announce_channel_name = config.get("Tournament", "announce_channel")
+    announce_channel = None
 
     while True:
         if embed_channel is None:
             embed_channel = discord.utils.get(client.get_all_channels(), name=embed_channel_name)
+        if announce_channel is None:
+            announce_channel = discord.utils.get(client.get_all_channels(), name=announce_channel_name)
 
         # Get Open Games
         game_dict = {"SUMMONERS_RIFT": None, "HOWLING_ABYSS": None}
@@ -112,26 +118,23 @@ def action(client, config):
             players_sr = new_sr_players
 
         # Check to see if a game has started, if it has, alert the channel - get_lobby_status
-        # TODO: Complete game start notification message
-        # TODO: Add debug strings that get sent to a chat channel - send message when doing any actions
 
         sr_start = game_dict["SUMMONERS_RIFT"].is_game_started()
         aram_start = game_dict["HOWLING_ABYSS"].is_game_started()
 
         if sr_start:
-            print("SUMMONERS RIFT HAS STARTED!")
+            yield from client.send_message(announce_channel, "A Summoner's Rift game has started!")
         if aram_start:
-            print("ARAM HAS STARTED!")
+            yield from client.send_message(announce_channel, "An ARAM game has started!")
 
-        # TODO: To check finished games, you can't check the game in the list, you have to get the running but not finished game
         # Check to see if a game has completed, if it has alert the channel - check_game_status
-        # sr_finished = game_dict["SUMMONERS_RIFT"].is_game_finished()
-        # aram_finished = game_dict["HOWLING_ABYSS"].is_game_finished()
-        #
-        # if sr_finished:
-        #     print("SUMMONERS RIFT HAS FINISHED!")
-        # if aram_finished:
-        #     print("ARAM HAS FINISHED!")
+        finished_games = tournament.check_for_finished_games()
+
+        for game in finished_games:
+            # TODO: parse the game results, use the summary dict to fill in the Embed
+            game_summary_embed = Embed(title='{} - Game Summary', color=Color.gold())
+            game_summary_embed.add_field(name='Winning Team', value='', inline=True)
+            game_summary_embed.add_field(name='Losing Team', value='', inline=True)
 
         # Sleep for the wait period before running these loops again
         yield from asyncio.sleep(5)
