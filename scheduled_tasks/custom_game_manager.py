@@ -133,33 +133,35 @@ def action(client, config):
         # Check to see if anyone's joined the active lobbies and update the Embeds
         if game_dict["SUMMONERS_RIFT"] is not None:
             new_sr_players = game_dict['SUMMONERS_RIFT'].get_players_in_lobby()
+
+            if set(new_sr_players) != set(players_sr) and sr_embed is not None and embed_channel:
+                # Update SR players
+                new_sr_embed = build_embed("Summoner's Rift Custom", new_sr_players, game_dict["SUMMONERS_RIFT"].tournament_code, Color.dark_green())
+                yield from client.purge_from(embed_channel, check=is_summoners)
+                yield from client.send_message(embed_channel, embed=new_sr_embed)
+                aram_embed = new_sr_embed
+                players_sr = new_sr_players
+
         if game_dict["HOWLING_ABYSS"] is not None:
             new_aram_players = game_dict['HOWLING_ABYSS'].get_players_in_lobby()
 
-        if set(new_aram_players) != set(players_aram) and aram_embed is not None and embed_channel:
-            # Update ARAM players
-            new_aram_embed = build_embed("ARAM Custom", new_aram_players, game_dict["HOWLING_ABYSS"].tournament_code, Color.dark_blue())
-            yield from client.purge_from(embed_channel, check=is_aram)
-            yield from client.send_message(embed_channel, embed=new_aram_embed)
-            aram_embed = new_aram_embed
-            players_aram = new_aram_players
-
-        if set(new_sr_players) != set(players_sr) and sr_embed is not None and embed_channel:
-            # Update SR players
-            new_sr_embed = build_embed("Summoner's Rift Custom", new_sr_players, game_dict["SUMMONERS_RIFT"].tournament_code, Color.dark_green())
-            yield from client.purge_from(embed_channel, check=is_summoners)
-            yield from client.send_message(embed_channel, embed=new_sr_embed)
-            aram_embed = new_sr_embed
-            players_sr = new_sr_players
+            if set(new_aram_players) != set(players_aram) and aram_embed is not None and embed_channel:
+                # Update ARAM players
+                new_aram_embed = build_embed("ARAM Custom", new_aram_players, game_dict["HOWLING_ABYSS"].tournament_code, Color.dark_blue())
+                yield from client.purge_from(embed_channel, check=is_aram)
+                yield from client.send_message(embed_channel, embed=new_aram_embed)
+                aram_embed = new_aram_embed
+                players_aram = new_aram_players
 
         # Check to see if a game has started, if it has, alert the channel - get_lobby_status
-        sr_start = game_dict["SUMMONERS_RIFT"].is_game_started()
-        aram_start = game_dict["HOWLING_ABYSS"].is_game_started()
-
-        if sr_start and announce_channel:
-            yield from client.send_message(announce_channel, "A Summoner's Rift game has started!")
-        if aram_start and announce_channel:
-            yield from client.send_message(announce_channel, "An ARAM game has started!")
+        if game_dict["SUMMONERS_RIFT"] is not None:
+            sr_start = game_dict["SUMMONERS_RIFT"].is_game_started()
+            if sr_start and announce_channel:
+                yield from client.send_message(announce_channel, "A Summoner's Rift game has started!")
+        if game_dict["HOWLING_ABYSS"] is not None:
+            aram_start = game_dict["HOWLING_ABYSS"].is_game_started()
+            if aram_start and announce_channel:
+                yield from client.send_message(announce_channel, "An ARAM game has started!")
 
         # Check to see if a game has completed, if it has alert the channel
         if announce_channel:
@@ -178,4 +180,4 @@ def action(client, config):
                 yield from client.send_message(announce_channel, embed=game_summary_embed)
 
         # Sleep for the wait period before running these loops again
-        yield from asyncio.sleep(5)
+        yield from asyncio.sleep(10)
