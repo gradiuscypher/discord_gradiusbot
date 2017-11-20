@@ -35,6 +35,40 @@ def is_summoners(message):
     return False
 
 
+def parse_eog_json(eog_json):
+    game_json = json.loads(eog_json)
+    summary_dict = {
+        'teams': {
+            100: {'players': '', 'win': False},
+            200: {'players': '', 'win': False},
+        },
+        'winning_team': None,
+        'summary_url': 'https://matchhistory.na.leagueoflegends.com/en/#match-details/NA1/{}?tab=overview'.format(
+            game_json['gameId']
+        ),
+        'map_type': game_json['gameMode']
+    }
+    player_identities = {}
+
+    # Build the teams list
+    for player in game_json['participantIdentities']:
+        player_identities[player['participantId']] = player['player']['summonerName']
+
+    for player in game_json['participants']:
+        if player['teamId'] == 100:
+            summary_dict['teams'][100]['players'] += player_identities[player['participantId']] + "\n"
+        if player['teamId'] == 200:
+            summary_dict['teams'][200]['players'] += player_identities[player['participantId']] + "\n"
+
+    # Get who won and build team dict
+    teams = game_json['teams']
+    for team in teams:
+        if team['win'] == 'Win':
+            summary_dict['teams'][team['teamId']]['win'] = True
+            summary_dict['winning_team'] = team['teamId']
+    return summary_dict
+
+
 def build_embed(embed_target, players, tournament_code, color):
     target_embed = Embed(title=embed_target, color=color)
 
@@ -84,7 +118,6 @@ def action(client, config):
 
         # Check to see if sr_embed or aram_embed is None, if so, create new Embeds for both and delete the old ones
         if (aram_embed is None) or (sr_embed is None):
-
             if embed_channel:
                 yield from client.purge_from(embed_channel, check=is_embed)
 
@@ -98,10 +131,12 @@ def action(client, config):
                     yield from client.send_message(embed_channel, embed=sr_embed)
 
         # Check to see if anyone's joined the active lobbies and update the Embeds
-        new_sr_players = game_dict['SUMMONERS_RIFT'].get_players_in_lobby()
-        new_aram_players = game_dict['HOWLING_ABYSS'].get_players_in_lobby()
+        if game_dict["SUMMONERS_RIFT"] is not None:
+            new_sr_players = game_dict['SUMMONERS_RIFT'].get_players_in_lobby()
+        if game_dict["HOWLING_ABYSS"] is not None:
+            new_aram_players = game_dict['HOWLING_ABYSS'].get_players_in_lobby()
 
-        if set(new_aram_players) != set(players_aram) and aram_embed is not None:
+        if set(new_aram_players) != set(players_aram) and aram_embed is not None and embed_channel:
             # Update ARAM players
             new_aram_embed = build_embed("ARAM Custom", new_aram_players, game_dict["HOWLING_ABYSS"].tournament_code, Color.dark_blue())
             yield from client.purge_from(embed_channel, check=is_aram)
@@ -109,7 +144,7 @@ def action(client, config):
             aram_embed = new_aram_embed
             players_aram = new_aram_players
 
-        if set(new_sr_players) != set(players_sr) and sr_embed is not None:
+        if set(new_sr_players) != set(players_sr) and sr_embed is not None and embed_channel:
             # Update SR players
             new_sr_embed = build_embed("Summoner's Rift Custom", new_sr_players, game_dict["SUMMONERS_RIFT"].tournament_code, Color.dark_green())
             yield from client.purge_from(embed_channel, check=is_summoners)
@@ -118,23 +153,29 @@ def action(client, config):
             players_sr = new_sr_players
 
         # Check to see if a game has started, if it has, alert the channel - get_lobby_status
-
         sr_start = game_dict["SUMMONERS_RIFT"].is_game_started()
         aram_start = game_dict["HOWLING_ABYSS"].is_game_started()
 
-        if sr_start:
+        if sr_start and announce_channel:
             yield from client.send_message(announce_channel, "A Summoner's Rift game has started!")
-        if aram_start:
+        if aram_start and announce_channel:
             yield from client.send_message(announce_channel, "An ARAM game has started!")
 
-        # Check to see if a game has completed, if it has alert the channel - check_game_status
-        finished_games = tournament.check_for_finished_games()
+        # Check to see if a game has completed, if it has alert the channel
+        if announce_channel:
+            finished_games = tournament.check_for_finished_games()
+            for game in finished_games:
+                game_dict = parse_eog_json(game.eog_json)
 
-        for game in finished_games:
-            # TODO: parse the game results, use the summary dict to fill in the Embed
-            game_summary_embed = Embed(title='{} - Game Summary', color=Color.gold())
-            game_summary_embed.add_field(name='Winning Team', value='', inline=True)
-            game_summary_embed.add_field(name='Losing Team', value='', inline=True)
+                game_summary_embed = Embed(title='{} - Game Summary'.format(game_dict['map_type']), color=Color.gold())
+                game_summary_embed.add_field(name='Match History URL', value=game_dict['summary_url'])
+
+                for team_id in game_dict['teams'].keys():
+                    if game_dict['teams'][team_id]['win']:
+                        game_summary_embed.add_field(name='Victory', value=game_dict['teams'][team_id]['players'], inline=True)
+                    else:
+                        game_summary_embed.add_field(name='Defeat', value=game_dict['teams'][team_id]['players'], inline=True)
+                yield from client.send_message(announce_channel, embed=game_summary_embed)
 
         # Sleep for the wait period before running these loops again
         yield from asyncio.sleep(5)
