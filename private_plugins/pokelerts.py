@@ -47,6 +47,10 @@ def action(message, client, config):
             if alert_name:
                 alert_name = alert_name.group(0)
 
+            # Brute-force guess at location name, usually on the first line
+            else:
+                alert_name = description.split("\n")[0]
+
             moves = re.search("\[.*\]", description)
             if moves:
                 moves = moves.group(0)
@@ -70,7 +74,7 @@ def action(message, client, config):
             pokemon_embed.add_field(name="Moves", value=moves, inline=True)
             pokemon_embed.add_field(name="Stats", value=pokemon_stats, inline=True)
             pokemon_embed.add_field(name="Spawn Timer", value=spawn_time, inline=True)
-            pokemon_embed.add_field(name="FLPokeMap Link", value=fl_url, inline=True)
+            # pokemon_embed.add_field(name="FLPokeMap Link", value=fl_url, inline=True)
             pokemon_embed.set_thumbnail(url=pokemon_thumbnail_url)
             pokemon_embed.set_image(url=map_image_url)
             pokemon_embed.set_footer(text="Alerts provided by Florida PokeMap. For more information and to sign up for "
