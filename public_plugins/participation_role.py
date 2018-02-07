@@ -29,7 +29,7 @@ async def action(message, client, config):
     target_role = discord.utils.get(message.server.roles, id=target_role_id)
 
     # For each message, check to see if the user id is part of the cached users list, ignore if true
-    if author_id not in user_id_cache:
+    if author_id not in user_id_cache and len(message.content) > 0:
         # Try to get the target role from the author, if None, they don't have it assigned.
         # Make sure they only have 1 role to prevent cluttering roles on other tagged members
         if discord.utils.get(message.author.roles, id=target_role_id) is None and len(message.author.roles) <= 1:
