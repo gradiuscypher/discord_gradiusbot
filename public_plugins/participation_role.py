@@ -35,6 +35,7 @@ async def action(message, client, config):
         if discord.utils.get(message.author.roles, id=target_role_id) is None and len(message.author.roles) <= 1:
             # Add the role to the user and add them to the cache
             await client.add_roles(message.author, target_role)
+            await client.add_reaction(message, '👍')
             user_id_cache.append(author_id)
         else:
             # Add user to cache to avoid checking later
