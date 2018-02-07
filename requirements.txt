@@ -6,7 +6,6 @@ bs4==0.0.1
 cassiopeia==0.1.3
 certifi==2017.4.17
 chardet==3.0.4
-custom-games==0.1.0
 decorator==4.0.11
 discord.py==0.16.5
 elasticsearch==5.1.0
