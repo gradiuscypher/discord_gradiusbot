@@ -1,4 +1,6 @@
 # Dockerfile to build a gradiusbot docker container
+# Remember to pass along a target config using this command as an example:
+# docker run -v $(pwd)/config.conf:/usr/src/app/config.conf -t discord_gradiusbot
 
 # Set the base image to Python3
 FROM python:3
