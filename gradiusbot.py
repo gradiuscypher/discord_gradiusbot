@@ -1,7 +1,5 @@
 #! venv3/bin/python
 
-from plugin_loader import PluginLoader
-from libs.elastic_logging import ElasticLogging
 import discord
 import asyncio
 import configparser
@@ -10,6 +8,8 @@ import json
 import sys
 import logging
 import random
+from plugin_loader import PluginLoader
+from libs.elastic_logging import ElasticLogging
 
 
 config = configparser.RawConfigParser()
@@ -222,6 +222,7 @@ def main_task(config_file):
     except:
         print("There was an exception:")
         print(traceback.print_exc())
+
 
 if __name__ == "__main__":
         main_task(sys.argv[1])

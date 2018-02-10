@@ -1,11 +1,27 @@
+"""
+Config Values:
+[LogMessages]
+# The elasticsearch host
+elastic_host =
+"""
+
 import asyncio
-from datetime import datetime
+import configparser
 import traceback
 import elasticsearch
+from datetime import datetime
+from sys import argv
 
-es = elasticsearch.Elasticsearch()
+# Plugin version
+plugin_version = '1.0.0'
 
-print("[Public Plugin] <log_messages.py>: Log messages to ElasticSearch.")
+config = configparser.RawConfigParser()
+config.read(argv[1])
+elastic_host = config.get("LogMessages", "elastic_host")
+
+es = elasticsearch.Elasticsearch([elastic_host])
+
+print("[Public Plugin] <log_messages.py:{}>: Log messages to ElasticSearch.".format(plugin_version))
 
 
 def setup_index():
@@ -32,7 +48,7 @@ def setup_index():
 
 
 @asyncio.coroutine
-def action(message, client, config):
+async def action(message, client, config):
     try:
         author = str(message.author)
         content = message.clean_content
