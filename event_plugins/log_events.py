@@ -1,11 +1,27 @@
+"""
+Config Values:
+[LogMessages]
+# The elasticsearch host
+elastic_host =
+"""
+
 import asyncio
-from datetime import datetime
 import traceback
 import elasticsearch
+import configparser
+from datetime import datetime
+from sys import argv
+
+# Plugin version
+plugin_version = '1.0.0'
+
+config = configparser.RawConfigParser()
+config.read(argv[1])
+elastic_host = config.get("LogMessages", "elastic_host")
 
 es = elasticsearch.Elasticsearch()
 
-print("[Public Plugin] <log_events.py>: Log events to ElasticSearch.")
+print("[Public Plugin] <log_events.py:{}>: Log events to ElasticSearch.".format(plugin_version))
 
 
 def setup_index():
