@@ -10,7 +10,6 @@ logfile = False
 elastic_logging = False
 server_id =
 self_name =
-permitted_channels = []
 public_plugins = []
 private_plugins = []
 event_plugins = []

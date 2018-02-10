@@ -52,7 +52,6 @@ def on_ready():
 def on_message(message):
     selfname = config.get("BotSettings", "self_name")
     elastic_logging = config.getboolean("BotSettings", "elastic_logging")
-    permitted_channels = json.loads(config.get('BotSettings', 'permitted_channels'))
     server_id = config.get("BotSettings", "server_id")
 
     if message.channel.is_private:
@@ -76,7 +75,8 @@ def on_message(message):
                         print(traceback.format_exc())
                         if elastic_logging:
                             elogging.log_message(message, traceback.format_exc(), "private on_message", "except")
-            #TODO: Make this an else to avoid looping over !help again
+
+            # TODO: Make this an else to avoid looping over !help again
             for plugin in plugins.private_plugins:
                 try:
                     asyncio.ensure_future(plugin.action(message, client, config))
@@ -88,7 +88,7 @@ def on_message(message):
 
     else:
         if (message.server.id == server_id) or (server_id == ""):
-            if not message.author.name == selfname and message.channel.name in permitted_channels:
+            if not message.author.name == selfname:
                 for plugin in plugins.public_plugins:
                     try:
                         asyncio.ensure_future(plugin.action(message, client, config))
@@ -104,7 +104,6 @@ def on_message(message):
 def on_message_delete(message):
     selfname = config.get("BotSettings", "self_name")
     elastic_logging = config.getboolean("BotSettings", "elastic_logging")
-    permitted_channels = json.loads(config.get('BotSettings', 'permitted_channels'))
     server_id = config.get("BotSettings", "server_id")
 
     if message.channel.is_private:
@@ -113,7 +112,7 @@ def on_message_delete(message):
             pass
     else:
         if (message.server.id == server_id) or (server_id == ""):
-            if not message.author.name == selfname and message.channel.name in permitted_channels:
+            if not message.author.name == selfname:
                 for plugin in plugins.event_plugins:
                     try:
                         asyncio.ensure_future(plugin.action(message, client, config, "delete"))
@@ -129,7 +128,6 @@ def on_message_delete(message):
 def on_message_edit(message, message_after):
     selfname = config.get("BotSettings", "self_name")
     elastic_logging = config.getboolean("BotSettings", "elastic_logging")
-    permitted_channels = json.loads(config.get('BotSettings', 'permitted_channels'))
     server_id = config.get("BotSettings", "server_id")
 
     if message.channel.is_private:
@@ -138,7 +136,7 @@ def on_message_edit(message, message_after):
             pass
     else:
         if (message.server.id == server_id) or (server_id == ""):
-            if not message.author.name == selfname and message.channel.name in permitted_channels:
+            if not message.author.name == selfname:
                 for plugin in plugins.event_plugins:
                     try:
                         asyncio.ensure_future(plugin.action(message, client, config, "edit", object_after=message_after))
