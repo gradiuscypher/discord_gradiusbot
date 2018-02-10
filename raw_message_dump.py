@@ -7,6 +7,7 @@ import traceback
 import json
 import logging
 import sys
+import pprint
 
 config = configparser.RawConfigParser()
 client = discord.Client()
@@ -103,6 +104,38 @@ def on_member_join(member):
 def on_member_remove(member):
     username = member.name
     print("[on_member_remove] {}".format(username))
+
+
+@client.async_event
+def on_member_update(before, after):
+
+    if before is not None:
+        print("[on_member_update] before :")
+        member_json_before = {
+            'id': before.id,
+            'name': before.name,
+            'discriminator': before.discriminator,
+            'game': {
+                'name': before.game.name,
+                'url': before.game.url,
+                'type': before.game.type
+            }
+        }
+        pprint.pprint(member_json_before)
+
+    if after is not None:
+        print("[on_member_update] after :")
+        member_json_after = {
+            'id': after.id,
+            'name': after.name,
+            'discriminator': after.discriminator,
+            'game': {
+                'name': after.game.name,
+                'url': after.game.url,
+                'type': after.game.type
+            }
+        }
+        pprint.pprint(member_json_after)
 
 
 def main_task(config_file):
