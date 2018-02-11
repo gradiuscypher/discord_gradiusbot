@@ -24,9 +24,13 @@ def action(message, client, config):
     forward_chan = config.get('Pokemon', 'forward_chan')
     forward_names = json.loads(config.get('Pokemon', 'forward_names'))
     production = config.getboolean('Pokemon', 'production')
+    is_alert = False
 
-    # if forward_from.lower() in str(message.author).lower() and len(message.embeds) > 0:
-    if str(message.author).lower() in forward_names and len(message.embeds) > 0:
+    for account_name in forward_names:
+        if str(message.author).lower() in account_name:
+            is_alert = True
+
+    if is_alert and len(message.embeds) > 0:
 
         # Parse the information
         json_blob = message.embeds[0]
