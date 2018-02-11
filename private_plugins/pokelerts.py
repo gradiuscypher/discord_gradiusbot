@@ -3,6 +3,7 @@ import re
 import discord
 import datetime
 import traceback
+import json
 from discord import Embed, Color
 
 
@@ -12,7 +13,7 @@ print("[Private Plugin] <pokelerts.py>: This plugin forwards PokemonGo Alerts.")
 config options:
 [Pokemon]
 forward_chan = (channel to forward to)
-forward_from = (account string match to forward from)
+forward_names = (account strings match to forward from)
 production = False (whether the message should be sent to a channel or as a test PM)
 """
 
@@ -21,10 +22,11 @@ production = False (whether the message should be sent to a channel or as a test
 def action(message, client, config):
     # Get configuration values
     forward_chan = config.get('Pokemon', 'forward_chan')
-    forward_from = config.get('Pokemon', 'forward_from')
+    forward_names = json.loads(config.get('Pokemon', 'forward_names'))
     production = config.getboolean('Pokemon', 'production')
 
-    if forward_from.lower() in str(message.author).lower() and len(message.embeds) > 0:
+    # if forward_from.lower() in str(message.author).lower() and len(message.embeds) > 0:
+    if str(message.author).lower() in forward_names and len(message.embeds) > 0:
 
         # Parse the information
         json_blob = message.embeds[0]
