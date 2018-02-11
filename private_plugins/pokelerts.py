@@ -27,7 +27,7 @@ def action(message, client, config):
     is_alert = False
 
     for account_name in forward_names:
-        if str(message.author).lower() in account_name:
+        if account_name in str(message.author).lower():
             is_alert = True
 
     if is_alert and len(message.embeds) > 0:
