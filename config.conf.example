@@ -17,3 +17,6 @@ scheduled_tasks = []
 statuses = ["PM me !help for more info", "status1", "status2"]
 bot_channel =
 alert_channel =
+
+[Permissions]
+admin_group =
