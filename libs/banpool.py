@@ -1,8 +1,8 @@
+import traceback
 from sqlalchemy import Column, Boolean, Integer, String, ForeignKey, create_engine, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker, scoped_session
 from datetime import datetime
-import traceback
 
 Base = declarative_base()
 engine = create_engine('sqlite:///banpool.db')
@@ -91,6 +91,7 @@ class BanPoolManager:
             return list_result
         except:
             print(traceback.format_exc())
+            return None
 
     def banpool_user_list(self, banpool_name):
         """
