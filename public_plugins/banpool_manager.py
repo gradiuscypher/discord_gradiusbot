@@ -1,7 +1,9 @@
 import asyncio
+import discord
 from libs import banpool
+from discord import Embed, Color
 
-print("[Public Plugin] <echo.py>: This plugin echoes stuff to a public channel.")
+print("[Public Plugin] <banpool_manager.py>: This plugin manages the banpool.")
 
 banpool_manager = banpool.BanPoolManager()
 
@@ -12,7 +14,8 @@ async def action(message, client, config):
     Config Values:
     [banpool]
     # The Discord ID of the Admin user
-    admin_id =
+    admin_server_id =
+    admin_group =
 
     :param message: discord message obj
     :param client: discord client obj
@@ -21,16 +24,25 @@ async def action(message, client, config):
     """
 
     # get config values
-    admin_id = config.get('banpool', 'admin_id')
+    admin_server_id = config.get('banpool', 'admin_server_id')
+    admin_group = config.get('banpool', 'admin_group')
 
-    author_id = message.author.id
+    server_id = message.server.id
 
-    if author_id == admin_id:
+    in_admin_group = discord.utils.get(message.author.roles, name=admin_group)
+
+    if server_id == admin_server_id and in_admin_group:
         split_content = message.content.split()
 
         if split_content[0] == '!banpool':
             if split_content[1] == 'list':
-                pass
+                banpool_list = banpool_manager.banpool_list()
+                bp_embed = Embed(title="Active BanPools", color=Color.green())
+
+                for bp in banpool_list:
+                    bp_embed.add_field(name=bp.pool_name, value=bp.pool_description, inline=True)
+                await client.send_message(message.channel, embed=bp_embed)
+
             if split_content[1] == 'listusers':
                 pass
             if split_content[1] == 'adduser':
