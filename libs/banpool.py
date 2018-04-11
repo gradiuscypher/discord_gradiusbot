@@ -201,6 +201,51 @@ class BanPoolManager:
         :param user_id:
         :return:
         """
+        try:
+            # Identify the banpool that the User ID will be added to
+            banpool = session.query(BanPool).filter(BanPool.pool_name==banpool_name).one()
+
+            if banpool:
+                # Find if the user is in the banpool
+                user_query = session.query(DiscordUser).filter(DiscordUser.banpool_id==banpool.id, DiscordUser.user_id==user_id)
+
+                if user_query.count() > 0:
+                    user = user_query.one()
+                    if user:
+                        session.delete(user)
+                        session.commit()
+                        return "User has been removed from the banpool.", True
+                else:
+                    return "User not found in banpool.", False
+            else:
+                return "This banpool does not exist.", False
+
+        except:
+            print(traceback.format_exc())
+            return "An error has occurred.", False
+
+    def remove_user_from_exceptions(self, user_id, server_id):
+        """
+        Removes a User ID and Server ID combination from exceptions
+        :param user_id:
+        :param server_id:
+        :return:
+        """
+        try:
+            user_exception = session.query(BanExceptions).filter(BanExceptions.user_id==user_id, BanExceptions.server_id==server_id)
+
+            if user_exception.count() > 0:
+                user = user_exception.one()
+                session.delete(user)
+                session.commit()
+                return "User has been removed from exception list", True
+
+            else:
+                return "User wasn't found in exception list", False
+
+        except:
+            print(traceback.format_exc())
+            return "An error has occurred.", False
 
 
 class BanPool(Base):
