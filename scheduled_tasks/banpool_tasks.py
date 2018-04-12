@@ -12,6 +12,7 @@ banpool_manager = banpool.BanPoolManager()
 async def action(client, config):
     admin_server_id = config.get('banpool', 'admin_server_id')
     admin_chan_name = config.get('banpool', 'admin_chan')
+    task_length = config.getint('banpool', 'task_length')
     admin_chan = None
 
     setting_up = True
@@ -49,7 +50,7 @@ async def action(client, config):
                         is_exception = banpool_manager.is_user_in_exceptions(user_id, server.id)
 
                         if not is_exception:
-                            ban_embed = Embed(title="User Banned", color=Color.green())
+                            ban_embed = Embed(title="User Banned via Task", color=Color.green())
                             ban_embed.add_field(name="Server ID", value=server.id, inline=True)
                             ban_embed.add_field(name="User ID", value=user_id, inline=True)
                             ban_embed.add_field(name="User Name", value=user.name + "#" + str(user.discriminator), inline=True)
@@ -59,4 +60,4 @@ async def action(client, config):
                             await client.ban(user)
                             await client.send_message(admin_chan, embed=ban_embed)
 
-        await asyncio.sleep(10)
+        await asyncio.sleep(task_length)

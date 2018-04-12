@@ -7,6 +7,36 @@ print("[Public Plugin] <banpool_manager.py>: This plugin manages the banpool.")
 
 banpool_manager = banpool.BanPoolManager()
 
+help_string = """
+**BanPool Commands**
+BanPool is a Discord bot that automatically coordinates bans between Discord servers which have the bot.
+All commands start with `!bp`. Do not include the `<` or `>` brackets in your commands.
+
+```
+!bp help - this command
+
+!bp list - list all available banpools. Currently only 'global' is used
+
+!bp listusers <BANPOOL_NAME> - list all user IDs in the banpool
+
+!bp adduser <BANPOOL_NAME> <USER_ID> - add user ID to the banpool
+
+!bp adduserlist <BANPOOL_NAME> <USER_ID_LIST> - ban a list of user IDs, separated by commas
+
+!bp listexception - list all of the ban exceptions: a user ID and Server ID pair
+
+!bp addexception <USER_ID> <SERVER_ID> - add a ban exception pair for user ID and Server ID
+
+!bp removeuser <BANPOOL_NAME> <USER_ID> - remove user ID from the banpool
+
+!bp removeexception <USER_ID> <SERVER_ID> - remove a ban exception pair for user ID and Server ID
+
+!bp isuserbanned <USER_ID> - check if the user ID is in any banpools
+
+!bp getuserinfo <USER_ID> - check to see if the user ID is present in any servers
+```
+"""
+
 
 def chunks(l, n):
     # Stolen from: https://stackoverflow.com/questions/312443/how-do-you-split-a-list-into-evenly-sized-chunks
@@ -23,6 +53,8 @@ async def action(message, client, config):
     admin_server_id =
     admin_group =
     admin_chan =
+    # the time to wait between executing scheduled tasks in seconds
+    task_length =
 
     :param message: discord message obj
     :param client: discord client obj
@@ -46,7 +78,7 @@ async def action(message, client, config):
         if split_content[0] == '!bp':
 
             if split_content[1] == 'help':
-                pass
+                await client.send_message(message.channel, help_string)
 
             if split_content[1] == 'list':
                 banpool_list = banpool_manager.banpool_list()

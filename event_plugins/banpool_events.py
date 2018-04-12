@@ -32,3 +32,29 @@ async def action(member, client, config, event_type, object_after=None):
             unban_embed.set_footer(icon_url=object_after.icon_url, text=object_after.name)
 
             await client.send_message(admin_chan, embed=unban_embed)
+
+    # Someone joined, check to see if they're in the banpool, if so, ban them.
+    if event_type == "member_join":
+        result = banpool_manager.is_user_banned(member.id)
+
+        if result[1]:
+            user_id = member.id
+            user_name = member.name
+            user_discriminator = member.discriminator
+            user_avatar_url = member.avatar_url
+            server_id = member.server.id
+            server_icon_url = member.server.icon_url
+            server_name = member.server.name
+
+            is_exception = banpool_manager.is_user_in_exceptions(user_id, server_id)
+
+            if not is_exception:
+                ban_embed = Embed(title="User Banned on Join", color=Color.green())
+                ban_embed.add_field(name="Server ID", value=server_id, inline=True)
+                ban_embed.add_field(name="User ID", value=user_id, inline=True)
+                ban_embed.add_field(name="User Name", value=user_name + "#" + str(user_discriminator), inline=True)
+                ban_embed.set_thumbnail(url=user_avatar_url)
+                ban_embed.set_footer(icon_url=server_icon_url, text=server_name)
+
+                await client.ban(member)
+                await client.send_message(admin_chan, embed=ban_embed)
