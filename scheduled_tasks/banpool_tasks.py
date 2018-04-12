@@ -1,11 +1,17 @@
 import asyncio
 import discord
+import logging
+import traceback
 from libs import banpool
 from discord import Embed, Color
 
 print("[Scheduled Task] <banpool_tasks.py>: Scheduled tasks for the banpool.")
 
 banpool_manager = banpool.BanPoolManager()
+
+# Setup Logging
+logger = logging.getLogger('banpool_manager')
+logger.setLevel(logging.DEBUG)
 
 
 @asyncio.coroutine
@@ -26,38 +32,42 @@ async def action(client, config):
         await asyncio.sleep(5)
 
     while True:
-        if client.is_logged_in:
-            # Check each server for a user with a matching User ID and ban those found
+        try:
+            if client.is_logged_in:
+                # Check each server for a user with a matching User ID and ban those found
 
-            # Build a list of all banned user IDs
-            banned_user_ids = []
-            banpool_list = banpool_manager.banpool_list()
+                # Build a list of all banned user IDs
+                banned_user_ids = []
+                banpool_list = banpool_manager.banpool_list()
 
-            for pool in banpool_list:
-                userlist = banpool_manager.banpool_user_list(pool.pool_name)
+                for pool in banpool_list:
+                    userlist = banpool_manager.banpool_user_list(pool.pool_name)
 
-                if userlist:
-                    for user in userlist:
-                        banned_user_ids.append(user.user_id)
+                    if userlist:
+                        for user in userlist:
+                            banned_user_ids.append(user.user_id)
 
-            # Iterate through each server, looking for banned user IDs
-            for server in client.servers:
-                for user_id in banned_user_ids:
-                    user = server.get_member(str(user_id))
+                # Iterate through each server, looking for banned user IDs
+                for server in client.servers:
+                    for user_id in banned_user_ids:
+                        user = server.get_member(str(user_id))
 
-                    # If a user was found, check to see if there's an exception. If not, ban them.
-                    if user:
-                        is_exception = banpool_manager.is_user_in_exceptions(user_id, server.id)
+                        # If a user was found, check to see if there's an exception. If not, ban them.
+                        if user:
+                            is_exception = banpool_manager.is_user_in_exceptions(user_id, server.id)
 
-                        if not is_exception:
-                            ban_embed = Embed(title="User Banned via Task", color=Color.green())
-                            ban_embed.add_field(name="Server ID", value=server.id, inline=True)
-                            ban_embed.add_field(name="User ID", value=user_id, inline=True)
-                            ban_embed.add_field(name="User Name", value=user.name + "#" + str(user.discriminator), inline=True)
-                            ban_embed.set_thumbnail(url=user.avatar_url)
-                            ban_embed.set_footer(icon_url=server.icon_url, text=server.name)
+                            if not is_exception:
+                                logger.debug('member is in the banpool and has no exceptions: {}'.format(user_id))
+                                ban_embed = Embed(title="User Banned via Task", color=Color.green())
+                                ban_embed.add_field(name="Server ID", value=server.id, inline=True)
+                                ban_embed.add_field(name="User ID", value=user_id, inline=True)
+                                ban_embed.add_field(name="User Name", value=user.name + "#" + str(user.discriminator), inline=True)
+                                ban_embed.set_thumbnail(url=user.avatar_url)
+                                ban_embed.set_footer(icon_url=server.icon_url, text=server.name)
 
-                            await client.ban(user)
-                            await client.send_message(admin_chan, embed=ban_embed)
+                                await client.ban(user)
+                                await client.send_message(admin_chan, embed=ban_embed)
 
-        await asyncio.sleep(task_length)
+            await asyncio.sleep(task_length)
+        except:
+            logger.error(traceback.format_exc())
