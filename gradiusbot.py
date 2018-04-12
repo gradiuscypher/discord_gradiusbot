@@ -187,6 +187,17 @@ def on_member_remove(member):
                 print(traceback.format_exc())
 
 
+# Fired when a member is unbanned
+@client.async_event
+def on_member_unban(server, member):
+    for plugin in plugins.event_plugins:
+        try:
+            asyncio.ensure_future(plugin.action(member, client, config, "member_unban", object_after=server))
+        except:
+            print("There was an error with: " + str(plugin))
+            print(traceback.format_exc())
+
+
 # Main processing loop
 def main_task(config_file):
     config.read(config_file)
