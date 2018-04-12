@@ -22,6 +22,7 @@ async def action(message, client, config):
     # The Discord ID of the Admin user
     admin_server_id =
     admin_group =
+    admin_chan =
 
     :param message: discord message obj
     :param client: discord client obj
@@ -32,15 +33,20 @@ async def action(message, client, config):
     # get config values
     admin_server_id = config.get('banpool', 'admin_server_id')
     admin_group = config.get('banpool', 'admin_group')
+    admin_chan = config.get('banpool', 'admin_chan')
 
     server_id = message.server.id
+    source_chan = message.channel.name
 
     in_admin_group = discord.utils.get(message.author.roles, name=admin_group)
 
-    if server_id == admin_server_id and in_admin_group:
+    if server_id == admin_server_id and in_admin_group and source_chan == admin_chan:
         split_content = message.content.split()
 
         if split_content[0] == '!bp':
+            if split_content[1] == 'help':
+                pass
+
             if split_content[1] == 'list':
                 banpool_list = banpool_manager.banpool_list()
                 bp_embed = Embed(title="Active BanPools", color=Color.green())
@@ -53,7 +59,7 @@ async def action(message, client, config):
                 banpool_name = split_content[2]
                 userlist = banpool_manager.banpool_user_list(banpool_name)
 
-                ul_embed = Embed(title=banpool_name + " IDs", color=Color.green())
+                ul_embed = Embed(title=banpool_name + " banned IDs", color=Color.green())
 
                 if userlist:
                     # Split the list into chunks
@@ -79,8 +85,20 @@ async def action(message, client, config):
 
                 await client.send_message(message.channel, embed=notice_embed)
 
-            if split_content[1] == 'adduserlist':
-                pass
+            if split_content[1] == 'adduserlist' and len(split_content) == 4:
+                banpool_name = split_content[2]
+                user_id_list = split_content[3]
+
+                result = banpool_manager.add_userlist_to_banpool(banpool_name, user_id_list)
+
+                if result[1]:
+                    # The add was successful
+                    notice_embed = Embed(title="BanPool Manager", color=Color.green(), description=result[0])
+                else:
+                    # The add was not successful
+                    notice_embed = Embed(title="BanPool Manager", color=Color.red(), description=result[0])
+
+                await client.send_message(message.channel, embed=notice_embed)
 
             if split_content[1] == 'listexception':
                 exception_list = banpool_manager.exception_list()
@@ -143,5 +161,8 @@ async def action(message, client, config):
                     notice_embed = Embed(title="BanPool Manager", color=Color.red(), description=result[0])
                 await client.send_message(message.channel, embed=notice_embed)
 
-            if split_content[1] == 'isuser':
+            if split_content[1] == 'isuserbanned':
+                pass
+
+            if split_content[1] == 'getuserinfo':
                 pass

@@ -57,6 +57,23 @@ class BanPoolManager:
         :return:
         """
 
+        # Process the list and turn it to a python list
+        try:
+            user_list = user_id_list.split(',')
+
+        except:
+            print(traceback.format_exc())
+            return "Your userlist wasn't properly formatted. Separate each ID with a comma.", False
+
+        try:
+            for user in user_list:
+                self.add_user_to_banpool(banpool_name, user)
+            return "Users have been processed. Non-duplicates have been added to the ban list.", True
+
+        except:
+            print(traceback.format_exc())
+            return "An error has occurred.", False
+
     def add_user_to_exceptions(self, user_id, server_id):
         """
         Add a User ID+Server ID to the ban exceptions list
