@@ -13,6 +13,7 @@ def chunks(l, n):
     for i in range(0, len(l), n):
         yield l[i:i + n]
 
+
 @asyncio.coroutine
 async def action(message, client, config):
     """
@@ -114,11 +115,33 @@ async def action(message, client, config):
                     notice_embed = Embed(title="BanPool Manager", color=Color.red(), description=result[0])
                 await client.send_message(message.channel, embed=notice_embed)
 
-            if split_content[1] == 'removeuser':
-                pass
+            if split_content[1] == 'removeuser' and len(split_content) == 4:
+                banpool_name = split_content[2]
+                user_id = split_content[3]
 
-            if split_content[1] == 'removeexception':
-                pass
+                result = banpool_manager.remove_user_from_banpool(banpool_name, user_id)
+
+                if result[1]:
+                    # The add was successful
+                    notice_embed = Embed(title="BanPool Manager", color=Color.green(), description=result[0])
+                else:
+                    # The add was not successful
+                    notice_embed = Embed(title="BanPool Manager", color=Color.red(), description=result[0])
+                await client.send_message(message.channel, embed=notice_embed)
+
+            if split_content[1] == 'removeexception' and len(split_content) == 4:
+                user_id = split_content[2]
+                server_id = split_content[3]
+
+                result = banpool_manager.remove_user_from_exceptions(user_id, server_id)
+
+                if result[1]:
+                    # The add was successful
+                    notice_embed = Embed(title="BanPool Manager", color=Color.green(), description=result[0])
+                else:
+                    # The add was not successful
+                    notice_embed = Embed(title="BanPool Manager", color=Color.red(), description=result[0])
+                await client.send_message(message.channel, embed=notice_embed)
 
             if split_content[1] == 'isuser':
                 pass

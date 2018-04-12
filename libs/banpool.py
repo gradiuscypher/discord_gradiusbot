@@ -22,24 +22,27 @@ class BanPoolManager:
         """
         try:
             # Identify the banpool that the User ID will be added to
-            banpool = session.query(BanPool).filter(BanPool.pool_name==banpool_name).one()
+            banpool_query = session.query(BanPool).filter(BanPool.pool_name==banpool_name)
 
-            # The banpool name existed
-            if banpool:
-                # Determine if the user has already been added to the banpool
-                user_query = session.query(DiscordUser).filter(DiscordUser.banpool_id==banpool.id, DiscordUser.user_id==user_id)
+            if banpool_query.count() > 0:
+                banpool = banpool_query.one()
 
-                if user_query.count() == 0:
-                    ban_date = datetime.now()
-                    new_discord_user = DiscordUser(user_id=user_id, ban_date=ban_date, banpool_id=banpool.id)
-                    session.add(new_discord_user)
-                    session.commit()
-                    return "User has been added to the banpool.", True
-                else:
-                    return "This user is already a part of this banpool.", False
+                # The banpool name existed
+                if banpool:
+                    # Determine if the user has already been added to the banpool
+                    user_query = session.query(DiscordUser).filter(DiscordUser.banpool_id==banpool.id, DiscordUser.user_id==user_id)
 
-            # The banpool name did not exist
+                    if user_query.count() == 0:
+                        ban_date = datetime.now()
+                        new_discord_user = DiscordUser(user_id=user_id, ban_date=ban_date, banpool_id=banpool.id)
+                        session.add(new_discord_user)
+                        session.commit()
+                        return "User has been added to the banpool.", True
+                    else:
+                        return "This user is already a part of this banpool.", False
+
             else:
+                # The banpool name did not exist
                 return "This banpool does not exist.", False
 
         except:
