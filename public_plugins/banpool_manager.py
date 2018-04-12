@@ -183,7 +183,7 @@ async def action(message, client, config):
                 user_embed = Embed(title="Discord User", color=Color.green())
                 user_embed.add_field(name="User ID", value=user_id, inline=False)
                 server_name_string = ''
-                user_name_string = ''
+                user_object = None
 
                 for server in client.servers:
                     user = server.get_member(user_id)
@@ -191,11 +191,13 @@ async def action(message, client, config):
                     if user:
                         found_user = True
                         server_name_string += server.name + "\n"
-                        user_name_string += user.name + "\n"
+                        user_object = user
 
                 if found_user:
-                    user_embed.add_field(name="Server Name", value=server_name_string)
-                    user_embed.add_field(name="User Name", value=user_name_string)
+                    user_embed.add_field(name="In Servers", value=server_name_string)
+                    user_embed.add_field(name="User Name", value=user_object.name + "#" + str(user_object.discriminator), inline=True)
+                    user_embed.set_thumbnail(url=user_object.avatar_url)
+
                     await client.send_message(message.channel, embed=user_embed)
                 else:
                     fail_embed = Embed(title="Discord User", color=Color.red(), description="User was not found on any of my servers.")
