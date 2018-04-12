@@ -197,6 +197,26 @@ class BanPoolManager:
             print(traceback.format_exc())
             return False
 
+    def is_user_banned(self, user_id):
+        """
+        Checks if the user is in any banpool
+        :param user_id:
+        :return:
+        """
+        try:
+            user_query = session.query(DiscordUser).filter(DiscordUser.user_id==user_id)
+
+            if user_query.count() > 0:
+                user = user_query.one()
+                banpool = session.query(BanPool).filter(BanPool.id==user.banpool_id).one()
+
+                return banpool.pool_name, True
+            else:
+                return "User is not in any banpool.", False
+        except:
+            print(traceback.format_exc())
+            return "An error has occurred.", False
+
     def is_user_in_exceptions(self, user_id, server_id):
         """
         Checks if a User ID is in the exception list for server_id

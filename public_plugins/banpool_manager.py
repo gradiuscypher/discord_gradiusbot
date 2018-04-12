@@ -44,6 +44,7 @@ async def action(message, client, config):
         split_content = message.content.split()
 
         if split_content[0] == '!bp':
+
             if split_content[1] == 'help':
                 pass
 
@@ -161,8 +162,41 @@ async def action(message, client, config):
                     notice_embed = Embed(title="BanPool Manager", color=Color.red(), description=result[0])
                 await client.send_message(message.channel, embed=notice_embed)
 
-            if split_content[1] == 'isuserbanned':
-                pass
+            if split_content[1] == 'isuserbanned' and len(split_content) == 3:
+                user_id = split_content[2]
+                result = banpool_manager.is_user_banned(user_id)
 
-            if split_content[1] == 'getuserinfo':
-                pass
+                if result[1]:
+                    # The add was successful
+                    notice_embed = Embed(title="BanPool Manager", color=Color.green(),
+                                         description='User is in banpool: ' + result[0])
+                else:
+                    # The add was not successful
+                    notice_embed = Embed(title="BanPool Manager", color=Color.red(), description=result[0])
+
+                await client.send_message(message.channel, embed=notice_embed)
+
+            if split_content[1] == 'getuserinfo' and len(split_content) == 3:
+                user_id = split_content[2]
+                found_user = False
+
+                user_embed = Embed(title="Discord User", color=Color.green())
+                user_embed.add_field(name="User ID", value=user_id, inline=False)
+                server_name_string = ''
+                user_name_string = ''
+
+                for server in client.servers:
+                    user = server.get_member(user_id)
+
+                    if user:
+                        found_user = True
+                        server_name_string += server.name + "\n"
+                        user_name_string += user.name + "\n"
+
+                if found_user:
+                    user_embed.add_field(name="Server Name", value=server_name_string)
+                    user_embed.add_field(name="User Name", value=user_name_string)
+                    await client.send_message(message.channel, embed=user_embed)
+                else:
+                    fail_embed = Embed(title="Discord User", color=Color.red(), description="User was not found on any of my servers.")
+                    await client.send_message(message.channel, embed=fail_embed)
