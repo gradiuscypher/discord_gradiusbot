@@ -6,7 +6,7 @@ from discord import Embed, Color
 print("[Private Plugin] <admin_panel.py>: This plugin lets you administer your bot.")
 
 # Setup Logging
-logger = logging.getLogger('banpool_manager')
+logger = logging.getLogger('banpool_admin_panel')
 logger.setLevel(logging.DEBUG)
 fh = logging.FileHandler('banpool_admin.log')
 fh.setLevel(logging.DEBUG)
