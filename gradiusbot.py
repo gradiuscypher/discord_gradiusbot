@@ -228,6 +228,7 @@ def main_task(config_file):
             client.run(token)
     except KeyboardInterrupt:
         print("Killed by keboard!")
+        exit(0)
     except:
         print("There was an exception:")
         print(traceback.print_exc())
