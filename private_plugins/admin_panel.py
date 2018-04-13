@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import discord
+import operator
 from discord import Embed, Color
 
 print("[Private Plugin] <admin_panel.py>: This plugin lets you administer your bot.")
@@ -39,3 +40,28 @@ async def action(message, client, config):
                 result_str += "```"
 
                 await client.send_message(message.channel, result_str)
+
+            if split_content[1] == 'usercount':
+                result_embed = Embed(title="", color=Color.green())
+                servers = client.servers
+                result_dict = {}
+                result_embed.description = "**Total Servers: **" + str(len(servers))
+                server_names = ""
+                server_counts = ""
+                total_users = 0
+
+                for server in servers:
+                    result_dict[server.name] = len(server.members)
+
+                sorted_val = sorted(result_dict.items(), key=operator.itemgetter(1))
+
+                for i in sorted_val:
+                    server_names += i[0] + "\n"
+                    server_counts += str(i[1]) + "\n"
+                    total_users += i[1]
+
+                result_embed.description += "  **Total Users: **" + str(total_users)
+                result_embed.add_field(name="User Count", value=server_counts)
+                result_embed.add_field(name="Servers", value=server_names)
+
+                await client.send_message(message.channel, embed=result_embed)
