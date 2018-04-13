@@ -110,10 +110,11 @@ async def action(message, client, config):
                     if split_content[1] == 'listusers' and len(split_content) == 3:
                         banpool_name = split_content[2]
                         userlist = banpool_manager.banpool_user_list(banpool_name)
-
                         ul_embed = Embed(title=banpool_name + " banned IDs", color=Color.green())
 
                         if userlist:
+                            userlist_len = str(len(userlist))
+                            ul_embed.title = banpool_name + ": {} banned IDs".format(userlist_len)
                             # Split the list into chunks
                             user_chunks = chunks(userlist, 25)
                             for chunk in user_chunks:
