@@ -57,16 +57,20 @@ async def action(client, config):
                             is_exception = banpool_manager.is_user_in_exceptions(user_id, server.id)
 
                             if not is_exception:
-                                logger.debug('member is in the banpool and has no exceptions: {}'.format(user_id))
-                                ban_embed = Embed(title="User Banned via Task", color=Color.green())
-                                ban_embed.add_field(name="Server ID", value=server.id, inline=True)
-                                ban_embed.add_field(name="User ID", value=user_id, inline=True)
-                                ban_embed.add_field(name="User Name", value=user.name + "#" + str(user.discriminator), inline=True)
-                                ban_embed.set_thumbnail(url=user.avatar_url)
-                                ban_embed.set_footer(icon_url=server.icon_url, text=server.name)
+                                try:
+                                    logger.debug('member is in the banpool and has no exceptions: {}'.format(user_id))
+                                    ban_embed = Embed(title="User Banned via Task", color=Color.green())
+                                    ban_embed.add_field(name="Server ID", value=server.id, inline=True)
+                                    ban_embed.add_field(name="User ID", value=user_id, inline=True)
+                                    ban_embed.add_field(name="User Name", value=user.name + "#" + str(user.discriminator), inline=True)
+                                    ban_embed.set_thumbnail(url=user.avatar_url)
+                                    ban_embed.set_footer(icon_url=server.icon_url, text=server.name)
 
-                                await client.ban(user)
-                                await client.send_message(admin_chan, embed=ban_embed)
+                                    await client.ban(user)
+                                    await client.send_message(admin_chan, embed=ban_embed)
+                                except:
+                                    logger.error("Failed to execute ban on {}[{}] server".format(server.name, server.id))
+                                    logger.error(traceback.format_exc())
 
             await asyncio.sleep(task_length)
         except:
