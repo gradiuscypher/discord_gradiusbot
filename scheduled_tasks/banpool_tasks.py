@@ -3,7 +3,7 @@ import discord
 import logging
 import traceback
 from libs import banpool
-from discord import Embed, Color
+from discord import Embed, Color, Permissions
 
 print("[Scheduled Task] <banpool_tasks.py>: Scheduled tasks for the banpool.")
 
@@ -49,11 +49,17 @@ async def action(client, config):
 
                 # Iterate through each server, looking for banned user IDs
                 for server in client.servers:
+                    # Validate bot's permissions
+                    bot_perms = server.me.server_permissions
+
+                    if not bot_perms.ban_members:
+                        logger.error("The bot does not have ban permissions on {}[{}]".format(server.name, server.id))
+
                     for user_id in banned_user_ids:
                         user = server.get_member(str(user_id))
 
                         # If a user was found, check to see if there's an exception. If not, ban them.
-                        if user:
+                        if user and bot_perms.ban_members:
                             is_exception = banpool_manager.is_user_in_exceptions(user_id, server.id)
 
                             if not is_exception:

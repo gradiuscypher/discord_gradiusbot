@@ -60,7 +60,9 @@ async def action(member, client, config, event_type, object_after=None):
 
                 is_exception = banpool_manager.is_user_in_exceptions(user_id, server_id)
 
-                if not is_exception:
+                bot_perms = member.server.me.server_permissions
+
+                if not is_exception and bot_perms.ban_members:
                     logger.debug('member joined is in the banpool and has no exceptions: {}'.format(member.id))
                     ban_embed = Embed(title="User Banned on Join", color=Color.green())
                     ban_embed.add_field(name="Server ID", value=server_id, inline=True)
