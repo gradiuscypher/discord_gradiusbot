@@ -8,7 +8,7 @@ print("[Private Plugin] <admin_panel.py>: This plugin lets you administer your b
 # Setup Logging
 logger = logging.getLogger('banpool_manager')
 logger.setLevel(logging.DEBUG)
-fh = logging.FileHandler('banpool.log')
+fh = logging.FileHandler('banpool_admin.log')
 fh.setLevel(logging.DEBUG)
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
@@ -26,7 +26,16 @@ async def action(message, client, config):
     if message.author.id == admin_id:
         split_content = message.content.split()
 
-        if split_content[0] == '!admin':
-            pass
+        if split_content[0] == '!admin' and len(split_content) > 1:
+            logger.info("{}#{} [{}] has attempted to execute command {}".format(
+                message.author.name, message.author.discriminator, message.author.id, message.content))
 
-        # await client.send_message(message.channel, "Your message: " + message.content)
+            if split_content[1] == 'listservers':
+                server_list = client.servers
+                result_str = "```"
+
+                for server in server_list:
+                    result_str += server.name + "\n"
+                result_str += "```"
+
+                await client.send_message(message.channel, result_str)
