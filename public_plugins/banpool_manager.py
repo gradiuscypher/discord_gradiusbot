@@ -2,6 +2,7 @@ import asyncio
 import discord
 import logging
 import traceback
+import re
 from libs import banpool
 from discord import Embed, Color
 
@@ -50,6 +51,10 @@ All commands start with `!bp`. Do not include the `<` or `>` brackets in your co
 !bp isuserbanned <USER_ID> - check if the user ID is in any banpools
 
 !bp getuserinfo <USER_ID> - check to see if the user ID is present in any servers
+
+!bp whatservers - list what servers the bot is in
+
+!bp serversmissing - list what servers the bot is not in, based on the CommunityMains invite channel
 ```
 """
 
@@ -254,5 +259,34 @@ async def action(message, client, config):
                         else:
                             fail_embed = Embed(title="Discord User", color=Color.red(), description="User was not found on any of my servers.")
                             await client.send_message(message.channel, embed=fail_embed)
+
+                    if split_content[1] == 'whatservers' and len(split_content) == 2:
+                        server_list = client.servers
+                        result_str = "```"
+
+                        for server in server_list:
+                            result_str += server.name + "\n"
+                        result_str += "```"
+
+                        await client.send_message(message.channel, result_str)
+
+                    if split_content[1] == 'serversmissing' and len(split_content) == 2:
+                        community_server = client.get_server('125440014904590336')
+                        community_chan = community_server.get_channel('324969552452780042')
+                        result_string = '**Servers without Tim**\n```'
+
+                        await client.send_message(message.channel, "Processing invite list, please wait ...")
+
+                        async for hist_message in client.logs_from(community_chan, limit=500):
+
+                            for invite in re.findall(r"https?://discord.gg/\w*", hist_message.content):
+                                found_invite = await client.get_invite(invite)
+
+                                if found_invite.server not in client.servers:
+                                    result_string += found_invite.server.name + "\n"
+
+                        result_string += '```'
+
+                        await client.send_message(message.channel, result_string)
     except:
         logger.error(traceback.format_exc())

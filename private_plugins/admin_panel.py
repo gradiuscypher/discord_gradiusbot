@@ -2,6 +2,7 @@ import asyncio
 import logging
 import discord
 import operator
+import re
 from discord import Embed, Color
 
 print("[Private Plugin] <admin_panel.py>: This plugin lets you administer your bot.")
@@ -65,3 +66,22 @@ async def action(message, client, config):
                 result_embed.add_field(name="Servers", value=server_names)
 
                 await client.send_message(message.channel, embed=result_embed)
+
+            if split_content[1] == 'missingservers' and len(split_content) == 2:
+                community_server = client.get_server('125440014904590336')
+                community_chan = community_server.get_channel('324969552452780042')
+                result_string = '**Servers without Tim**\n```'
+
+                await client.send_message(message.channel, "Processing invite list, please wait ...")
+
+                async for hist_message in client.logs_from(community_chan, limit=500):
+
+                    for invite in re.findall(r"https?://discord.gg/\w*", hist_message.content):
+                        found_invite = await client.get_invite(invite)
+
+                        if found_invite.server not in client.servers:
+                            result_string += found_invite.server.name + "\n"
+
+                result_string += '```'
+                await client.send_message(message.channel, result_string)
+
