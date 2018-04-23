@@ -71,19 +71,28 @@ async def action(message, client, config):
                 community_server = client.get_server('125440014904590336')
                 community_chan = community_server.get_channel('324969552452780042')
                 result_string = '**Servers without Tim**\n```'
+                invalid_links = '**Invalid Invite Links**\n```'
 
                 await client.send_message(message.channel, "Processing invite list, please wait ...")
 
                 async for hist_message in client.logs_from(community_chan, limit=500):
 
                     for invite in re.findall(r"https?://discord.gg/\w*", hist_message.content):
-                        found_invite = await client.get_invite(invite)
+                        try:
+                            found_invite = await client.get_invite(invite)
 
-                        if found_invite.server not in client.servers:
-                            result_string += found_invite.server.name + "\n"
+                            if found_invite.server not in client.servers:
+                                result_string += found_invite.server.name + "\n"
+                        except discord.errors.NotFound:
+                            logger.debug('Unable to find a valid invite with this invite: {}'.format(invite))
+                            reformatted_link = invite.replace('.', '[.]')
+                            invalid_links += "{}".format(reformatted_link) + "\n"
+                            continue
 
                 result_string += '```'
+                invalid_links += '```'
                 await client.send_message(message.channel, result_string)
+                await client.send_message(message.channel, invalid_links)
 
             if split_content[1] == 'getuserinfo' and len(split_content) == 3:
                 user_id = split_content[2]
