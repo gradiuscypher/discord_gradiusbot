@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# Discord 1.0 docs: http://discordpy.readthedocs.io/en/rewrite/index.html
 import discord
 import configparser
 import traceback
