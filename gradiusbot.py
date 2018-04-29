@@ -231,18 +231,33 @@ async def on_guild_channel_pins_update(channel, last_pin):
 # When a member leaves or joins a guild
 @client.event
 async def on_member_join(member):
-    pass
+    for plugin in plugins.event_plugins.member:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action(event_type='member.join', member=member))
+        except:
+            logger.error(traceback.format_exc())
 
 
 @client.event
 async def on_member_remove(member):
-    pass
+    for plugin in plugins.event_plugins.member:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action(event_type='member.remove', member=member))
+        except:
+            logger.error(traceback.format_exc())
 
 
 # When a member updates their profile
 @client.event
 async def on_member_update(before, after):
-    pass
+    for plugin in plugins.event_plugins.member:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action(event_type='member.update', before=before, after=after))
+        except:
+            logger.error(traceback.format_exc())
 
 
 # When the client joins a guild or creates a guild
@@ -321,19 +336,34 @@ async def on_guild_unavailable(guild):
 # When a member updates their voice state
 @client.event
 async def on_voice_state_update(member, before, after):
-    pass
+    for plugin in plugins.event_plugins.member:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action(event_type='member.voice.update', member=member, before=before, after=after))
+        except:
+            logger.error(traceback.format_exc())
 
 
 # When a member is banned from a guild
 @client.event
 async def on_member_ban(guild, user):
-    pass
+    for plugin in plugins.event_plugins.member:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action(event_type='member.ban', guild=guild, user=user))
+        except:
+            logger.error(traceback.format_exc())
 
 
 # When a member is unbanned from a guild
 @client.event
 async def on_member_unban(guild, user):
-    pass
+    for plugin in plugins.event_plugins.member:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action(event_type='member.unban', guild=guild, user=user))
+        except:
+            logger.error(traceback.format_exc())
 
 
 # When someone joins/leaves a group (private channel)
