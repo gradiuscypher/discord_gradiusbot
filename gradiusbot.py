@@ -5,6 +5,8 @@ import configparser
 import traceback
 import logging
 from sys import argv
+from libs import plugin_loader
+from asyncio import ensure_future
 
 # Setup Config
 config = configparser.RawConfigParser()
@@ -30,6 +32,9 @@ logger.addHandler(ch)
 # Grab config values
 token = config.get('gradiusbot', 'token')
 
+# Create the plugin loader
+plugins = plugin_loader.PluginLoader()
+
 # Create Discord Client
 client = discord.Client()
 
@@ -53,8 +58,23 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content.startswith('$hello'):
-        await message.channel.send('hello!')
+    # Is it a private message?
+    if isinstance(message.channel, discord.abc.PrivateChannel):
+        for plugin in plugins.private_plugins:
+            try:
+                # Launch the plugin and the method .action
+                ensure_future(plugin.action(message, config))
+            except:
+                logger.error(traceback.format_exc())
+
+    # Is it a Guild Message
+    if isinstance(message.channel, discord.abc.GuildChannel):
+        for plugin in plugins.public_plugins:
+            try:
+                # Launch the plugin and the method .action
+                ensure_future(plugin.action(message, config))
+            except:
+                logger.error(traceback.format_exc())
 
 
 # When a message is deleted
@@ -248,4 +268,10 @@ async def on_relationship_update(before, after):
     pass
 
 
-client.run(token)
+if __name__ == '__main__':
+    # Load the plugins that are configured in the config file
+    logger.debug("Loading plugins...")
+    plugins.load_plugins(config)
+
+    # Start the client
+    client.run(token)

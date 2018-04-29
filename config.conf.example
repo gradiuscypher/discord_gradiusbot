@@ -1,2 +1,6 @@
 [gradiusbot]
 token =
+public_plugins = []
+private_plugins = []
+event_plugins = []
+scheduled_tasks = []
