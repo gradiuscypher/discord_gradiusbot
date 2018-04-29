@@ -39,6 +39,7 @@ class PluginLoader:
         self.private_event_plugin_config = None
         self.guild_event_plugin_config = None
         self.member_event_plugin_config = None
+        self.client_event_plugin_config = None
 
     def load_plugins(self, config):
         self.config = config
@@ -52,6 +53,7 @@ class PluginLoader:
         self.private_event_plugin_config = json.loads(self.config.get('gradiusbot', 'event_plugins.private'))
         self.guild_event_plugin_config = json.loads(self.config.get('gradiusbot', 'event_plugins.guild'))
         self.member_event_plugin_config = json.loads(self.config.get('gradiusbot', 'event_plugins.member'))
+        self.client_event_plugin_config = json.loads(self.config.get('gradiusbot', 'event_plugins.client'))
 
         # Load public plugins
         count = 0
@@ -129,6 +131,17 @@ class PluginLoader:
                 self.event_plugins.member.append(import_module(self.event_plugin_dir + '.member.' + plugin + '.' + plugin))
                 count += 1
         self.logger.info("Loaded " + str(count) + " member event plugins.")
+
+        # Load member event plugins
+        count = 0
+        for plugin in self.client_event_plugin_config:
+            plugin_file = plugin + '.py'
+            location = os.path.join(self.event_plugin_dir, 'client', plugin, plugin_file)
+
+            if not os.path.isdir(location):
+                self.event_plugins.member.append(import_module(self.event_plugin_dir + '.client.' + plugin + '.' + plugin))
+                count += 1
+        self.logger.info("Loaded " + str(count) + " client event plugins.")
 
         # Load scheduled tasks
         count = 0

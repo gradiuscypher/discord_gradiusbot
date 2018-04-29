@@ -263,13 +263,23 @@ async def on_member_update(before, after):
 # When the client joins a guild or creates a guild
 @client.event
 async def on_guild_join(guild):
-    pass
+    for plugin in plugins.event_plugins.client:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action(event_type='client.guild.join', guild=guild))
+        except:
+            logger.error(traceback.format_exc())
 
 
 # When a guild is removed from the client
 @client.event
 async def on_guild_remove(guild):
-    pass
+    for plugin in plugins.event_plugins.client:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action(event_type='client.guild.remove', guild=guild))
+        except:
+            logger.error(traceback.format_exc())
 
 
 # When a guild updates
@@ -325,12 +335,22 @@ async def on_guild_emojis_update(guild, before, after):
 # When a guild becomes available or unavailable
 @client.event
 async def on_guild_available(guild):
-    pass
+    for plugin in plugins.event_plugins.client:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action(event_type='client.guild.available', guild=guild))
+        except:
+            logger.error(traceback.format_exc())
 
 
 @client.event
 async def on_guild_unavailable(guild):
-    pass
+    for plugin in plugins.event_plugins.client:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action(event_type='client.guild.unavailable', guild=guild))
+        except:
+            logger.error(traceback.format_exc())
 
 
 # When a member updates their voice state
