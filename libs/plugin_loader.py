@@ -8,7 +8,7 @@ class EventPlugin:
     def __init__(self):
         self.messages = []
         self.reactions = []
-        self.guilds = []
+        self.guild = []
         self.members = []
         self.private_channels = []
         self.client = []
@@ -37,6 +37,7 @@ class PluginLoader:
         self.message_event_plugin_config = None
         self.reaction_event_plugin_config = None
         self.private_event_plugin_config = None
+        self.guild_event_plugin_config = None
 
     def load_plugins(self, config):
         self.config = config
@@ -48,6 +49,7 @@ class PluginLoader:
         self.message_event_plugin_config = json.loads(self.config.get('gradiusbot', 'event_plugins.messages'))
         self.reaction_event_plugin_config = json.loads(self.config.get('gradiusbot', 'event_plugins.reactions'))
         self.private_event_plugin_config = json.loads(self.config.get('gradiusbot', 'event_plugins.private'))
+        self.guild_event_plugin_config = json.loads(self.config.get('gradiusbot', 'event_plugins.guild'))
 
         # Load public plugins
         count = 0
@@ -103,6 +105,17 @@ class PluginLoader:
                 self.event_plugins.private_channels.append(import_module(self.event_plugin_dir + '.private.' + plugin + '.' + plugin))
                 count += 1
         self.logger.info("Loaded " + str(count) + " private channel event plugins.")
+
+        # Load guild event plugins
+        count = 0
+        for plugin in self.guild_event_plugin_config:
+            plugin_file = plugin + '.py'
+            location = os.path.join(self.event_plugin_dir, 'guild', plugin, plugin_file)
+
+            if not os.path.isdir(location):
+                self.event_plugins.guild.append(import_module(self.event_plugin_dir + '.guild.' + plugin + '.' + plugin))
+                count += 1
+        self.logger.info("Loaded " + str(count) + " guild event plugins.")
 
         # Load scheduled tasks
         count = 0

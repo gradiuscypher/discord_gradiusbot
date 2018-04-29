@@ -188,24 +188,44 @@ async def on_private_channel_pins_update(channel, last_pin):
 # When a guild channel is deleted or created
 @client.event
 async def on_guild_channel_create(channel):
-    pass
+    for plugin in plugins.event_plugins.guild:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action('create_channel', channel, config))
+        except:
+            logger.error(traceback.format_exc())
 
 
 @client.event
 async def on_guild_channel_delete(channel):
-    pass
+    for plugin in plugins.event_plugins.guild:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action('delete_channel', channel, config))
+        except:
+            logger.error(traceback.format_exc())
 
 
 # When a guild channel is updated
 @client.event
 async def on_guild_channel_update(before, after):
-    pass
+    for plugin in plugins.event_plugins.guild:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action('channel_update', before, config, after=after))
+        except:
+            logger.error(traceback.format_exc())
 
 
-# When a guild channel's message is pinned or unpinned
+# When a guild channel's message is pinned or unpinned, last_pin is None if there are no pins
 @client.event
 async def on_guild_channel_pins_update(channel, last_pin):
-    pass
+    for plugin in plugins.event_plugins.guild:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action('pin_update', channel, config, after=last_pin))
+        except:
+            logger.error(traceback.format_exc())
 
 
 # When a member leaves or joins a guild
@@ -240,29 +260,50 @@ async def on_guild_remove(guild):
 # When a guild updates
 @client.event
 async def on_guild_update(before, after):
-    pass
+    for plugin in plugins.event_plugins.guild:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action('guild_update', before, config, after=after))
+        except:
+            logger.error(traceback.format_exc())
 
 
 # When a guild creates or deletes a role
 @client.event
 async def on_guild_role_create(role):
-    pass
+    for plugin in plugins.event_plugins.guild:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action('guild_role_create', role, config))
+        except:
+            logger.error(traceback.format_exc())
 
 
 @client.event
 async def on_guild_role_delete(role):
-    pass
+    for plugin in plugins.event_plugins.guild:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action('guild_role_delete', role, config))
+        except:
+            logger.error(traceback.format_exc())
 
 
 # When a guild updates a role
 @client.event
 async def on_guild_role_update(before, after):
-    pass
+    for plugin in plugins.event_plugins.guild:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action('guild_role_update', before, config, after=after))
+        except:
+            logger.error(traceback.format_exc())
 
 
 # When a guild adds or removes an emoji
 @client.event
 async def on_guild_emojis_update(guild, before, after):
+    # TODO: implement
     pass
 
 
