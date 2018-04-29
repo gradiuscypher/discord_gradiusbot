@@ -67,7 +67,7 @@ async def on_message(message):
             except:
                 logger.error(traceback.format_exc())
 
-    # Is it a Guild Message
+    # Is it a Guild Message?
     if isinstance(message.channel, discord.abc.GuildChannel):
         for plugin in plugins.public_plugins:
             try:
@@ -80,31 +80,56 @@ async def on_message(message):
 # When a message is deleted
 @client.event
 async def on_message_delete(message):
-    pass
+    for plugin in plugins.event_plugins.messages:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action('delete', message, config))
+        except:
+            logger.error(traceback.format_exc())
 
 
 # When a message is edited
 @client.event
 async def on_message_edit(before, after):
-    pass
+    for plugin in plugins.event_plugins.messages:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action('edit', before, config, after=after))
+        except:
+            logger.error(traceback.format_exc())
 
 
 # When a reaction is added
 @client.event
 async def on_reaction_add(reaction, user):
-    pass
+    for plugin in plugins.event_plugins.reactions:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action('add', reaction, config, user=user))
+        except:
+            logger.error(traceback.format_exc())
 
 
 # When a reaction is removed
 @client.event
 async def on_reaction_remove(reaction, user):
-    pass
+    for plugin in plugins.event_plugins.reactions:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action('remove', reaction, config, user=user))
+        except:
+            logger.error(traceback.format_exc())
 
 
 # When a message has all reactions removed
 @client.event
 async def on_reaction_clear(payload):
-    pass
+    for plugin in plugins.event_plugins.reactions:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action('clear', payload, config))
+        except:
+            logger.error(traceback.format_exc())
 
 
 # When a private channel is created

@@ -2,5 +2,6 @@
 token =
 public_plugins = []
 private_plugins = []
-event_plugins = []
 scheduled_tasks = []
+event_plugins.messages = []
+event_plugins.reactions = []
