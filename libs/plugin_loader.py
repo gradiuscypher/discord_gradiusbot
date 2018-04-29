@@ -94,10 +94,10 @@ class PluginLoader:
         # Load scheduled tasks
         count = 0
         for plugin in self.scheduled_tasks_config:
-            location = os.path.join(self.scheduled_tasks_dir, plugin)
+            plugin_file = plugin + '.py'
+            location = os.path.join(self.scheduled_tasks_dir, plugin, plugin_file)
 
             if not os.path.isdir(location):
-                plugin_name = plugin.replace('.py', '')
-                self.scheduled_tasks.append(import_module(self.scheduled_tasks_dir + "." + plugin_name))
+                self.scheduled_tasks.append(import_module(self.scheduled_tasks_dir + '.' + plugin + '.' + plugin))
                 count += 1
         self.logger.info("Loaded " + str(count) + " scheduled tasks.")

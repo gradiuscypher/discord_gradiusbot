@@ -39,6 +39,16 @@ plugins = plugin_loader.PluginLoader()
 client = discord.Client()
 
 
+@client.async_event
+def background_tasks():
+    for task in plugins.scheduled_tasks:
+        try:
+            ensure_future(task.action(client, config))
+        except:
+            print("There was an error with: " + str(task))
+            print(traceback.format_exc())
+
+
 # When the client is connected and ready
 @client.event
 async def on_ready():
@@ -297,6 +307,9 @@ if __name__ == '__main__':
     # Load the plugins that are configured in the config file
     logger.debug("Loading plugins...")
     plugins.load_plugins(config)
+
+    # Setup scheduled tasks loop
+    client.loop.create_task(background_tasks())
 
     # Start the client
     client.run(token)
