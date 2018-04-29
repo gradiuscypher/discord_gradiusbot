@@ -12,6 +12,7 @@ class EventPlugin:
         self.member = []
         self.private_channels = []
         self.client = []
+        self.relationships = []
 
 
 class PluginLoader:
@@ -40,6 +41,7 @@ class PluginLoader:
         self.guild_event_plugin_config = None
         self.member_event_plugin_config = None
         self.client_event_plugin_config = None
+        self.relationships_event_plugin_config = None
 
     def load_plugins(self, config):
         self.config = config
@@ -54,6 +56,7 @@ class PluginLoader:
         self.guild_event_plugin_config = json.loads(self.config.get('gradiusbot', 'event_plugins.guild'))
         self.member_event_plugin_config = json.loads(self.config.get('gradiusbot', 'event_plugins.member'))
         self.client_event_plugin_config = json.loads(self.config.get('gradiusbot', 'event_plugins.client'))
+        self.relationships_event_plugin_config = json.loads(self.config.get('gradiusbot', 'event_plugins.relationships'))
 
         # Load public plugins
         count = 0
@@ -132,7 +135,7 @@ class PluginLoader:
                 count += 1
         self.logger.info("Loaded " + str(count) + " member event plugins.")
 
-        # Load member event plugins
+        # Load client event plugins
         count = 0
         for plugin in self.client_event_plugin_config:
             plugin_file = plugin + '.py'
@@ -142,6 +145,17 @@ class PluginLoader:
                 self.event_plugins.member.append(import_module(self.event_plugin_dir + '.client.' + plugin + '.' + plugin))
                 count += 1
         self.logger.info("Loaded " + str(count) + " client event plugins.")
+
+        # Load relationship event plugins
+        count = 0
+        for plugin in self.relationships_event_plugin_config:
+            plugin_file = plugin + '.py'
+            location = os.path.join(self.event_plugin_dir, 'relationships', plugin, plugin_file)
+
+            if not os.path.isdir(location):
+                self.event_plugins.relationships.append(import_module(self.event_plugin_dir + '.relationships.' + plugin + '.' + plugin))
+                count += 1
+        self.logger.info("Loaded " + str(count) + " relationship event plugins.")
 
         # Load scheduled tasks
         count = 0

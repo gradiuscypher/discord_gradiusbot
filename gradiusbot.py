@@ -400,18 +400,33 @@ async def on_group_remove(channel, user):
 # When a relationship is added or removed
 @client.event
 async def on_relationship_add(relationship):
-    pass
+    for plugin in plugins.event_plugins.relationships:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action(event_type='relationship.add', relationship=relationship))
+        except:
+            logger.error(traceback.format_exc())
 
 
 @client.event
 async def on_relationship_remove(relationship):
-    pass
+    for plugin in plugins.event_plugins.relationships:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action(event_type='relationship.remove', relationship=relationship))
+        except:
+            logger.error(traceback.format_exc())
 
 
 # When a relationship is updated (block a friend, friendship is accepted)
 @client.event
 async def on_relationship_update(before, after):
-    pass
+    for plugin in plugins.event_plugins.relationships:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action(event_type='relationship.update', before=before, after=after))
+        except:
+            logger.error(traceback.format_exc())
 
 
 if __name__ == '__main__':
