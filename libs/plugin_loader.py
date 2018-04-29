@@ -36,6 +36,7 @@ class PluginLoader:
         self.event_plugin_dir = 'event_plugins'
         self.message_event_plugin_config = None
         self.reaction_event_plugin_config = None
+        self.private_event_plugin_config = None
 
     def load_plugins(self, config):
         self.config = config
@@ -46,6 +47,7 @@ class PluginLoader:
         # Event Plugin Config
         self.message_event_plugin_config = json.loads(self.config.get('gradiusbot', 'event_plugins.messages'))
         self.reaction_event_plugin_config = json.loads(self.config.get('gradiusbot', 'event_plugins.reactions'))
+        self.private_event_plugin_config = json.loads(self.config.get('gradiusbot', 'event_plugins.private'))
 
         # Load public plugins
         count = 0
@@ -90,6 +92,17 @@ class PluginLoader:
                 self.event_plugins.reactions.append(import_module(self.event_plugin_dir + '.reactions.' + plugin + '.' + plugin))
                 count += 1
         self.logger.info("Loaded " + str(count) + " reaction event plugins.")
+
+        # Load private event plugins
+        count = 0
+        for plugin in self.private_event_plugin_config:
+            plugin_file = plugin + '.py'
+            location = os.path.join(self.event_plugin_dir, 'private', plugin, plugin_file)
+
+            if not os.path.isdir(location):
+                self.event_plugins.private_channels.append(import_module(self.event_plugin_dir + '.private.' + plugin + '.' + plugin))
+                count += 1
+        self.logger.info("Loaded " + str(count) + " private channel event plugins.")
 
         # Load scheduled tasks
         count = 0

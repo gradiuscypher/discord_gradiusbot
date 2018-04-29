@@ -145,24 +145,44 @@ async def on_reaction_clear(payload):
 # When a private channel is created
 @client.event
 async def on_private_channel_create(channel):
-    pass
+    for plugin in plugins.event_plugins.private_channels:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action('create', channel, config))
+        except:
+            logger.error(traceback.format_exc())
 
 
 @client.event
 async def on_private_channel_delete(channel):
-    pass
+    for plugin in plugins.event_plugins.private_channels:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action('delete', channel, config))
+        except:
+            logger.error(traceback.format_exc())
 
 
 # When a private channel is updated
 @client.event
 async def on_private_channel_update(before, after):
-    pass
+    for plugin in plugins.event_plugins.private_channels:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action('update', before, config, after=after))
+        except:
+            logger.error(traceback.format_exc())
 
 
 # When a message is pinned/unpinned from a private channel
 @client.event
 async def on_private_channel_pins_update(channel, last_pin):
-    pass
+    for plugin in plugins.event_plugins.private_channels:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action('pin_update', channel, config, after=last_pin))
+        except:
+            logger.error(traceback.format_exc())
 
 
 # When a guild channel is deleted or created
