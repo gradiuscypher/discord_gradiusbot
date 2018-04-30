@@ -93,7 +93,7 @@ async def on_message_delete(message):
     for plugin in plugins.event_plugins.messages:
         try:
             # Launch the plugin and the method .action
-            ensure_future(plugin.action('delete', message, config))
+            ensure_future(plugin.action(event_type='delete', message=message))
         except:
             logger.error(traceback.format_exc())
 
@@ -104,7 +104,7 @@ async def on_message_edit(before, after):
     for plugin in plugins.event_plugins.messages:
         try:
             # Launch the plugin and the method .action
-            ensure_future(plugin.action('edit', before, config, after=after))
+            ensure_future(plugin.action(event_type='edit', before=before, after=after))
         except:
             logger.error(traceback.format_exc())
 

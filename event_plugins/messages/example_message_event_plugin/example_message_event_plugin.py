@@ -7,10 +7,14 @@ logger.info("[Message Event Plugin] <example_message_event_plugin.py>: This plug
 
 
 @asyncio.coroutine
-async def action(event_type, message, config, after=None):
+async def action(**kwargs):
+    event_type = kwargs['event_type']
+
     if event_type == 'delete':
+        message = kwargs['message']
         await message.channel.send("You deleted: {}".format(message.content))
 
     if event_type == 'edit':
-        if after:
-            await message.channel.send("You edited a message.\n\n Before it was :```{}```\n\n Now it's: ```{}```".format(message.content, after.content))
+        before = kwargs['before']
+        after = kwargs['after']
+        await before.channel.send("You edited a message.\n\n Before it was :```{}```\n\n Now it's: ```{}```".format(before.content, after.content))
