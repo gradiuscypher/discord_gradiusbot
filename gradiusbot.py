@@ -389,12 +389,22 @@ async def on_member_unban(guild, user):
 # When someone joins/leaves a group (private channel)
 @client.event
 async def on_group_join(channel, user):
-    pass
+    for plugin in plugins.event_plugins.group:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action(event_type='group.join', channel=channel, user=user))
+        except:
+            logger.error(traceback.format_exc())
 
 
 @client.event
 async def on_group_remove(channel, user):
-    pass
+    for plugin in plugins.event_plugins.group:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action(event_type='group.remove', channel=channel, user=user))
+        except:
+            logger.error(traceback.format_exc())
 
 
 # When a relationship is added or removed
