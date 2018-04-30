@@ -115,7 +115,7 @@ async def on_reaction_add(reaction, user):
     for plugin in plugins.event_plugins.reactions:
         try:
             # Launch the plugin and the method .action
-            ensure_future(plugin.action('add', reaction, config, user=user))
+            ensure_future(plugin.action(event_type='add', reaction=reaction, user=user))
         except:
             logger.error(traceback.format_exc())
 
@@ -126,18 +126,18 @@ async def on_reaction_remove(reaction, user):
     for plugin in plugins.event_plugins.reactions:
         try:
             # Launch the plugin and the method .action
-            ensure_future(plugin.action('remove', reaction, config, user=user))
+            ensure_future(plugin.action(event_type='remove', reaction=reaction, user=user))
         except:
             logger.error(traceback.format_exc())
 
 
 # When a message has all reactions removed
 @client.event
-async def on_reaction_clear(payload):
+async def on_reaction_clear(message, reactions):
     for plugin in plugins.event_plugins.reactions:
         try:
             # Launch the plugin and the method .action
-            ensure_future(plugin.action('clear', payload, config))
+            ensure_future(plugin.action(event_type='clear', message=message, reactions=reactions))
         except:
             logger.error(traceback.format_exc())
 
