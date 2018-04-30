@@ -148,7 +148,7 @@ async def on_private_channel_create(channel):
     for plugin in plugins.event_plugins.private_channels:
         try:
             # Launch the plugin and the method .action
-            ensure_future(plugin.action('create', channel, config))
+            ensure_future(plugin.action(event_type='create', channel=channel))
         except:
             logger.error(traceback.format_exc())
 
@@ -158,7 +158,7 @@ async def on_private_channel_delete(channel):
     for plugin in plugins.event_plugins.private_channels:
         try:
             # Launch the plugin and the method .action
-            ensure_future(plugin.action('delete', channel, config))
+            ensure_future(plugin.action(event_type='delete', channel=channel))
         except:
             logger.error(traceback.format_exc())
 
@@ -169,7 +169,7 @@ async def on_private_channel_update(before, after):
     for plugin in plugins.event_plugins.private_channels:
         try:
             # Launch the plugin and the method .action
-            ensure_future(plugin.action('update', before, config, after=after))
+            ensure_future(plugin.action(event_type='delete', before=before, after=after))
         except:
             logger.error(traceback.format_exc())
 
@@ -180,7 +180,7 @@ async def on_private_channel_pins_update(channel, last_pin):
     for plugin in plugins.event_plugins.private_channels:
         try:
             # Launch the plugin and the method .action
-            ensure_future(plugin.action('pin_update', channel, config, after=last_pin))
+            ensure_future(plugin.action(event_type='pin.update', channel=channel, last_pin=last_pin))
         except:
             logger.error(traceback.format_exc())
 
@@ -191,7 +191,7 @@ async def on_guild_channel_create(channel):
     for plugin in plugins.event_plugins.guild:
         try:
             # Launch the plugin and the method .action
-            ensure_future(plugin.action('create_channel', channel, config))
+            ensure_future(plugin.action(event_type='guild.channel.create', channel=channel))
         except:
             logger.error(traceback.format_exc())
 
@@ -201,7 +201,7 @@ async def on_guild_channel_delete(channel):
     for plugin in plugins.event_plugins.guild:
         try:
             # Launch the plugin and the method .action
-            ensure_future(plugin.action('delete_channel', channel, config))
+            ensure_future(plugin.action(event_type='guild.channel.delete', channel=channel))
         except:
             logger.error(traceback.format_exc())
 
@@ -212,7 +212,7 @@ async def on_guild_channel_update(before, after):
     for plugin in plugins.event_plugins.guild:
         try:
             # Launch the plugin and the method .action
-            ensure_future(plugin.action('channel_update', before, config, after=after))
+            ensure_future(plugin.action(event_type='guild.channel.update', before=before, after=after))
         except:
             logger.error(traceback.format_exc())
 
@@ -223,7 +223,7 @@ async def on_guild_channel_pins_update(channel, last_pin):
     for plugin in plugins.event_plugins.guild:
         try:
             # Launch the plugin and the method .action
-            ensure_future(plugin.action('pin_update', channel, config, after=last_pin))
+            ensure_future(plugin.action(event_type='guild.channel.pins.update', channel=channel, last_pin=last_pin))
         except:
             logger.error(traceback.format_exc())
 
@@ -288,7 +288,7 @@ async def on_guild_update(before, after):
     for plugin in plugins.event_plugins.guild:
         try:
             # Launch the plugin and the method .action
-            ensure_future(plugin.action('guild_update', before, config, after=after))
+            ensure_future(plugin.action(event_type='guild.update', before=before, after=after))
         except:
             logger.error(traceback.format_exc())
 
@@ -299,7 +299,7 @@ async def on_guild_role_create(role):
     for plugin in plugins.event_plugins.guild:
         try:
             # Launch the plugin and the method .action
-            ensure_future(plugin.action('guild_role_create', role, config))
+            ensure_future(plugin.action(event_type='guild.role.create', role=role))
         except:
             logger.error(traceback.format_exc())
 
@@ -309,7 +309,7 @@ async def on_guild_role_delete(role):
     for plugin in plugins.event_plugins.guild:
         try:
             # Launch the plugin and the method .action
-            ensure_future(plugin.action('guild_role_delete', role, config))
+            ensure_future(plugin.action(event_type='guild.role.delete', role=role))
         except:
             logger.error(traceback.format_exc())
 
@@ -320,7 +320,7 @@ async def on_guild_role_update(before, after):
     for plugin in plugins.event_plugins.guild:
         try:
             # Launch the plugin and the method .action
-            ensure_future(plugin.action('guild_role_update', before, config, after=after))
+            ensure_future(plugin.action(event_type='guild.role.update', before=before, after=after))
         except:
             logger.error(traceback.format_exc())
 
@@ -328,8 +328,12 @@ async def on_guild_role_update(before, after):
 # When a guild adds or removes an emoji
 @client.event
 async def on_guild_emojis_update(guild, before, after):
-    # TODO: implement
-    pass
+    for plugin in plugins.event_plugins.guild:
+        try:
+            # Launch the plugin and the method .action
+            ensure_future(plugin.action(event_type='guild.emoji.update', guild=guild, before=before, after=after))
+        except:
+            logger.error(traceback.format_exc())
 
 
 # When a guild becomes available or unavailable

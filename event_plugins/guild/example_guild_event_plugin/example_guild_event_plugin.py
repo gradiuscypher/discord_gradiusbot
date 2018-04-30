@@ -7,20 +7,47 @@ logger.info("[Guild Event Plugin] <example_guild_event_plugin.py>: This plugin s
 
 
 @asyncio.coroutine
-async def action(event_type, inital_object, config, after=None):
-    if event_type == 'create_inital_object':
-        print("The {} inital_object was created in {} server.".format(inital_object.name, inital_object.guild.name))
-    if event_type == 'delete_inital_object':
-        print("The {} inital_object was deleted in {} server.".format(inital_object.name, inital_object.guild.name))
-    if event_type == 'inital_object_update' and after:
-        print("A inital_object was updated on {} server.\n\nbefore:{}\n\nafter:{}".format(inital_object.guild.name, inital_object, after))
-    if event_type == 'pin_update':
-        print("{} on {} server had a pin update. Last pin was: {}".format(inital_object.name, inital_object.guild.name, after))
-    if event_type == 'guild_update':
-        print("{} guild has updated.\n\nbefore:{}\n\nafter:{}".format(inital_object.name, inital_object, after))
-    if event_type == 'guild_role_create':
-        print("{} guild has created the role {}".format(inital_object.guild.name, inital_object.name))
-    if event_type == 'guild_role_delete':
-        print("{} guild has deleted the role {}".format(inital_object.guild.name, inital_object.name))
-    if event_type == 'guild_role_update':
-        print("{} guild has updated a role.\n\nbefore:{}\n\nafter:{}".format(inital_object.guild.name, inital_object, after))
+async def action(**kwargs):
+    event_type = kwargs['event_type']
+
+    if event_type == 'guild.channel.create':
+        channel = kwargs['channel']
+        print("A channel named {} was created in the guild named {}".format(channel.name, channel.guild.name))
+
+    if event_type == 'guild.channel.delete':
+        channel = kwargs['channel']
+        print("A channel named {} was deleted in the guild named {}".format(channel.name, channel.guild.name))
+
+    if event_type == 'guild.channel.update':
+        before = kwargs['before']
+        after = kwargs['after']
+        print("A channel was updated in {}.\n\nbefore:{}\n\nafter:{}".format(before.guild.name, before, after))
+
+    if event_type == 'guild.channel.pins.update':
+        channel = kwargs['channel']
+        last_pin = kwargs['last_pin']
+        print("{} had its pins updated. Last pin datetime was {}".format(channel.name, last_pin))
+
+    if event_type == 'guild.update':
+        before = kwargs['before']
+        after = kwargs['after']
+        print("{} was updated.\n\nbefore:{}\n\nafter:{}".format(before.name, before, after))
+
+    if event_type == 'guild.role.create':
+        role = kwargs['role']
+        print("{} role was created on {}".format(role.name, role.guild.name))
+
+    if event_type == 'guild.role.delete':
+        role = kwargs['role']
+        print("{} role was deleted on {}".format(role.name, role.guild.name))
+
+    if event_type == 'guild.role.update':
+        before = kwargs['before']
+        after = kwargs['after']
+        print("{} guild has updated a role.\n\nbefore:{}\n\nafter:{}".format(before.guild.name, before, after))
+
+    if event_type == 'guild.emoji.update':
+        guild = kwargs['guild']
+        before = kwargs['before']
+        after = kwargs['after']
+        print("{} guild has had its emojis updated.\n\nbefore:{}\n\nafter:{}".format(guild.name, before, after))
