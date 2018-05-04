@@ -1,5 +1,8 @@
 [gradiusbot]
 token =
+debug = False
+debug_channel = debug
+# Plugins
 public_plugins = []
 private_plugins = []
 scheduled_tasks = []
