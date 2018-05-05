@@ -73,7 +73,7 @@ async def on_message(message):
         for plugin in plugins.private_plugins:
             try:
                 # Launch the plugin and the method .action
-                ensure_future(plugin.action(message, config))
+                ensure_future(plugin.action(message=message, config=config, client=client))
             except:
                 logger.error(traceback.format_exc())
 
@@ -82,7 +82,7 @@ async def on_message(message):
         for plugin in plugins.public_plugins:
             try:
                 # Launch the plugin and the method .action
-                ensure_future(plugin.action(message, config))
+                ensure_future(plugin.action(message=message, config=config, client=client))
             except:
                 logger.error(traceback.format_exc())
 
