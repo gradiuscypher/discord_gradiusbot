@@ -444,12 +444,21 @@ async def on_relationship_update(before, after):
 
 
 if __name__ == '__main__':
-    # Load the plugins that are configured in the config file
-    logger.debug("Loading plugins...")
-    plugins.load_plugins(config)
+    try:
+        # Load the plugins that are configured in the config file
+        logger.debug("Loading plugins...")
+        plugins.load_plugins(config)
 
-    # Setup scheduled tasks loop
-    client.loop.create_task(background_tasks())
+        # Setup scheduled tasks loop
+        client.loop.create_task(background_tasks())
 
-    # Start the client
-    client.run(token)
+        # Start the client
+        client.run(token)
+
+    except KeyboardInterrupt:
+        print("Killed by keboard!")
+        exit(0)
+
+    except:
+        print("There was an exception:")
+        print(traceback.print_exc())
