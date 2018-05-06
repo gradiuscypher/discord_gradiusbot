@@ -7,7 +7,6 @@ import re
 from libs import banpool
 from discord import Embed, Color
 
-print("[Public Plugin] <banpool_manager.py>: This plugin manages the banpool.")
 
 # Setup the BanPoolManager
 banpool_manager = banpool.BanPoolManager()
@@ -24,6 +23,8 @@ ch.setFormatter(formatter)
 fh.setFormatter(formatter)
 logger.addHandler(ch)
 logger.addHandler(fh)
+
+logger.info("[Public Plugin] <banpool_manager.py>: This plugin manages the banpool.")
 
 help_string = """
 **BanPool Commands**
