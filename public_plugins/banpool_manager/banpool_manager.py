@@ -81,6 +81,9 @@ async def action(**kwargs):
     admin_chan =
     # the time to wait between executing scheduled tasks in seconds
     task_length =
+    # community server where to get Server invites from
+    community_server_id =
+    community_server_chan_id = 
 
     :param message: discord message obj
     :param config: config obj
@@ -91,6 +94,8 @@ async def action(**kwargs):
     admin_server_id = config.getint('banpool', 'admin_server_id')
     admin_group = config.get('banpool', 'admin_group')
     admin_chan = config.get('banpool', 'admin_chan')
+    community_server_id = config.getint('banpool', 'community_server_id')
+    community_server_chan_id = config.getint('banpool', 'community_server_chan_id')
 
     server_id = message.guild.id
     source_chan = message.channel.name
@@ -246,7 +251,7 @@ async def action(**kwargs):
                         user_object = None
 
                         for server in client.guilds:
-                            user = server.get_member(user_id)
+                            user = server.get_member(int(user_id))
 
                             if user:
                                 found_user = True
@@ -264,31 +269,31 @@ async def action(**kwargs):
                             await channel.send(embed=fail_embed)
 
                     if split_content[1] == 'whatservers' and len(split_content) == 2:
-                        server_list = client.servers
-                        result_str = "```"
+                        server_list = client.guilds
+                        result_str = "```\n"
 
                         for server in server_list:
                             result_str += server.name + "\n"
                         result_str += "```"
 
-                        await client.send_message(message.channel, result_str)
+                        await channel.send(result_str)
 
                     if split_content[1] == 'serversmissing' and len(split_content) == 2:
-                        community_server = client.get_guild(125440014904590336)
-                        community_chan = community_server.get_channel(324969552452780042)
+                        community_server = client.get_guild(community_server_id)
+                        community_chan = community_server.get_channel(community_server_chan_id)
                         result_string = '**Servers without Tim**\n```'
                         invalid_links = '**Invalid Invite Links**\n```'
 
-                        await client.send_message(message.channel, "Processing invite list, please wait ...")
+                        await channel.send("Processing invite list, please wait ...")
 
-                        async for hist_message in client.logs_from(community_chan, limit=500):
+                        async for hist_message in community_chan.history(limit=500):
 
                             for invite in re.findall(r"https?://discord.gg/\w*", hist_message.content):
                                 try:
                                     found_invite = await client.get_invite(invite)
 
-                                    if found_invite.server not in client.guilds:
-                                        result_string += found_invite.server.name + "\n"
+                                    if found_invite.guild not in client.guilds:
+                                        result_string += found_invite.guild.name + "\n"
                                 except discord.errors.NotFound:
                                     logger.debug('Unable to find a valid invite with this invite: {}'.format(invite))
                                     reformatted_link = invite.replace('.', '[.]')
