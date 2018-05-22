@@ -11,9 +11,15 @@ session_factory = sessionmaker(bind=engine)
 Session = scoped_session(session_factory)
 session = Session()
 
+# TODO:
+# Add reason to add_user_to_banpool
+# Add reason to add_userlist_to_banpool
+# Add reason to discord chat commands
+# Test
+
 
 class BanPoolManager:
-    def add_user_to_banpool(self, banpool_name, user_id):
+    def add_user_to_banpool(self, banpool_name, user_id, reason):
         """
         Add a User ID to the banpool
         :param banpool_name:
@@ -321,8 +327,9 @@ class DiscordUser(Base):
     user_id = Column(Integer)
     ban_date = Column(DateTime)
     banpool_id = Column(Integer, ForeignKey('banpool.id'))
+    reason = Column(String)
 
     def __repr__(self):
-        return '<DiscordUser(id={}, user_id={}, ban_date={}, banpool_id={}>'.format(
-            self.id, self.user_id, self.ban_date, self.banpool_id
+        return '<DiscordUser(id={}, user_id={}, ban_date={}, banpool_id={}> reason={}'.format(
+            self.id, self.user_id, self.ban_date, self.banpool_id, self.reason
         )
