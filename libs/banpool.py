@@ -217,9 +217,9 @@ class BanPoolManager:
                 user = user_query.one()
                 banpool = session.query(BanPool).filter(BanPool.id==user.banpool_id).one()
 
-                return banpool.pool_name, True, user.reason
+                return banpool.pool_name, True, user.reason, user.last_name, user.last_discrim
             else:
-                return "User is not in any banpool.", False, None
+                return "User is not in any banpool.", False, None, None, None
         except:
             print(traceback.format_exc())
             return "An error has occurred.", False, None
