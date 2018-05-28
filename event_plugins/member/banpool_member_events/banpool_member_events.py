@@ -81,6 +81,7 @@ async def action(**kwargs):
 
                 if not is_exception and bot_perms.ban_members:
                     logger.debug('member joined is in the banpool and has no exceptions: {}'.format(member.id))
+                    banpool_manager.set_last_knowns(user_id, user_name, user_discriminator)
                     ban_embed = Embed(title="User Banned on Join", color=Color.green())
                     ban_embed.add_field(name="Server ID", value=server_id, inline=True)
                     ban_embed.add_field(name="User ID", value=user_id, inline=True)

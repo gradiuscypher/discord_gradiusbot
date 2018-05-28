@@ -295,6 +295,26 @@ class BanPoolManager:
             print(traceback.format_exc())
             return "An error has occurred.", False
 
+    def set_last_knowns(self, user_id, user_name, user_discrim):
+        """
+        Sets the last known identification info of the user banned. Is collected on a ban.
+        :param user_id:
+        :param user_name:
+        :param user_discrim:
+        :return:
+        """
+        try:
+            user_query = session.query(DiscordUser).filter(DiscordUser.user_id==user_id)
+
+            if user_query.count() > 0:
+                user = user_query.one()
+                user.last_name = user_name
+                user.last_discrim = user_discrim
+                session.commit()
+
+        except:
+            print(traceback.format_exc())
+
 
 class BanPool(Base):
     __tablename__ = 'banpool'
@@ -329,6 +349,8 @@ class DiscordUser(Base):
     ban_date = Column(DateTime)
     banpool_id = Column(Integer, ForeignKey('banpool.id'))
     reason = Column(String)
+    last_name = Column(String)
+    last_discrim = Column(String)
 
     def __repr__(self):
         return '<DiscordUser(id={}, user_id={}, ban_date={}, banpool_id={}> reason={}'.format(
