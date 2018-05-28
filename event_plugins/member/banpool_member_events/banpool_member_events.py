@@ -64,6 +64,8 @@ async def action(**kwargs):
 
             # The member is banpooled and we need to ban them
             if result[1]:
+                banpool_name = result[0]
+                reason = result[2]
                 logger.debug('member_join was caught for banpool ID: {}'.format(member.id))
                 user_id = member.id
                 user_name = member.name
@@ -82,11 +84,12 @@ async def action(**kwargs):
                     ban_embed = Embed(title="User Banned on Join", color=Color.green())
                     ban_embed.add_field(name="Server ID", value=server_id, inline=True)
                     ban_embed.add_field(name="User ID", value=user_id, inline=True)
-                    ban_embed.add_field(name="User Name", value=user_name + "#" + str(user_discriminator), inline=True)
+                    ban_embed.add_field(name="User Name", value=user_name + "#" + str(user_discriminator), inline=False)
+                    ban_embed.add_field(name="Ban Reason", value=reason, inline=False)
                     ban_embed.set_thumbnail(url=user_avatar_url)
                     ban_embed.set_footer(icon_url=server_icon_url, text=server_name)
 
-                    await guild.ban(member, reason="Banpool bot - User is a part of the banpool.")
+                    await guild.ban(member, reason="Banpool Bot [{}] - {}".format(banpool_name, reason))
                     await admin_chan.send(embed=ban_embed)
         except:
             logger.error(traceback.format_exc())

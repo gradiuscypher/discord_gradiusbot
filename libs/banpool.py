@@ -12,10 +12,8 @@ Session = scoped_session(session_factory)
 session = Session()
 
 # TODO:
-# Add reason to add_user_to_banpool
-# Add reason to add_userlist_to_banpool
 # Add reason to discord chat commands
-# Test
+# Test it all
 
 
 class BanPoolManager:
@@ -24,6 +22,7 @@ class BanPoolManager:
         Add a User ID to the banpool
         :param banpool_name:
         :param user_id: Discord User ID
+        :param reason:
         :return:
         """
         try:
@@ -40,7 +39,7 @@ class BanPoolManager:
 
                     if user_query.count() == 0:
                         ban_date = datetime.now()
-                        new_discord_user = DiscordUser(user_id=user_id, ban_date=ban_date, banpool_id=banpool.id)
+                        new_discord_user = DiscordUser(user_id=user_id, ban_date=ban_date, banpool_id=banpool.id, reason=reason)
                         session.add(new_discord_user)
                         session.commit()
                         return "User has been added to the banpool.", True
@@ -55,11 +54,12 @@ class BanPoolManager:
             print(traceback.format_exc())
             return "An error has occurred", False
 
-    def add_userlist_to_banpool(self, banpool_name, user_id_list):
+    def add_userlist_to_banpool(self, banpool_name, user_id_list, reason):
         """
         Add a list of User IDs separated by comma to the banpool
         :param banpool_name:
         :param user_id_list:
+        :param reason:
         :return:
         """
 
@@ -73,7 +73,7 @@ class BanPoolManager:
 
         try:
             for user in user_list:
-                self.add_user_to_banpool(banpool_name, user)
+                self.add_user_to_banpool(banpool_name, user, reason)
             return "Users have been processed. Non-duplicates have been added to the ban list.", True
 
         except:
@@ -127,6 +127,7 @@ class BanPoolManager:
         """
         try:
             # Identify the banpool that the User ID will be added to
+            # TODO BUG: This could actually end up being no users, so we should check that we have results first
             banpool = session.query(BanPool).filter(BanPool.pool_name==banpool_name).one()
 
             if banpool:
@@ -216,12 +217,12 @@ class BanPoolManager:
                 user = user_query.one()
                 banpool = session.query(BanPool).filter(BanPool.id==user.banpool_id).one()
 
-                return banpool.pool_name, True
+                return banpool.pool_name, True, user.reason
             else:
-                return "User is not in any banpool.", False
+                return "User is not in any banpool.", False, None
         except:
             print(traceback.format_exc())
-            return "An error has occurred.", False
+            return "An error has occurred.", False, None
 
     def is_user_in_exceptions(self, user_id, server_id):
         """

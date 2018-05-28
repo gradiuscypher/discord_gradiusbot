@@ -65,15 +65,19 @@ async def action(client, config):
 
                                 if not is_exception:
                                     try:
+                                        is_user_banned = banpool_manager.is_user_banned(user_id)
+                                        reason = is_user_banned[2]
+                                        banpool_name = is_user_banned[0]
+
                                         logger.debug('member is in the banpool and has no exceptions: {}'.format(user_id))
                                         ban_embed = Embed(title="User Banned via Task", color=Color.green())
                                         ban_embed.add_field(name="Server ID", value=guild.id, inline=True)
                                         ban_embed.add_field(name="User ID", value=user_id, inline=True)
-                                        ban_embed.add_field(name="User Name", value=user.name + "#" + str(user.discriminator), inline=True)
+                                        ban_embed.add_field(name="User Name", value=user.name + "#" + str(user.discriminator), inline=False)
+                                        ban_embed.add_field(name="Ban Reason", value=reason, inline=False)
                                         ban_embed.set_thumbnail(url=user.avatar_url)
                                         ban_embed.set_footer(icon_url=guild.icon_url, text=guild.name)
-
-                                        await guild.ban(user, reason="Banpool bot - User is a part of the banpool.")
+                                        await guild.ban(user, reason="Banpool Bot [{}] - {}".format(banpool_name, reason))
                                         await admin_chan.send(embed=ban_embed)
                                     except:
                                         logger.error("Failed to execute ban on {}[{}] server".format(guild.name, guild.id))

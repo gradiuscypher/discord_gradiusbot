@@ -38,7 +38,7 @@ All commands start with `!bp`. Do not include the `<` or `>` brackets in your co
 
 !bp listusers <BANPOOL_NAME> - list all user IDs in the banpool
 
-!bp adduser <BANPOOL_NAME> <USER_ID> - add user ID to the banpool
+!bp adduser <BANPOOL_NAME> <USER_ID> <REASON> - add user ID to the banpool. REASON is a description of why the user was banpooled.
 
 !bp adduserlist <BANPOOL_NAME> <USER_ID_LIST> - ban a list of user IDs, separated by commas
 
@@ -138,11 +138,11 @@ async def action(**kwargs):
                                 ul_embed.add_field(name="User IDs", value=field_string, inline=True)
                         await channel.send(embed=ul_embed)
 
-                    if split_content[1] == 'adduser' and len(split_content) == 4:
+                    if split_content[1] == 'adduser' and len(split_content) > 4:
                         banpool_name = split_content[2]
                         user_id = split_content[3]
-                        result = banpool_manager.add_user_to_banpool(banpool_name, user_id)
-
+                        reason = ' '.join(split_content[4:])
+                        result = banpool_manager.add_user_to_banpool(banpool_name, user_id, reason)
                         if result[1]:
                             # The add was successful
                             notice_embed = Embed(title="BanPool Manager", color=Color.green(), description=result[0])
@@ -156,7 +156,7 @@ async def action(**kwargs):
                         banpool_name = split_content[2]
                         user_id_list = split_content[3]
 
-                        result = banpool_manager.add_userlist_to_banpool(banpool_name, user_id_list)
+                        result = banpool_manager.add_userlist_to_banpool(banpool_name, user_id_list, "Userlist Import")
 
                         if result[1]:
                             # The add was successful
