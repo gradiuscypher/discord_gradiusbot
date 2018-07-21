@@ -39,8 +39,7 @@ plugins = plugin_loader.PluginLoader()
 client = discord.Client()
 
 
-@client.async_event
-def background_tasks():
+async def background_tasks():
     for task in plugins.scheduled_tasks:
         try:
             ensure_future(task.action(client, config))
