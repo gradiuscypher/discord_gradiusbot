@@ -9,6 +9,8 @@ services/
 *.swp
 *.sqlite
 *.log
+roles.json
+roles_msg_id.tmp
 
 #Gradius Wants
 !item_definitions.sqlite
