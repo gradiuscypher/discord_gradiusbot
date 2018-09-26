@@ -88,7 +88,9 @@ async def action(client, config):
 
         except RuntimeError:
             logger.error(traceback.format_exc())
+            await asyncio.sleep(task_length)
             exit(0)
 
         except:
             logger.error(traceback.format_exc())
+            await asyncio.sleep(task_length)
