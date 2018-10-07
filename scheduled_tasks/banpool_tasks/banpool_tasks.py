@@ -6,7 +6,7 @@ from datetime import datetime
 from discord import Embed, Color, Permissions
 
 from libs import banpool
-from libs import gsheets_logging
+# from libs import gsheets_logging
 
 banpool_manager = banpool.BanPoolManager()
 
@@ -82,7 +82,8 @@ async def action(client, config):
                                         ban_embed.add_field(name="Ban Reason", value=reason, inline=False)
                                         ban_embed.set_thumbnail(url=user.avatar_url)
                                         ban_embed.set_footer(icon_url=guild.icon_url, text=guild.name)
-                                        gsheets_logging.update_row('Action Log', 'A1', [[date_string, guild.id, guild.name, user_id, user.name, user.discriminator, reason]])
+                                        # TODO: re-enable gsheets logging in a separate try/except
+                                        #gsheets_logging.update_row('Action Log', 'A1', [[date_string, guild.id, guild.name, user_id, user.name, user.discriminator, reason]])
                                         await guild.ban(user, reason="Banpool Bot [{}] - {}".format(banpool_name, reason))
                                         await admin_chan.send(embed=ban_embed)
                                     except:

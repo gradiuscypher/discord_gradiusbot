@@ -13,10 +13,6 @@ session_factory = sessionmaker(bind=engine)
 Session = scoped_session(session_factory)
 session = Session()
 
-# TODO:
-# Add reason to discord chat commands
-# Test it all
-
 
 class BanPoolManager:
     def add_user_to_banpool(self, banpool_name, user_id, reason):
@@ -44,7 +40,8 @@ class BanPoolManager:
                         new_discord_user = DiscordUser(user_id=user_id, ban_date=ban_date, banpool_id=banpool.id, reason=reason)
                         session.add(new_discord_user)
                         session.commit()
-                        gsheets_logging.update_row('Global Banpool', 'A1', [[ban_date.strftime('%Y-%m-%d %H:%M:%S'), user_id, reason]])
+                        # TODO: re-enable gsheets logging in a different try/catch
+                        # gsheets_logging.update_row('Global Banpool', 'A1', [[ban_date.strftime('%Y-%m-%d %H:%M:%S'), user_id, reason]])
                         return "User has been added to the banpool.", True
                     else:
                         return "This user is already a part of this banpool.", False
