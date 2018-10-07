@@ -2,8 +2,11 @@ import asyncio
 import discord
 import logging
 import traceback
-from libs import banpool
+from datetime import datetime
 from discord import Embed, Color, Permissions
+
+from libs import banpool
+from libs import gsheets_logging
 
 banpool_manager = banpool.BanPoolManager()
 
@@ -69,6 +72,7 @@ async def action(client, config):
                                         reason = is_user_banned[2]
                                         banpool_name = is_user_banned[0]
                                         banpool_manager.set_last_knowns(user_id, user.name, user.discriminator)
+                                        date_string = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
                                         logger.debug('member is in the banpool and has no exceptions: {}'.format(user_id))
                                         ban_embed = Embed(title="User Banned via Task", color=Color.green())
@@ -78,6 +82,7 @@ async def action(client, config):
                                         ban_embed.add_field(name="Ban Reason", value=reason, inline=False)
                                         ban_embed.set_thumbnail(url=user.avatar_url)
                                         ban_embed.set_footer(icon_url=guild.icon_url, text=guild.name)
+                                        gsheets_logging.update_row('Action Log', 'A1', [[date_string, guild.id, guild.name, user_id, user.name, user.discriminator, reason]])
                                         await guild.ban(user, reason="Banpool Bot [{}] - {}".format(banpool_name, reason))
                                         await admin_chan.send(embed=ban_embed)
                                     except:

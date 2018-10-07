@@ -4,6 +4,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker, scoped_session
 from datetime import datetime
 
+from libs import gsheets_logging
+
 Base = declarative_base()
 engine = create_engine('sqlite:///banpool.db')
 Base.metadata.bind = engine
@@ -42,6 +44,7 @@ class BanPoolManager:
                         new_discord_user = DiscordUser(user_id=user_id, ban_date=ban_date, banpool_id=banpool.id, reason=reason)
                         session.add(new_discord_user)
                         session.commit()
+                        gsheets_logging.update_row('Global Banpool', 'A1', [[ban_date.strftime('%Y-%m-%d %H:%M:%S'), user_id, reason]])
                         return "User has been added to the banpool.", True
                     else:
                         return "This user is already a part of this banpool.", False

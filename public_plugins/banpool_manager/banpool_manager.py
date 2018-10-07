@@ -1,11 +1,12 @@
 import asyncio
 import discord
 import logging
+import re
 import traceback
 import discord.errors
-import re
-from libs import banpool
 from discord import Embed, Color
+
+from libs import banpool
 
 
 # Setup the BanPoolManager
