@@ -10,6 +10,8 @@ services/
 *.sqlite
 *.log
 roles.json
+gapps-auth.json
+token.json
 roles_msg_id.tmp
 
 #Gradius Wants
