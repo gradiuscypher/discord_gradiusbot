@@ -4,10 +4,10 @@ attrs==18.1.0
 backcall==0.1.0
 chardet==3.0.4
 decorator==4.3.0
-git+https://github.com/Rapptz/discord.py@69ca675ca057f8bbd961562eefced97026e5d671
+discord.py==1.0.0a1493+g69ca675
 idna==2.7
 idna-ssl==1.1.0
-ipython==6.4.0
+ipython==7.1.1
 ipython-genutils==0.2.0
 jedi==0.12.1
 multidict==4.3.1
