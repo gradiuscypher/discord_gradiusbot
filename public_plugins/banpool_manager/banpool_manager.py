@@ -110,7 +110,7 @@ async def action(**kwargs):
             if in_admin_group:
                 split_content = message.content.split()
 
-                if split_content[0] == '!bp':
+                if split_content[0] == '!bp' and len(split_content) > 1:
                     if split_content[1] == 'help':
                         await channel.send(help_string)
 

@@ -22,9 +22,13 @@ logger.info("[Public Plugin] <banpool_configuration.py>: This plugin configures 
 bcm = BanpoolConfigManager()
 bpm = BanPoolManager()
 
+# TODO: write help string
 help_string = """
 Test help string.
 """
+
+# TODO: command to set admin role to allow others to control !bpc
+# TODO: allow configured role to also execute !bpc
 
 
 @asyncio.coroutine
@@ -52,6 +56,7 @@ async def action(**kwargs):
                     await message.channel.send(embed=bp_embed)
 
                 if split_content[1] == 'configured-pools':
+                    # TODO: when result is None, return message that none
                     pool_list = bcm.get_configured_pools(message.guild.id)
                     bp_embed = Embed(title="Configured BanPools", color=Color.green())
 
@@ -60,6 +65,7 @@ async def action(**kwargs):
                     await message.channel.send(embed=bp_embed)
 
                 # User is setting the announcement channel
+                # TODO: more detailed information about how this command works
                 if split_content[1] == 'set-announce-chan':
                     success = bcm.set_announce_chan(message.guild.id, message.channel.id,
                                                     message.author.name+'#'+message.author.discriminator,
@@ -81,6 +87,7 @@ async def action(**kwargs):
                         await message.channel.send('An announcement channel has not been set. Please set one with the `!bpc set-announce-chan` command in the desired channel.')
 
             if len(split_content) == 4:
+                # TODO: more explicit fail message mentioning how to find a list of available pools
                 # User wants to set a banpool level: ignore, notify, ban
                 if split_content[1] == 'set-pool-level':
                     pool_name = split_content[2]
