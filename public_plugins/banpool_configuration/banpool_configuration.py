@@ -104,17 +104,15 @@ async def action(**kwargs):
                         await message.channel.send('An announcement channel has not been set. Please set one with the `!bpc set-announce-chan` command in the desired channel.')
             if len(split_content) == 3:
                 if split_content[1] == 'subscribe':
-                    # TODO: implement
                     # add a banpool subscription with the level of 'ban' if the pool exists
                     pool_name = split_content[2]
-                    # TODO: need to validate if the pool actually exists
                     success = bcm.set_pool_level(message.guild.id, pool_name, 'ban',
                                                  message.author.name+'#'+message.author.discriminator,
                                                  message.author.id)
                     if success:
                         await message.channel.send(f'Successfully subscribed the pool **{pool_name}**.')
                     else:
-                        await message.channel.send(f'Unable to subscribe to the pool **{pool_name}**.')
+                        await message.channel.send(f'Unable to subscribe to the pool. Please validate that the pool name exists.')
 
                 if split_content[1] == 'unsubscribe':
                     # TODO: implement

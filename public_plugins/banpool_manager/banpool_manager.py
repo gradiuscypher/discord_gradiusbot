@@ -115,6 +115,7 @@ async def action(**kwargs):
                         await channel.send(help_string)
 
                     if split_content[1] == 'list':
+                        # TODO: list the pools in one column and include pool description and count
                         banpool_list = banpool_manager.banpool_list()
                         bp_embed = Embed(title="Active BanPools", color=Color.green())
 

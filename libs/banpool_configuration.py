@@ -5,6 +5,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker, scoped_session
 from datetime import datetime
 
+from libs import banpool
+
 Base = declarative_base()
 engine = create_engine('sqlite:///banpool_configuration.db')
 Base.metadata.bind = engine
@@ -14,6 +16,9 @@ session = Session()
 
 # Setup Logging
 logger = logging.getLogger('banpool_configuration')
+
+# Setup banpool manager
+bpm = banpool.BanPoolManager()
 
 
 class BanpoolConfigManager:
@@ -57,34 +62,41 @@ class BanpoolConfigManager:
             now = datetime.now()
             target_config = session.query(BanpoolConfig).filter(BanpoolConfig.server_id==server_id).first()
 
-            if target_config:
-                target_pool = session.query(PoolSubscription).filter(PoolSubscription.pool_name==pool_name).first()
+            # get the list of existing banpools
+            current_pools = [name.pool_name.lower() for name in bpm.banpool_list()]
 
-                if target_pool:
-                    target_pool.sub_level = level
-                    session.add(target_pool)
-                    session.commit()
-                    return True
+            # check to make sure the provided pool name exists in the pool list
+            if pool_name in current_pools:
+                if target_config:
+                    target_pool = session.query(PoolSubscription).filter(PoolSubscription.pool_name==pool_name).first()
 
+                    if target_pool:
+                        target_pool.sub_level = level
+                        session.add(target_pool)
+                        session.commit()
+                        return True
+
+                    else:
+                        new_pool = PoolSubscription(banpool_config_id=target_config.id, pool_name=pool_name,
+                                                    sub_level=level)
+                        session.add(new_pool)
+                        session.commit()
+                        return True
                 else:
-                    new_pool = PoolSubscription(banpool_config_id=target_config.id, pool_name=pool_name,
+                    # create the new server coniguration
+                    new_server = BanpoolConfig(server_id=server_id, last_edit_date=now, last_edit_author=author,
+                                               last_edit_id=author_id)
+                    session.add(new_server)
+                    session.commit()
+
+                    # set the new pool subscription level
+                    new_pool = PoolSubscription(banpool_config_id=new_server.id, pool_name=pool_name,
                                                 sub_level=level)
                     session.add(new_pool)
                     session.commit()
                     return True
             else:
-                # create the new server coniguration
-                new_server = BanpoolConfig(server_id=server_id, last_edit_date=now, last_edit_author=author,
-                                           last_edit_id=author_id)
-                session.add(new_server)
-                session.commit()
-
-                # set the new pool subscription level
-                new_pool = PoolSubscription(banpool_config_id=new_server.id, pool_name=pool_name,
-                                            sub_level=level)
-                session.add(new_pool)
-                session.commit()
-                return True
+                return False
 
         except:
             logger.error(traceback.format_exc())
