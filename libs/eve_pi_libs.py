@@ -37,10 +37,16 @@ class LedgerManager:
         """
         try:
             # delete the old 'stock' ledger so that there's only one
+            stock_query = session.query(PiLedger).filter(PiLedger.ledger_type=='stock').first()
+
+            if stock_query:
+                session.delete(stock_query)
+                session.commit()
 
             # build a new ledger out of pasted data
             new_ledger = PiLedger(ledger_date=datetime.utcnow(), ledger_type='stock')
             session.add(new_ledger)
+            session.commit()
 
             # add entries from parsed data
             ledger_list = self.parse_ledger_string(stock_string)
@@ -71,6 +77,8 @@ class PiLedger(Base):
     # factory (moving resources to factory planet) outgoing; multiple pages
     # stock (the current stock ledger, kept up to date with incoming/outgoing); single page
     ledger_type = Column(String)
+
+    entries = relationship("LedgerEntry", cascade="all, delete-orphan")
 
 
 class LedgerEntry(Base):
