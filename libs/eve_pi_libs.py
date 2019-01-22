@@ -1,5 +1,6 @@
 import traceback
-from sqlalchemy import Column, Boolean, Integer, String, ForeignKey, create_engine, DateTime
+from datetime import datetime
+from sqlalchemy import Column, Boolean, Integer, String, ForeignKey, create_engine, DateTime, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker, scoped_session
 
@@ -12,10 +13,64 @@ Session = scoped_session(session_factory)
 session = Session()
 
 
+class LedgerManager:
+    def build_db(self):
+        Base.metadata.create_all(engine)
+
+    def parse_ledger_string(self, ledger_text):
+        try:
+            ledger_list = []
+            split_text = ledger_text.split('\n')
+
+            for line in split_text:
+                ledger_list.append(line.split("    "))
+
+            return ledger_list
+        except:
+            print(traceback.format_exc())
+
+    def reset_stock(self, stock_string):
+        """
+        Copy/paste string from cargo and set that as the new stock. Useful for messed up incoming/outgoing entries
+        :param stock_string:
+        :return:
+        """
+        try:
+            # delete the old 'stock' ledger so that there's only one
+
+            # build a new ledger out of pasted data
+            new_ledger = PiLedger(ledger_date=datetime.utcnow(), ledger_type='stock')
+            session.add(new_ledger)
+
+            # add entries from parsed data
+            ledger_list = self.parse_ledger_string(stock_string)
+            for entry in ledger_list:
+                ledger_entry = LedgerEntry(ledger_id=new_ledger.id,
+                                           item_name=entry[0],
+                                           item_quantity=int(entry[1].replace(',', '')),
+                                           item_group=entry[2],
+                                           item_vol=float(entry[5].strip(' m3').replace(',', '')),
+                                           item_price=float(entry[6].strip(' ISK').replace(',', ''))
+                                           )
+                session.add(ledger_entry)
+                session.commit()
+
+        except:
+            print(traceback.format_exc())
+
+
 class PiLedger(Base):
     __tablename__ = 'ledger'
     id = Column(Integer, primary_key=True)
+
+    # when the ledger page was created
     ledger_date = Column(DateTime)
+
+    # the type of ledger page it is:
+    # harvest (collecting from resource planets); incoming; multiple pages
+    # factory (moving resources to factory planet) outgoing; multiple pages
+    # stock (the current stock ledger, kept up to date with incoming/outgoing); single page
+    ledger_type = Column(String)
 
 
 class LedgerEntry(Base):
@@ -25,18 +80,7 @@ class LedgerEntry(Base):
     item_name = Column(String)
     item_quantity = Column(Integer)
     item_group = Column(String)
-    item_vol = Column(Integer)
-    item_price = Column(Integer)
+    item_vol = Column(Float)
+    item_price = Column(Float)
 
 
-def parse_pi_ledger(ledger_text):
-    try:
-        return_str = ""
-        split_text = ledger_text.split('\n')
-
-        for line in split_text:
-            return_str += str(line.split()) + '\n'
-
-        return return_str
-    except:
-        print(traceback.format_exc())

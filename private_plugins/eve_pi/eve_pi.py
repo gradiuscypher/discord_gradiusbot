@@ -8,6 +8,8 @@ logger = logging.getLogger('gradiusbot')
 
 logger.info("[Public Plugin] <eve_pi.py>: Monitor and track EVE PI.")
 
+ledger_manager = eve_pi_libs.LedgerManager()
+
 help_str = """
 ** EVE PI Bot **
 ```
@@ -27,10 +29,11 @@ async def action(**kwargs):
 
     try:
         if filling_ledger:
-            await message.channel.send("Parsing PI inventory...")
-            result = eve_pi_libs.parse_pi_ledger(message.content)
-            await message.channel.send(f"```\n{result}\n```")
+            await message.channel.send("`Parsing PI inventory...`")
+            ledger_manager.reset_stock(message.content)
             filling_ledger = False
+            await message.channel.send("`Completed parsing PI inventory!`")
+
 
         split_content = message.content.split()
 
@@ -41,7 +44,7 @@ async def action(**kwargs):
                     await message.channel.send(help_str)
                 if split_content[1] == 'ledger':
                     filling_ledger = True
-                    await message.channel.send("Copy/paste your PI inventory from your ships hold...")
+                    await message.channel.send("`Copy/paste your PI inventory from your ships hold...`")
 
 
     except:
