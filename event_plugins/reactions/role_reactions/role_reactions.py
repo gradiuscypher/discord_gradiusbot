@@ -2,7 +2,7 @@ import asyncio
 import logging
 import json
 import discord.utils
-from discord import Emoji
+from discord import Emoji, PartialEmoji
 from pathlib import Path
 
 
@@ -46,52 +46,56 @@ logger.info("[Public Plugin] <role_reactions.py>: This allows users to change th
 @asyncio.coroutine
 async def action(**kwargs):
     event_type = kwargs['event_type']
-    reaction = kwargs['reaction']
     client = kwargs['client']
-    user = kwargs['user']
     roles_json = load_json_config()
     available_roles = roles_json['available_roles']
 
-    # Used to set up or resend reaction message
-    if event_type == 'add' and isinstance(reaction.emoji, Emoji) and reaction.emoji.name == roles_json['role_setup_emoji'] and user.id == roles_json['admin_id']:
-        send_chan = client.get_channel(id=roles_json['role_assign_channel_id'])
-        assign_message_id = get_temp_message_id()
+    if event_type == 'raw_add':
+        payload = kwargs['payload']
 
-        # delete the previous config message if it exists
-        if assign_message_id:
-            target_message = await send_chan.get_message(assign_message_id)
-            await target_message.delete()
+        # Used to set up or resend reaction message
+        if isinstance(payload.emoji, PartialEmoji) and payload.emoji.name == roles_json['role_setup_emoji'] and payload.user_id == roles_json['admin_id']:
+            send_chan = client.get_channel(id=roles_json['role_assign_channel_id'])
+            assign_message_id = get_temp_message_id()
 
-        # Build the role assign message
-        assign_message = await send_chan.send(build_assign_message(send_chan.guild))
+            # delete the previous config message if it exists
+            if assign_message_id:
+                target_message = await send_chan.get_message(assign_message_id)
+                await target_message.delete()
 
-        for role in available_roles:
-            emoji = discord.utils.get(assign_message.guild.emojis, name=role)
-            await assign_message.add_reaction(emoji)
+            # Build the role assign message
+            assign_message = await send_chan.send(build_assign_message(send_chan.guild))
 
-        # write the new message id to tmp
-        write_temp_message_id(str(assign_message.id))
+            for role in available_roles:
+                emoji = discord.utils.get(assign_message.guild.emojis, name=role)
+                await assign_message.add_reaction(emoji)
 
-    # All other user actions
-    if event_type == 'add' and isinstance(reaction.emoji, Emoji):
-        user = kwargs['user']
-        guild = reaction.message.guild
+            # write the new message id to tmp
+            write_temp_message_id(str(assign_message.id))
 
-        if reaction.emoji.name in roles_json['available_roles'].keys():
-            # get the role object
-            role = discord.utils.get(guild.roles, name=available_roles[reaction.emoji.name])
+        # All other user actions
+        if isinstance(payload.emoji, PartialEmoji) and payload.message_id == roles_json['role_assign_message_id']:
+            guild = discord.utils.get(client.guilds, id=payload.guild_id)
+            user = guild.get_member(payload.user_id)
 
-            # try to add the role
-            await user.add_roles(role)
+            if payload.emoji.name in roles_json['available_roles'].keys():
+                # get the role object
+                role = discord.utils.get(guild.roles, name=available_roles[payload.emoji.name])
 
-    if event_type == 'remove' and isinstance(reaction.emoji, Emoji):
-        user = kwargs['user']
-        guild = reaction.message.guild
+                # try to add the role
+                await user.add_roles(role)
 
-        if reaction.emoji.name in roles_json['available_roles'].keys():
-            # get the role object
-            role = discord.utils.get(guild.roles, name=available_roles[reaction.emoji.name])
+    if event_type == 'raw_remove':
+        payload = kwargs['payload']
 
-            # try to add the role
-            await user.remove_roles(role)
+        if isinstance(payload.emoji, PartialEmoji) and payload.message_id == roles_json['role_assign_message_id']:
+            guild = discord.utils.get(client.guilds, id=payload.guild_id)
+            user = guild.get_member(payload.user_id)
+
+            if payload.emoji.name in roles_json['available_roles'].keys():
+                # get the role object
+                role = discord.utils.get(guild.roles, name=available_roles[payload.emoji.name])
+
+                # try to add the role
+                await user.remove_roles(role)
 

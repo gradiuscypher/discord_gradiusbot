@@ -119,6 +119,17 @@ async def on_reaction_add(reaction, user):
             logger.error(traceback.format_exc())
 
 
+# When a reaction is added - raw event
+@client.event
+async def on_raw_reaction_add(payload):
+    for plugin in plugins.event_plugins.reactions:
+        try:
+            # Launch the plugin and the method .action
+            await ensure_future(plugin.action(event_type='raw_add', payload=payload, client=client, config=config))
+        except:
+            logger.error(traceback.format_exc())
+
+
 # When a reaction is removed
 @client.event
 async def on_reaction_remove(reaction, user):
@@ -126,6 +137,17 @@ async def on_reaction_remove(reaction, user):
         try:
             # Launch the plugin and the method .action
             await ensure_future(plugin.action(event_type='remove', reaction=reaction, user=user, config=config, client=client))
+        except:
+            logger.error(traceback.format_exc())
+
+
+# When a reaction is removed - raw event
+@client.event
+async def on_raw_reaction_remove(payload):
+    for plugin in plugins.event_plugins.reactions:
+        try:
+            # Launch the plugin and the method .action
+            await ensure_future(plugin.action(event_type='raw_remove', payload=payload, client=client, config=config))
         except:
             logger.error(traceback.format_exc())
 
