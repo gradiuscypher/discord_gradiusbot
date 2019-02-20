@@ -22,7 +22,7 @@ def get_temp_message_id():
 
     if tmp_file.exists():
         with open('roles_msg_id.tmp', 'r') as temp_id_file:
-            return temp_id_file.read()
+            return int(temp_id_file.read())
     else:
         return None
 
@@ -74,7 +74,7 @@ async def action(**kwargs):
             write_temp_message_id(str(assign_message.id))
 
         # All other user actions
-        if isinstance(payload.emoji, PartialEmoji) and payload.message_id == roles_json['role_assign_message_id']:
+        if isinstance(payload.emoji, PartialEmoji) and payload.message_id == get_temp_message_id():
             guild = discord.utils.get(client.guilds, id=payload.guild_id)
             user = guild.get_member(payload.user_id)
 
@@ -88,7 +88,7 @@ async def action(**kwargs):
     if event_type == 'raw_remove':
         payload = kwargs['payload']
 
-        if isinstance(payload.emoji, PartialEmoji) and payload.message_id == roles_json['role_assign_message_id']:
+        if isinstance(payload.emoji, PartialEmoji) and payload.message_id == get_temp_message_id():
             guild = discord.utils.get(client.guilds, id=payload.guild_id)
             user = guild.get_member(payload.user_id)
 
