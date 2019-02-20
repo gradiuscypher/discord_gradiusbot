@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import json
+import string
 import discord.utils
 from discord import Emoji, PartialEmoji
 from pathlib import Path
@@ -30,11 +31,32 @@ def get_temp_message_id():
         return None
 
 
+def build_assign_message(namecolor_list):
+    message_string = ""
+    ascii_index = 0
+    ascii_list = list(string.ascii_lowercase)
+    color_codes = ''
+
+    if len(namecolor_list) < 27:
+        for role in namecolor_list:
+            emoji = f':regional_indicator_{ascii_list[ascii_index]}:'
+            message_string += f"{emoji} - `[{role.color}] {role.name}`\n"
+            ascii_index += 1
+            color_codes += str(role.color) + ','
+        color_url = f"<http://colorpeek.com/{color_codes}>"
+        message_string += f"\n{color_url}"
+
+        return message_string
+    else:
+        return "You have more than 27 namecolors, time to find a different way to build a Emoji list."
+
+
 @asyncio.coroutine
 async def action(**kwargs):
     event_type = kwargs['event_type']
     client = kwargs['client']
     namecolor_json = load_json_config()
+    send_chan = client.get_channel(id=namecolor_json['role_assign_channel_id'])
 
     if event_type == 'raw_add':
         payload = kwargs['payload']
@@ -52,6 +74,19 @@ async def action(**kwargs):
                 for r in roles:
                     if 'namecolor_' in r.name:
                         namecolor_roles.append(r)
+
+                # build the assign message
+                assign_message = await send_chan.send(build_assign_message(namecolor_roles))
+
+                # add the reactions to the message
+                # TODO: figure out how to iterate through list of these emoji as reaction
+                ascii_list = list(string.ascii_lowercase)
+
+                for ascii_index in range(0, len(namecolor_roles)):
+                    # emoji = f':regional_indicator_{ascii_list[ascii_index]}:'
+                    emoji = '\N{Regional Indicator Symbol Letter A}'
+                    print(emoji)
+                    await assign_message.add_reaction(emoji)
 
         # otherwise check if the reaction is a valid namecolor reaction and add as needed
 
