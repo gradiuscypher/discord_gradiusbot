@@ -13,6 +13,7 @@ roles.json
 gapps-auth.json
 token.json
 roles_msg_id.tmp
+namecolors.json
 
 #Gradius Wants
 !item_definitions.sqlite
