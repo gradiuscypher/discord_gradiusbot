@@ -1,29 +1,74 @@
 import asyncio
 import logging
+import traceback
+from datetime import datetime, timedelta
 from discord import utils
-from discord import Embed, Color
 
 logger = logging.getLogger('gradiusbot')
+spotify_logger = logging.getLogger('spotify_tracking')
 
 logger.info("[Member Event Plugin] <spotify_tracking.py>: This plugin monitors Spotify events.")
+
+# track_cache[member.id] = {'track_id': spotify.track_id}
+track_cache = {}
+
+
+def log_event(elastic, title, artists, album, track_id, duration, party_id, member_id, member_name, guild_id):
+    index_name = f"spotify-events-{datetime.now().strftime('%Y-%m')}"
+    log_body = {
+        'guild_id': guild_id,
+        'member_id': member_id,
+        'member_name': member_name,
+        'title': title,
+        'artists': artists,
+        'album': album,
+        'track_id': track_id,
+        'duration': duration,
+        'party_id': party_id,
+        'timestamp': datetime.utcnow()
+    }
+    elastic.index(index=index_name, doc_type='spotify-event', body=log_body)
 
 
 @asyncio.coroutine
 async def action(**kwargs):
     event_type = kwargs['event_type']
+    elastic = kwargs['elastic']
 
     if event_type == 'member.update':
         after = kwargs['after']
+        before = kwargs['before']
+        monitoring_role = utils.get(after.roles, name='monitoring')
 
-        if after.activity:
+        if monitoring_role and after.activity:
             if after.activity.type.name == 'listening':
-                target_channel = utils.get(after.guild.channels, name='general')
                 spotify_obj = after.activity
-                spotify_embed = Embed(title='Spotify Tracker', color=spotify_obj.color)
-                spotify_embed.set_thumbnail(url=spotify_obj.album_cover_url)
-                spotify_embed.set_author(name=after.name, icon_url=after.avatar_url)
-                spotify_embed.add_field(name='Song', value=spotify_obj.title, inline=True)
-                spotify_embed.add_field(name='Artist', value=spotify_obj.artist, inline=True)
-                spotify_embed.add_field(name='Album', value=spotify_obj.album, inline=True)
-                spotify_embed.set_footer(text=spotify_obj.track_id)
-                await target_channel.send(embed=spotify_embed)
+                spotify_before = before.activity
+
+                try:
+                    if spotify_before and spotify_obj:
+                        if spotify_before.end <= (spotify_obj.start + timedelta(seconds=5)):
+                            if not (after.id in track_cache.keys() and spotify_obj.track_id == track_cache[after.id]['track_id']):
+                                spotify_logger.debug(f"new song not cached, {spotify_before.title}, "
+                                                     f"{spotify_before.artists}, {spotify_before.album}, "
+                                                     f"{spotify_before.track_id}, {spotify_before.duration.seconds}, "
+                                                     f"{spotify_before.party_id}")
+                                track_cache[after.id] = {'track_id': spotify_obj.track_id}
+                                log_event(elastic, spotify_before.title, spotify_before.artists, spotify_before.album,
+                                          spotify_before.track_id, spotify_before.duration.seconds,
+                                          spotify_before.party_id, before.id, before.name, before.guild.id)
+
+                    elif spotify_before and spotify_obj is None:
+                        if spotify_before.end <= (datetime.utcnow() + timedelta(seconds=5)):
+                            if not (after.id in track_cache.keys() and spotify_obj.track_id == track_cache[after.id]['track_id']):
+                                spotify_logger.debug(f"last song not cached, {spotify_before.title}, "
+                                                     f"{spotify_before.artists}, {spotify_before.album}, "
+                                                     f"{spotify_before.track_id}, {spotify_before.duration.seconds}, "
+                                                     f"{spotify_before.party_id}")
+                                track_cache[after.id] = {'track_id': spotify_obj.track_id}
+                                log_event(elastic, spotify_before.title, spotify_before.artists, spotify_before.album,
+                                          spotify_before.track_id, spotify_before.duration.seconds,
+                                          spotify_before.party_id, before.id, before.name, before.guild.id)
+                except:
+                    spotify_logger.error(traceback.format_exc())
+                    logger.error(traceback.format_exc())
