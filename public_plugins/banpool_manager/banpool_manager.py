@@ -1,10 +1,12 @@
 import asyncio
 import discord
 import logging
+import math
 import re
 import traceback
 import discord.errors
 from discord import Embed, Color
+from prettytable import PrettyTable
 
 from libs import banpool
 
@@ -126,19 +128,28 @@ async def action(**kwargs):
                     if split_content[1] == 'listusers' and len(split_content) == 3:
                         banpool_name = split_content[2]
                         userlist = banpool_manager.banpool_user_list(banpool_name)
-                        ul_embed = Embed(title=banpool_name + " banned IDs", color=Color.green())
 
                         if userlist:
                             userlist_len = str(len(userlist))
-                            ul_embed.title = banpool_name + ": {} banned IDs".format(userlist_len)
                             # Split the list into chunks
-                            user_chunks = chunks(userlist, 25)
-                            for chunk in user_chunks:
-                                field_string = ''
-                                for user in chunk:
-                                    field_string += str(user.user_id) + "\n"
-                                ul_embed.add_field(name="User IDs", value=field_string, inline=True)
-                        await channel.send(embed=ul_embed)
+                            user_chunks = chunks(userlist, 1)
+                            total_users = 0
+
+                            while user_chunks:
+                                try:
+                                    message_string = ''
+                                    while len(message_string) <= 1900:
+                                        user = next(user_chunks)[0]
+                                        message_string += str(user.user_id) + ' '
+                                        total_users += 1
+                                    message_string += '```'
+                                    message_header = '**Banned Users (Users: {}/{})**\n```\n'.format(total_users, userlist_len)
+                                    await channel.send(message_header + message_string)
+                                except StopIteration:
+                                    message_string += '```'
+                                    message_header = '**Banned Users (Users: {}/{})**\n```\n'.format(total_users, userlist_len)
+                                    await channel.send(message_header + message_string)
+                                    break
 
                     if split_content[1] == 'adduser' and len(split_content) > 4:
                         banpool_name = split_content[2]
