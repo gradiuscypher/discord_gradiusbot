@@ -59,6 +59,8 @@ async def action(client, config):
                         logger.error("The bot does not have ban permissions on {}[{}]".format(guild.name, guild.id))
 
                     else:
+                        # TODO: check that the banpool that contains the user is enabled on the server
+                        # TODO: something like is_guild_subscribed(banpool_id)
                         for user_id in banned_user_ids:
                             user = guild.get_member(user_id)
 
