@@ -72,6 +72,7 @@ async def action(**kwargs):
                     await message.channel.send(embed=bp_embed)
 
                 if split_content[1] == 'configured-pools':
+                    # TODO: change display format of the banpools, dont need banlevel
                     pool_list = bcm.get_configured_pools(message.guild.id)
                     bp_embed = Embed(title="Configured BanPools", color=Color.green())
 

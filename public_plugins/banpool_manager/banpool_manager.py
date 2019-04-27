@@ -39,6 +39,8 @@ All commands start with `!bp`. Do not include the `<` or `>` brackets in your co
 
 !bp list - list all available banpools. Currently only 'global' is used
 
+!bp addpool <POOL_NAME> <POOL_DESCRIPTION> - add a new banpool to the pool list
+
 !bp listusers <BANPOOL_NAME> - list all user IDs in the banpool
 
 !bp adduser <BANPOOL_NAME> <USER_ID> <REASON> - add user ID to the banpool. REASON is a description of why the user was banpooled.
@@ -122,8 +124,26 @@ async def action(**kwargs):
                         bp_embed = Embed(title="Active BanPools", color=Color.green())
 
                         for bp in banpool_list:
-                            bp_embed.add_field(name=bp.pool_name, value=bp.pool_description, inline=True)
+                            bp_embed.add_field(name=bp.pool_name, value=bp.pool_description, inline=False)
                         await channel.send(embed=bp_embed)
+
+                    if split_content[1] == 'addpool' and len(split_content) >= 4:
+                        pool_name = split_content[2]
+                        pool_description = ' '.join(split_content[3:])
+                        result = banpool_manager.create_banpool(pool_name, pool_description)
+
+                        if result[1]:
+                            notice_embed = Embed(title="BanPool Manager", color=Color.green(),
+                                                 description=result[0])
+                        else:
+                            # The add was not successful
+                            notice_embed = Embed(title="BanPool Manager", color=Color.red(), description=result[0])
+
+                        await message.channel.send(embed=notice_embed)
+
+                    if split_content[1] == 'removepool' and len(split_content) == 3:
+                        # TODO: implement
+                        pass
 
                     if split_content[1] == 'listusers' and len(split_content) == 3:
                         banpool_name = split_content[2]
@@ -249,8 +269,8 @@ async def action(**kwargs):
                             # The add was successful
                             notice_embed = Embed(title="BanPool Manager", color=Color.green(), description='User is in banpool: `' + result[0] + '`')
                             notice_embed.add_field(name="User ID", value=user_id, inline=True)
-                            notice_embed.add_field(name="User Name", value=result[3] + "#" + result[4], inline=False)
-                            notice_embed.add_field(name="Ban Reason", value=result[2], inline=False)
+                            notice_embed.add_field(name="User Name", value=str(result[3]) + "#" + str(result[4]), inline=False)
+                            notice_embed.add_field(name="Ban Reason", value=str(result[2]), inline=False)
                         else:
                             # The add was not successful
                             notice_embed = Embed(title="BanPool Manager", color=Color.red(), description=result[0])

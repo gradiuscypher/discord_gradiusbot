@@ -63,7 +63,7 @@ class BanpoolConfigManager:
             target_config = session.query(BanpoolConfig).filter(BanpoolConfig.server_id==server_id).first()
 
             # get the list of existing banpools
-            current_pools = [name.pool_name.lower() for name in bpm.banpool_list()]
+            current_pools = [name.pool_name for name in bpm.banpool_list()]
 
             # check to make sure the provided pool name exists in the pool list
             if pool_name in current_pools:
