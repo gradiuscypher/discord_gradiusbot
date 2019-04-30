@@ -5,10 +5,10 @@ import traceback
 from datetime import datetime
 from discord import Embed, Color, Permissions
 
-from libs import banpool
-# from libs import gsheets_logging
+from libs import banpool, banpool_configuration
 
 banpool_manager = banpool.BanPoolManager()
+banpool_config = banpool_configuration.BanpoolConfigManager()
 
 # Setup Logging
 logger = logging.getLogger('banpool_manager')
@@ -38,20 +38,23 @@ async def action(client, config):
         try:
             if client.is_ready():
                 # Check each server for a user with a matching User ID and ban those found
-
-                # Build a list of all banned user IDs
-                banned_user_ids = []
-                banpool_list = banpool_manager.banpool_list()
-
-                for pool in banpool_list:
-                    userlist = banpool_manager.banpool_user_list(pool.pool_name)
-
-                    if userlist:
-                        for user in userlist:
-                            banned_user_ids.append(user.user_id)
-
                 # Iterate through each server, looking for banned user IDs
                 for guild in client.guilds:
+                    # Build a list of all banned user IDs
+                    banned_user_ids = []
+                    all_banpool_list = banpool_manager.banpool_list()
+
+                    # create a list of pools that the guild is subscribed to
+                    banpool_list = [p for p in all_banpool_list if (banpool_config.is_guild_subscribed(guild.id, p.pool_name) or p.pool_name == 'global')]
+
+                    # for each subscribed pool, get the user ids of banned users
+                    for pool in banpool_list:
+                        userlist = banpool_manager.banpool_user_list(pool.pool_name)
+
+                        if userlist:
+                            for user in userlist:
+                                banned_user_ids.append(user.user_id)
+
                     # Validate bot's permissions
                     bot_perms = admin_chan.permissions_for(guild.me)
 
@@ -59,8 +62,6 @@ async def action(client, config):
                         logger.error("The bot does not have ban permissions on {}[{}]".format(guild.name, guild.id))
 
                     else:
-                        # TODO: check that the banpool that contains the user is enabled on the server
-                        # TODO: something like is_guild_subscribed(banpool_id)
                         for user_id in banned_user_ids:
                             user = guild.get_member(user_id)
 
@@ -74,7 +75,6 @@ async def action(client, config):
                                         reason = is_user_banned[2]
                                         banpool_name = is_user_banned[0]
                                         banpool_manager.set_last_knowns(user_id, user.name, user.discriminator)
-                                        date_string = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
                                         logger.debug('member is in the banpool and has no exceptions: {}'.format(user_id))
                                         ban_embed = Embed(title="User Banned via Task", color=Color.green())
@@ -84,8 +84,6 @@ async def action(client, config):
                                         ban_embed.add_field(name="Ban Reason", value=reason, inline=False)
                                         ban_embed.set_thumbnail(url=user.avatar_url)
                                         ban_embed.set_footer(icon_url=guild.icon_url, text=guild.name)
-                                        # TODO: re-enable gsheets logging in a separate try/except
-                                        #gsheets_logging.update_row('Action Log', 'A1', [[date_string, guild.id, guild.name, user_id, user.name, user.discriminator, reason]])
                                         await guild.ban(user, reason="Banpool Bot [{}] - {}".format(banpool_name, reason))
                                         await admin_chan.send(embed=ban_embed)
                                     except:

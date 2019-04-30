@@ -25,6 +25,11 @@ class BanpoolConfigManager:
     def build_db(self):
         Base.metadata.create_all(engine)
 
+    def is_guild_subscribed(self, guild_id, pool_name):
+        pool_config = session.query(BanpoolConfig).filter(BanpoolConfig.server_id==guild_id).first()
+        subscriptions = pool_config.subscriptions
+        return len([x for x in subscriptions if x.pool_name == pool_name]) > 0
+
     def set_announce_chan(self, server_id, channel_id, author, author_id):
         try:
             now = datetime.now()
