@@ -73,7 +73,7 @@ class BanpoolConfigManager:
             # check to make sure the provided pool name exists in the pool list
             if pool_name in current_pools:
                 if target_config:
-                    target_pool = session.query(PoolSubscription).filter(PoolSubscription.pool_name==pool_name).first()
+                    target_pool = session.query(PoolSubscription).filter(PoolSubscription.pool_name==pool_name, PoolSubscription.banpool_config_id==target_config.id).first()
 
                     if target_pool:
                         target_pool.sub_level = level

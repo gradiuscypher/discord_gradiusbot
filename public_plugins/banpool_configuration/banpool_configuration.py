@@ -37,14 +37,12 @@ help_string = """
 !bpc subscribe <BANPOOL NAME> : subscribe to a banpool and add its bans to your server bans
 
 !bpc unsubscribe <BANPOOL NAME> : unsubscribe from a banpool. you will no longer receive updated bans from this pool. Use !bpc cleanup <BANPOOL NAME> to remove previously configured bans.
-
-!bpc cleanup <BANPOOL NAME> : remove all previous banpool bans from a banpool from your server.
 ```
 """
 
 # TODO: command to set admin role to allow others to control !bpc
 # TODO: allow configured role to also execute !bpc
-# TODO: write the !bpc subscribe/unsubscribe/cleanup commands
+# TODO: write the !bpc subscribe/unsubscribe commands
 
 
 @asyncio.coroutine
