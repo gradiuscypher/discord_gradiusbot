@@ -114,11 +114,11 @@ async def action(**kwargs):
                         await message.channel.send(f'Unable to subscribe to the pool. Please validate that the pool name exists.')
 
                 if split_content[1] == 'unsubscribe':
-                    # TODO: implement
                     # remove the subscription if the pool exists and is subscribed to
                     pool_name = split_content[2]
+                    success = bcm.unsubscribe(message.guild.id, pool_name)
 
-                if split_content[1] == 'cleanup':
-                    # TODO: implement
-                    # remove the previously configured bans from the pool, if it exists. if the pool is still subscribed to, warn that you need to unsubscribe first
-                    pool_name = split_content[2]
+                    if success:
+                        await message.channel.send(f'Successfully unsubscribed from the pool **{pool_name}**.')
+                    else:
+                        await message.channel.send(f'Unable to unsubscribe from the pool. Please validate the pool name.')

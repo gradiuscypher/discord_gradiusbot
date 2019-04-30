@@ -1,3 +1,5 @@
+# TODO: need to consider cascading deleted banpools
+
 import traceback
 import logging
 from sqlalchemy import Column, Boolean, Integer, String, ForeignKey, create_engine, DateTime
@@ -127,6 +129,18 @@ class BanpoolConfigManager:
             return pool_config.subscriptions
         else:
             return None
+
+    def unsubscribe(self, server_id, banpool_name):
+        target_config = session.query(BanpoolConfig).filter(BanpoolConfig.server_id==server_id).first()
+
+        target_subscription = [s for s in target_config.subscriptions if s.pool_name == banpool_name]
+
+        if len(target_subscription) > 0:
+            session.delete(target_subscription[0])
+            session.commit()
+            return True
+        else:
+            return False
 
 
 class BanpoolConfig(Base):
