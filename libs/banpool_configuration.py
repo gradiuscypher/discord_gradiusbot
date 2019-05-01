@@ -1,5 +1,3 @@
-# TODO: need to consider cascading deleted banpools
-
 import traceback
 import logging
 from sqlalchemy import Column, Boolean, Integer, String, ForeignKey, create_engine, DateTime
@@ -26,6 +24,23 @@ bpm = banpool.BanPoolManager()
 class BanpoolConfigManager:
     def build_db(self):
         Base.metadata.create_all(engine)
+
+    def banpool_is_deleted(self, pool_name):
+        """
+        This is called when a banpool is deleted by the banpool manager, to safely remove subscriptions
+        :param pool_name:
+        :return:
+        """
+        try:
+            target_subscriptions = session.query(PoolSubscription).filter(PoolSubscription.pool_name==pool_name).all()
+
+            for subscription in target_subscriptions:
+                session.delete(subscription)
+                session.commit()
+            return True
+        except:
+            logger.error(traceback.format_exc())
+            return False
 
     def is_guild_subscribed(self, guild_id, pool_name):
         pool_config = session.query(BanpoolConfig).filter(BanpoolConfig.server_id==guild_id).first()
