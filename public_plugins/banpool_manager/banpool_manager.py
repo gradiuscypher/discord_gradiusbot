@@ -1,12 +1,10 @@
 import asyncio
 import discord
 import logging
-import math
 import re
 import traceback
 import discord.errors
 from discord import Embed, Color
-from prettytable import PrettyTable
 
 from libs import banpool
 
