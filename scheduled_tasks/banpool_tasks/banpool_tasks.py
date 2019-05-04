@@ -3,6 +3,7 @@ import discord
 import logging
 import traceback
 from discord import Embed, Color, Permissions
+from concurrent.futures import CancelledError
 
 from libs import banpool, banpool_configuration
 
@@ -101,11 +102,17 @@ async def action(client, config):
 
                                         # ban the user
                                         await guild.ban(user, reason="Banpool Bot [{}] - {}".format(banpool_name, reason))
+
+
                                     except:
                                         logger.error("Failed to execute ban on {}[{}] server".format(guild.name, guild.id))
                                         logger.error(traceback.format_exc())
 
             await asyncio.sleep(task_length)
+
+        # ref: https://stackoverflow.com/questions/38652819/from-concurrent-futures-to-asyncio
+        except CancelledError:
+            raise NotImplementedError
 
         except RuntimeError:
             logger.error(traceback.format_exc())
