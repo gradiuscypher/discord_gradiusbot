@@ -266,11 +266,15 @@ async def action(**kwargs):
                         result = banpool_manager.is_user_banned(user_id)
 
                         if result[1]:
-                            # The add was successful
-                            notice_embed = Embed(title="BanPool Manager", color=Color.green(), description='User is in banpool: `' + result[0] + '`')
+                            banpool_list = [p for p in result[0]]
+                            ban_reasons = []
+
+                            for p in banpool_list:
+                                ban_reasons.append(result[0][p].reason)
+
+                            notice_embed = Embed(title="BanPool Manager", color=Color.green(), description='User is in banpools: `' + str(banpool_list) + '`')
                             notice_embed.add_field(name="User ID", value=user_id, inline=True)
-                            notice_embed.add_field(name="User Name", value=str(result[3]) + "#" + str(result[4]), inline=False)
-                            notice_embed.add_field(name="Ban Reason", value=str(result[2]), inline=False)
+                            notice_embed.add_field(name="Ban Reason", value=str(ban_reasons), inline=False)
                         else:
                             # The add was not successful
                             notice_embed = Embed(title="BanPool Manager", color=Color.red(), description=result[0])

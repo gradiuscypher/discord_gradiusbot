@@ -72,8 +72,11 @@ async def action(client, config):
                                 if not is_exception:
                                     try:
                                         is_user_banned = banpool_manager.is_user_banned(user_id)
-                                        reason = is_user_banned[2]
-                                        banpool_name = is_user_banned[0]
+                                        user_bans = is_user_banned[0]
+                                        pool_names = [p for p in user_bans.keys()]
+
+                                        reason = user_bans[pool_names[0]].reason
+                                        banpool_name = pool_names[0]
                                         banpool_manager.set_last_knowns(user_id, user.name, user.discriminator)
 
                                         logger.debug('member is in the banpool and has no exceptions: {}'.format(user_id))

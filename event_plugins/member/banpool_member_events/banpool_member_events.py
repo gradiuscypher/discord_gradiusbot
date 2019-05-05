@@ -76,12 +76,20 @@ async def action(**kwargs):
 
             # The member is banpooled and we might need to ban them
             if result[1]:
-                # check if the guild is subscribed to the banpool
-                is_subscribed = banpool_config.is_guild_subscribed(guild.id, result[0])
+                # check if the guild is subscribed to any banpool the user is in
+                banpool_list = [p for p in result[0]]
+
+                is_subscribed = False
+                for pool in banpool_list:
+                    check_subscription = banpool_config.is_guild_subscribed(guild.id, pool)
+
+                    if check_subscription:
+                        is_subscribed = True
+                        target_pool = pool
 
                 if is_subscribed:
-                    banpool_name = result[0]
-                    reason = result[2]
+                    banpool_name = target_pool
+                    reason = result[0][target_pool].reason
                     logger.debug('member_join was caught for banpool ID: {}'.format(member.id))
                     user_id = member.id
                     user_name = member.name

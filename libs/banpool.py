@@ -208,13 +208,17 @@ class BanPoolManager:
         :return:
         """
         try:
+            ban_dict = {}
             user_query = session.query(DiscordUser).filter(DiscordUser.user_id==user_id)
 
             if user_query.count() > 0:
-                user = user_query.one()
-                banpool = session.query(BanPool).filter(BanPool.id==user.banpool_id).one()
+                users = user_query.all()
 
-                return banpool.pool_name, True, user.reason, user.last_name, user.last_discrim
+                for user in users:
+                    banpool = session.query(BanPool).filter(BanPool.id==user.banpool_id).one()
+                    ban_dict[banpool.pool_name] = user
+
+                return ban_dict, True
             else:
                 return "User is not in any banpool.", False, None, None, None
         except:
@@ -304,7 +308,7 @@ class BanPoolManager:
             user_query = session.query(DiscordUser).filter(DiscordUser.user_id==user_id)
 
             if user_query.count() > 0:
-                user = user_query.one()
+                user = user_query.first()
                 user.last_name = user_name
                 user.last_discrim = user_discrim
                 session.commit()
