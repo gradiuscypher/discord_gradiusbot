@@ -1,6 +1,7 @@
 import asyncio
 import logging
-from discord import Embed, Color
+import traceback
+from discord import Embed, Color, utils
 from libs.banpool_configuration import BanpoolConfigManager
 from libs.banpool import BanPoolManager
 
@@ -28,6 +29,10 @@ help_string = """
 
 !bpc banpool-list : list the available banpools to subscribe to
 
+!bpc admin-role set <ROLE NAME>: set the admin role ID
+
+!bpc admin-role get: get the admin role ID
+
 !bpc configured-pools : list the banpools that are configured
 
 !bpc set-announce-chan : set the channel to announce banpool changes in. Uses the channel the message was sent in.
@@ -50,8 +55,15 @@ async def action(**kwargs):
     config = kwargs['config']
     client = kwargs['client']
 
-    # Check to see if the message author is an administrator in the server
-    if message.author.guild_permissions.administrator:
+    # Check to see if the message author is an administrator in the server or if they're part of the admin role
+    is_admin_role = False
+    guild_admin_role_id = bcm.get_admin_role_id(message.guild.id)
+
+    if guild_admin_role_id:
+        if utils.get(message.author.roles, id=guild_admin_role_id):
+            is_admin_role = True
+
+    if message.author.guild_permissions.administrator or is_admin_role:
         split_content = message.content.split()
 
         if len(split_content) > 0 and split_content[0] == '!bpc':
@@ -100,6 +112,7 @@ async def action(**kwargs):
                         await target_channel.send('This is a test announcement message to the configured channel.')
                     else:
                         await message.channel.send('An announcement channel has not been set. Please set one with the `!bpc set-announce-chan` command in the desired channel.')
+
             if len(split_content) == 3:
                 if split_content[1] == 'subscribe':
                     # add a banpool subscription with the level of 'ban' if the pool exists
@@ -121,3 +134,40 @@ async def action(**kwargs):
                         await message.channel.send(f'Successfully unsubscribed from the pool **{pool_name}**.')
                     else:
                         await message.channel.send(f'Unable to unsubscribe from the pool. Please validate the pool name.')
+
+                if split_content[1] == 'admin-role':
+                    if split_content[2] == 'get':
+                        # show the role name that's configured to use !bpc commands
+                        admin_role_id = bcm.get_admin_role_id(message.guild.id)
+
+                        if admin_role_id:
+                            try:
+                                # Try to find the role ID that is set as admin role
+                                admin_role = utils.get(message.guild.roles, id=admin_role_id)
+
+                                if admin_role:
+                                    await message.channel.send(f'The role configured for admin is: `{admin_role.name}`')
+                                else:
+                                    await message.channel.send(f"The configured role ID `{admin_role_id}` does not exist on this server. Please set a new one")
+                            except:
+                                print(traceback.format_exc())
+                        else:
+                            await message.channel.send("There is no admin role configured. Set one with `!bpc admin-role set <ROLE NAME>`")
+
+            if len(split_content) >= 4:
+                if split_content[1] == 'admin-role':
+                    if split_content[2] == 'set':
+                        # set the role that will be able to run !bpc commands
+                        admin_role_id = utils.get(message.guild.roles, name=' '.join(split_content[3:])).id
+
+                        if admin_role_id:
+                            success = bcm.set_admin_role_id(message.guild.id, admin_role_id, message.author.name+'#'+message.author.discriminator, message.author.id)
+
+                            if success:
+                                await message.channel.send('Admin role has been set.')
+                            else:
+                                await message.channel.send('Was unable to set admin role. A generic error has occurred, please contact gradius.')
+
+                        else:
+                            await message.channel.send('Unable to find role. Unable to set admin role.')
+

@@ -51,6 +51,46 @@ class BanpoolConfigManager:
         else:
             return False
 
+    def set_admin_role_id(self, server_id, admin_role_id, author, author_id):
+        """
+        Sets the admin role that's allowed to run !bpc commands
+        :param server_id:
+        :param admin_role_id:
+        :param author:
+        :param author_id:
+        :return:
+        """
+        try:
+            now = datetime.now()
+            target_server = session.query(BanpoolConfig).filter(BanpoolConfig.server_id==server_id).first()
+
+            # the server exists, set its channel
+            if target_server:
+                target_server.admin_role_id = admin_role_id
+                session.add(target_server)
+                session.commit()
+                return True
+
+            # the server doesn't exist, create it and set its channel
+            else:
+                new_server = BanpoolConfig(server_id=server_id, admin_role_id=admin_role_id, last_edit_date=now,
+                                           last_edit_author=author, last_edit_id=author_id)
+                session.add(new_server)
+                session.commit()
+                return True
+
+        except:
+            logger.error(traceback.format_exc())
+            return False
+
+    def get_admin_role_id(self, server_id):
+        target_config = session.query(BanpoolConfig).filter(BanpoolConfig.server_id==server_id).first()
+
+        if target_config:
+            return target_config.admin_role_id
+        else:
+            return None
+
     def set_announce_chan(self, server_id, channel_id, author, author_id):
         try:
             now = datetime.now()
@@ -167,6 +207,7 @@ class BanpoolConfig(Base):
     id = Column(Integer, primary_key=True)
     server_id = Column(Integer)
     announce_chan = Column(Integer)
+    admin_role_id = Column(Integer)
     last_edit_date = Column(DateTime)
     last_edit_author = Column(String)
     last_edit_id = Column(Integer)
