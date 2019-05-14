@@ -43,13 +43,17 @@ class BanpoolConfigManager:
             return False
 
     def is_guild_subscribed(self, guild_id, pool_name):
-        pool_config = session.query(BanpoolConfig).filter(BanpoolConfig.server_id==guild_id).first()
+        if pool_name == 'global':
+            return True
 
-        if pool_config:
-            subscriptions = pool_config.subscriptions
-            return len([x for x in subscriptions if x.pool_name == pool_name]) > 0
         else:
-            return False
+            pool_config = session.query(BanpoolConfig).filter(BanpoolConfig.server_id==guild_id).first()
+
+            if pool_config:
+                subscriptions = pool_config.subscriptions
+                return len([x for x in subscriptions if x.pool_name == pool_name]) > 0
+            else:
+                return False
 
     def set_admin_role_id(self, server_id, admin_role_id, author, author_id):
         """
