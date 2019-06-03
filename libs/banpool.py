@@ -167,6 +167,27 @@ class BanPoolManager:
             print(traceback.format_exc())
             return "An error has occurred.", False
 
+    def delete_banpool(self, banpool_name):
+        """
+        Deletes a banpool.
+        :param banpool_name:
+        :return: boolean whether the action was successful or not
+        """
+        try:
+            query = session.query(BanPool).filter(BanPool.pool_name==banpool_name)
+            target_banpool = query.first()
+
+            if target_banpool and target_banpool.pool_name != 'global':
+                session.delete(target_banpool)
+                session.commit()
+                return True
+            else:
+                return False
+
+        except:
+            print(traceback.format_exc())
+            return False
+
     def exception_list(self):
         try:
             exceptions_list = session.query(BanExceptions)

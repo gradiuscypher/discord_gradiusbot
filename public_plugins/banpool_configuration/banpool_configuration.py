@@ -45,9 +45,6 @@ help_string = """
 ```
 """
 
-# TODO: command to set admin role to allow others to control !bpc
-# TODO: allow configured role to also execute !bpc
-
 
 @asyncio.coroutine
 async def action(**kwargs):

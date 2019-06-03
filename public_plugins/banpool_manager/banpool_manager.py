@@ -6,11 +6,14 @@ import traceback
 import discord.errors
 from discord import Embed, Color
 
-from libs import banpool
+from libs import banpool, banpool_configuration
 
 
 # Setup the BanPoolManager
 banpool_manager = banpool.BanPoolManager()
+
+# Setup the BanpoolConfiguration
+banpool_config = banpool_configuration.BanpoolConfigManager()
 
 # Setup Logging
 logger = logging.getLogger('banpool_manager')
@@ -48,6 +51,8 @@ All commands start with `!bp`. Do not include the `<` or `>` brackets in your co
 !bp listexception - list all of the ban exceptions: a user ID and Server ID pair
 
 !bp addexception <USER_ID> <SERVER_ID> - add a ban exception pair for user ID and Server ID
+
+!bp removepool <BANPOOL_NAME> - delete the banpool and unsubscribe all servers
 
 !bp removeuser <BANPOOL_NAME> <USER_ID> - remove user ID from the banpool
 
@@ -140,10 +145,20 @@ async def action(**kwargs):
                         await message.channel.send(embed=notice_embed)
 
                     if split_content[1] == 'removepool' and len(split_content) == 3:
-                        # TODO: implement
-                        # TODO: use the BanpoolConfiguration.banpool_is_deleted to remove the pool from subscriptions
-                        # TODO: add command to help string
-                        pass
+                        pool_name = split_content[2]
+                        delete_success = banpool_manager.delete_banpool(pool_name)
+
+                        if delete_success:
+                            banpool_config.banpool_is_deleted(pool_name)
+
+                            notice_text = "Banpool removal was successful."
+                            notice_embed = Embed(title="BanPool Manager", color=Color.green(),
+                                                 description=notice_text)
+                        else:
+                            notice_text = "Banpool removal was not successful."
+                            notice_embed = Embed(title="BanPool Manager", color=Color.red(), description=notice_text)
+
+                        await message.channel.send(embed=notice_embed)
 
                     if split_content[1] == 'listusers' and len(split_content) == 3:
                         banpool_name = split_content[2]
