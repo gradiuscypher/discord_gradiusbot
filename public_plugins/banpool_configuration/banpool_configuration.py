@@ -56,14 +56,14 @@ async def action(**kwargs):
     is_admin_role = False
     guild_admin_role_id = bcm.get_admin_role_id(message.guild.id)
 
+    split_content = message.content.split()
+
     if guild_admin_role_id:
         if utils.get(message.author.roles, id=guild_admin_role_id):
             is_admin_role = True
 
-    if message.author.guild_permissions.administrator or is_admin_role:
-        split_content = message.content.split()
-
-        if len(split_content) > 0 and split_content[0] == '!bpc':
+    if len(split_content) > 0 and split_content[0] == '!bpc':
+        if message.channel.permissions_for(message.author).administrator or is_admin_role:
             if len(split_content) == 2:
                 if split_content[1] == 'help':
                     await message.channel.send(help_string)
