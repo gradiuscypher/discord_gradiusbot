@@ -22,6 +22,7 @@ async def action(client, config):
     admin_server_id = config.getint('banpool', 'admin_server_id')
     admin_chan_name = config.get('banpool', 'admin_chan')
     task_length = config.getint('banpool', 'task_length')
+    mute_alerts = config.getbool('banpool', 'mute_alerts')
     admin_chan = None
 
     setting_up = True
@@ -71,6 +72,7 @@ async def action(client, config):
 
                                 if not is_exception:
                                     try:
+
                                         is_user_banned = banpool_manager.is_user_banned(user_id)
                                         user_bans = is_user_banned[0]
                                         pool_names = [p for p in user_bans.keys()]
@@ -78,6 +80,9 @@ async def action(client, config):
                                         reason = user_bans[pool_names[0]].reason
                                         banpool_name = pool_names[0]
                                         banpool_manager.set_last_knowns(user_id, user.name, user.discriminator)
+
+                                        # ban the user
+                                        await guild.ban(user, reason="Banpool Bot [{}] - {}".format(banpool_name, reason))
 
                                         logger.debug('member is in the banpool and has no exceptions: {}'.format(user_id))
                                         ban_embed = Embed(title="User Banned via Task", color=Color.green())
@@ -88,12 +93,14 @@ async def action(client, config):
                                         ban_embed.add_field(name="Ban Reason", value=reason, inline=False)
                                         ban_embed.set_footer(icon_url=guild.icon_url, text=guild.name)
 
-                                        await admin_chan.send(embed=ban_embed)
+                                        # send an ban announcement to the admin server
+                                        if not mute_alerts:
+                                            await admin_chan.send(embed=ban_embed)
 
                                         # check if the server has an announce channel set, if so, announce the ban
                                         announce_chan_id = banpool_config.get_announce_chan(guild.id)
 
-                                        if announce_chan_id:
+                                        if announce_chan_id and not mute_alerts:
                                             announce_chan = discord.utils.get(guild.channels, id=announce_chan_id)
                                             announce_embed = Embed(title="User Banned via Task", color=Color.green())
                                             announce_embed.add_field(name="User Name", value=user.name + "#" + str(user.discriminator), inline=True)
@@ -102,10 +109,6 @@ async def action(client, config):
                                             announce_embed.add_field(name="User ID", value=user_id, inline=False)
                                             announce_embed.set_footer(icon_url=guild.icon_url, text="See Admin Mains for more details")
                                             await announce_chan.send(embed=announce_embed)
-
-                                        # ban the user
-                                        await guild.ban(user, reason="Banpool Bot [{}] - {}".format(banpool_name, reason))
-
 
                                     except:
                                         logger.error("Failed to execute ban on {}[{}] server".format(guild.name, guild.id))
