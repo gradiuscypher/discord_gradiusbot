@@ -82,7 +82,7 @@ async def action(client, config):
                                         banpool_manager.set_last_knowns(user_id, user.name, user.discriminator)
 
                                         # ban the user
-                                        await guild.ban(user, reason="Banpool Bot [{}] - {}".format(banpool_name, reason))
+                                        await guild.ban(user, 7, reason="Banpool Bot [{}] - {}".format(banpool_name, reason))
 
                                         logger.debug('member is in the banpool and has no exceptions: {}'.format(user_id))
                                         ban_embed = Embed(title="User Banned via Task", color=Color.green())
