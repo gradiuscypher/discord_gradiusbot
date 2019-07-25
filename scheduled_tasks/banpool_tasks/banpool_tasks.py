@@ -22,7 +22,7 @@ async def action(client, config):
     admin_server_id = config.getint('banpool', 'admin_server_id')
     admin_chan_name = config.get('banpool', 'admin_chan')
     task_length = config.getint('banpool', 'task_length')
-    mute_alerts = config.getbool('banpool', 'mute_alerts')
+    mute_alerts = config.getboolean('banpool', 'mute_alerts')
     admin_chan = None
 
     setting_up = True
