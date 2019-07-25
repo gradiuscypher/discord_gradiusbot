@@ -111,6 +111,8 @@ async def action(client, config):
                                             await announce_chan.send(embed=announce_embed)
 
                                     except:
+                                        print("Failed to execute ban on {}[{}] server".format(guild.name, guild.id))
+                                        print(traceback.format_exc())
                                         logger.error("Failed to execute ban on {}[{}] server".format(guild.name, guild.id))
                                         logger.error(traceback.format_exc())
 
