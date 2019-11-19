@@ -108,7 +108,7 @@ async def action(client, config):
 
 
                                     except:
-                                        logger.error("Failed to execute ban on {}[{}] server".format(guild.name, guild.id))
+                                        logger.error("Failed to execute user ban [{}] on {}[{}] server".format(user_id, guild.name, guild.id))
                                         logger.error(traceback.format_exc())
 
             await asyncio.sleep(task_length)
