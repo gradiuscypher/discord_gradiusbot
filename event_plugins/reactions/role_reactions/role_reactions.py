@@ -79,7 +79,7 @@ async def action(**kwargs):
 
             # delete the previous config message if it exists
             if assign_message_id:
-                target_message = await send_chan.get_message(assign_message_id)
+                target_message = await send_chan.fetch_message(assign_message_id)
                 await target_message.delete()
 
             # Build the role assign message
