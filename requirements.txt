@@ -4,7 +4,7 @@ attrs==18.1.0
 backcall==0.1.0
 chardet==3.0.4
 decorator==4.3.0
-discord.py==1.0.1
+discord.py==1.2.5
 elasticsearch==7.0.0
 idna==2.7
 idna-ssl==1.1.0
