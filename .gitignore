@@ -9,6 +9,7 @@ services/
 *.swp
 *.sqlite
 *.log
+*.pickle
 roles.json
 gapps-auth.json
 token.json
