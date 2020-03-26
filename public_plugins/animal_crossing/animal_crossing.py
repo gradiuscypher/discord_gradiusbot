@@ -118,7 +118,11 @@ def build_chart(config, guild):
         dodo_code = ac_data['users'][discord_user]['dodo_code']
 
         t_price = ac_data['users'][discord_user]['turnip_price']
-        t_time = ac_data['users'][discord_user]['turnip_time'].strftime("%d/%m %H:%M PDT")
+
+        if ac_data['users'][discord_user]['turnip_time']:
+            t_time = ac_data['users'][discord_user]['turnip_time'].strftime("%d/%m %H:%M PDT")
+        else:
+            t_time = ''
 
         out_table.append([discord_name, friend_code, dodo_code, island_open + fruit, t_price, t_time])
 
