@@ -92,7 +92,7 @@ async def action(**kwargs):
         if split_msg[1] == 'chart':
             chart = build_chart(config, message.guild)
             await message.channel.send(f"```\n{chart}\n```")
-        if split_msg[1] == 'help':
+        elif split_msg[1] == 'help':
             await message.author.send(help_str)
         else:
             logger.debug(f"FAILED COMMAND - {message.author.id} : {message.content}")
