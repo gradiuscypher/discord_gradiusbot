@@ -4,11 +4,10 @@ import os.path
 import pickle
 import traceback
 from datetime import datetime
-from tabulate import tabulate
 
 logger = logging.getLogger('gradiusbot')
 
-logger.info("[Public Plugin] <animal_crossing.py> Provides tools for the game Animal Crossing.")
+logger.info("[Private Plugin] <animal_crossing.py> Provides tools for the game Animal Crossing.")
 
 """
 ac_data layout:
@@ -30,6 +29,19 @@ ac_data layout:
         }
     ]
 }
+"""
+
+help_str = """Here's how to use the Animal Crossing bot, all commands start with `!ac`:
+
+Optional input is surrounded by `[]`, required input is surrounded by `<>`. Please do not include the `[]<>` symbols, though.
+```
+!ac help - this command.
+!ac turnip add <PRICE> - set the current price that Turnips are for on your island. On Sundays this will be the buy price, all other days will be the sell price.
+!ac friendcode <FRIEND CODE> - set your Nintendo friend code if you'd like others to be able to add you.
+!ac island open [DODO CODE] - set your island to appear as open on the status chart. Include the DODO CODE if you'd like anyone to be able to join you.
+!ac island close - set your island to appear as closed on the status chart.
+!ac fruit <apple, pear, cherry, peach, orange> - set your native fruit for the status chart. Please use the names listed.
+```
 """
 
 
@@ -71,12 +83,14 @@ async def action(**kwargs):
     """
     message = kwargs['message']
     config = kwargs['config']
-    client = kwargs['client']
 
     split_msg = message.content.split()
     sender_id = message.author.id
 
-    if split_msg[0] == '!ac':
+    if split_msg[0] == '!ac' and len(split_msg) == 1:
+        await message.channel.send(help_str)
+
+    elif split_msg[0] == '!ac' and len(split_msg) > 1:
 
         if split_msg[1] == 'turnip':
             if split_msg[2] == 'add' and len(split_msg) == 4:
@@ -88,8 +102,10 @@ async def action(**kwargs):
                         await message.add_reaction("🆗")
                     else:
                         await message.add_reaction("❌")
+                        logger.debug(f"FAILED COMMAND - {message.author.id} : {message.content}")
                 except:
                     await message.add_reaction("❌")
+                    logger.debug(f"FAILED COMMAND - {message.author.id} : {message.content}")
                     logger.error(traceback.format_exc())
 
         elif split_msg[1] == 'friendcode' and len(split_msg) == 3:
@@ -102,9 +118,11 @@ async def action(**kwargs):
                     await message.add_reaction("🆗")
                 else:
                     await message.add_reaction("❌")
+                    logger.debug(f"FAILED COMMAND - {message.author.id} : {message.content}")
 
             except:
                 await message.add_reaction("❌")
+                logger.debug(f"FAILED COMMAND - {message.author.id} : {message.content}")
                 logger.error(traceback.format_exc())
 
         elif split_msg[1] == 'fruit' and len(split_msg) == 3:
@@ -118,26 +136,37 @@ async def action(**kwargs):
                     await message.add_reaction("🆗")
                 else:
                     await message.add_reaction("❌")
+                    logger.debug(f"FAILED COMMAND - {message.author.id} : {message.content}")
             else:
                 await message.add_reaction("❌")
+                logger.debug(f"FAILED COMMAND - {message.author.id} : {message.content}")
                 await message.channel.send(f"That fruit does not exist, please choose from the following: {fruit_list}")
 
         elif split_msg[1] == 'island':
             success = False
 
-            if split_msg[2] == 'open' and len(split_msg) == 3:
-                success = set_island(config, sender_id, True)
-            elif split_msg[2] == 'close' and len(split_msg) == 3:
-                success = set_island(config, sender_id, False)
+            if split_msg[2] == 'open':
+                if len(split_msg) == 3:
+                    success = set_island(config, sender_id, True)
+                if len(split_msg) == 4:
+                    dodo_code = split_msg[3]
+                    success = set_island(config, sender_id, True, dodo_code=dodo_code)
+
+            elif split_msg[2] == 'close':
+                if len(split_msg) == 3:
+                    success = set_island(config, sender_id, False, dodo_code='')
 
             if success:
                 await message.add_reaction("🆗")
             else:
                 await message.add_reaction("❌")
+                logger.debug(f"FAILED COMMAND - {message.author.id} : {message.content}")
+        elif split_msg[1] == 'help':
+            await message.channel.send(help_str)
 
-        elif split_msg[1] == 'chart':
-            chart = build_chart(config, message.guild)
-            await message.channel.send(f"```\n{chart}\n```")
+        else:
+            await message.channel.send("You did not provide a properly formatted command. Check out !ac help for more info.")
+            logger.debug(f"FAILED COMMAND - {message.author.id} : {message.content}")
 
 
 def add_turnip(config, discord_id, turnip_price):
@@ -175,7 +204,8 @@ def add_turnip(config, discord_id, turnip_price):
                 'fruit': '',
                 'island': False,
                 'turnip_price': turnip_price,
-                'turnip_time': datetime.now()
+                'turnip_time': datetime.now(),
+                'dodo_code': ''
             }
 
             # save the data pickle
@@ -212,7 +242,8 @@ def set_friendcode(config, discord_id, friendcode):
                 'fruit': '',
                 'island': False,
                 'turnip_price': None,
-                'turnip_time': None
+                'turnip_time': None,
+                'dodo_code': ''
             }
 
             # save the data pickle
@@ -248,7 +279,8 @@ def set_fruit(config, discord_id, fruit):
                 'fruit': fruit,
                 'island': False,
                 'turnip_price': None,
-                'turnip_time': None
+                'turnip_time': None,
+                'dodo_code': ''
             }
 
             # save the data pickle
@@ -260,12 +292,13 @@ def set_fruit(config, discord_id, fruit):
         return False
 
 
-def set_island(config, discord_id, island_open):
+def set_island(config, discord_id, island_open, dodo_code=''):
     """
     Sets the boolean whether the Island is open or not.
     :param config:
     :param discord_id:
     :param island_open:
+    :param dodo_code:
     :return:
     """
     # load the most current pickle data
@@ -275,6 +308,7 @@ def set_island(config, discord_id, island_open):
     try:
         if discord_id in ac_data['users'].keys():
             ac_data['users'][discord_id]['island'] = island_open
+            ac_data['users'][discord_id]['dodo_code'] = dodo_code
             save_pickle(ac_data, pickle_file)
             return True
 
@@ -284,7 +318,8 @@ def set_island(config, discord_id, island_open):
                 'fruit': '',
                 'island': island_open,
                 'turnip_price': None,
-                'turnip_time': None
+                'turnip_time': None,
+                'dodo_code': dodo_code
             }
 
             # save the data pickle
@@ -294,26 +329,3 @@ def set_island(config, discord_id, island_open):
     except:
         logger.error(traceback.format_exc())
         return False
-
-
-def build_chart(config, guild):
-    # load the most current pickle data
-    pickle_file = config.get("animalcrossing", "pickle_file")
-    ac_data = load_pickle(pickle_file)
-
-    out_table = []
-    fruit_list = ['apple', 'pear', 'cherry', 'peach', 'orange']
-    fruit_lookup = {'apple': '🍎', 'pear': '🍐', 'cherry': '🍒', 'peach': '🍑', 'orange': '🍊'}
-
-    for discord_user in ac_data['users']:
-        discord_name = guild.get_member(discord_user).display_name
-        friend_code = ac_data['users'][discord_user]['friend_code']
-        island_open = '👍' if ac_data['users'][discord_user]['island'] else '👎'
-        fruit = fruit_lookup[ac_data['users'][discord_user]['fruit']]
-
-        t_price = ac_data['users'][discord_user]['turnip_price']
-        t_time = ac_data['users'][discord_user]['turnip_time'].strftime("%b %d %H:%M")
-
-        out_table.append([discord_name, friend_code, island_open + fruit, t_price, t_time])
-
-    return tabulate(out_table, headers=['User', 'Friend Code', '🏝️', 'Turnip 🔔', 'Turnip ⏲️'])
