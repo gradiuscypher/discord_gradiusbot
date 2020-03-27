@@ -35,12 +35,18 @@ help_str = """Here's how to use the Animal Crossing bot, all commands start with
 
 Optional input is surrounded by `[]`, required input is surrounded by `<>`. Please do not include the `[]<>` symbols, though.
 ```
+DM COMMANDS:
 !ac help - this command.
 !ac turnip add <PRICE> - set the current price that Turnips are for on your island. On Sundays this will be the buy price, all other days will be the sell price.
 !ac friendcode <FRIEND CODE> - set your Nintendo friend code if you'd like others to be able to add you.
 !ac island open [DODO CODE] - set your island to appear as open on the status chart. Include the DODO CODE if you'd like anyone to be able to join you.
 !ac island close - set your island to appear as closed on the status chart.
 !ac fruit <apple, pear, cherry, peach, orange> - set your native fruit for the status chart. Please use the names listed.
+
+CHANNEL COMMANDS:
+!ac stonks - show the turnip prices that have been registered
+!ac social - show the friend codes that have been registered
+!ac travel - show the islands that are open for travel and the native fruits
 ```
 """
 
