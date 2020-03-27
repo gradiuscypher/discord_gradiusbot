@@ -111,11 +111,11 @@ def build_chart(config, guild):
     fruit_lookup = {'apple': '🍎', 'pear': '🍐', 'cherry': '🍒', 'peach': '🍑', 'orange': '🍊'}
 
     for discord_user in ac_data['users']:
-        discord_name = guild.get_member(discord_user).display_name
-        friend_code = ac_data['users'][discord_user]['friend_code']
+        discord_name = clean_string(guild.get_member(discord_user).display_name)
+        friend_code = clean_string(ac_data['users'][discord_user]['friend_code'])
         island_open = '✈️' if ac_data['users'][discord_user]['island'] else '⛔'
         fruit = fruit_lookup[ac_data['users'][discord_user]['fruit']]
-        dodo_code = ac_data['users'][discord_user]['dodo_code']
+        dodo_code = clean_string(ac_data['users'][discord_user]['dodo_code'])
 
         t_price = ac_data['users'][discord_user]['turnip_price']
 
@@ -127,3 +127,15 @@ def build_chart(config, guild):
         out_table.append([discord_name, friend_code, dodo_code, island_open + fruit, t_price, t_time])
 
     return tabulate(out_table, headers=['User', 'Friend Code', 'Dodo', '🏝️  ', 'Turnip 🔔', 'Turnip ⏲️'], disable_numparse=True)
+
+
+def clean_string(input_string):
+    """
+    Removes bad characters from the string known to cause formatting issues.
+    :return:
+    """
+    bad_chars = "`@"
+    for bad_char in bad_chars:
+        input_string = input_string.replace(bad_char, "")
+
+    return input_string
