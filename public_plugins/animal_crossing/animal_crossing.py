@@ -52,6 +52,8 @@ CHANNEL COMMANDS:
 ```
 """
 
+DISPLAY_CHAR_LIMIT = 32
+
 
 def load_pickle(file_name):
     if os.path.exists(file_name):
@@ -131,7 +133,7 @@ def turnip_chart(config, guild):
 
     out_table = []
     for discord_user in ac_data['users']:
-        discord_name = clean_string(guild.get_member(discord_user).display_name, max_length=16)
+        discord_name = clean_string(guild.get_member(discord_user).display_name, max_length=DISPLAY_CHAR_LIMIT)
         t_price = ac_data['users'][discord_user]['turnip_price']
 
         if ac_data['users'][discord_user]['turnip_time']:
@@ -158,7 +160,7 @@ def social_chart(config, guild):
     out_table = []
 
     for discord_user in ac_data['users']:
-        discord_name = clean_string(guild.get_member(discord_user).display_name, max_length=16)
+        discord_name = clean_string(guild.get_member(discord_user).display_name, max_length=DISPLAY_CHAR_LIMIT)
         friend_code = clean_string(ac_data['users'][discord_user]['friend_code'], max_length=18)
         out_table.append([discord_name, friend_code])
 
@@ -180,7 +182,7 @@ def travel_chart(config, guild):
     fruit_lookup = {'apple': '🍎', 'pear': '🍐', 'cherry': '🍒', 'peach': '🍑', 'orange': '🍊'}
 
     for discord_user in ac_data['users']:
-        discord_name = clean_string(guild.get_member(discord_user).display_name, max_length=16)
+        discord_name = clean_string(guild.get_member(discord_user).display_name, max_length=DISPLAY_CHAR_LIMIT)
         island_open = '✈️' if ac_data['users'][discord_user]['island'] else '⛔'
         fruit = fruit_lookup[ac_data['users'][discord_user]['fruit']]
         dodo_code = clean_string(ac_data['users'][discord_user]['dodo_code'], max_length=8)
