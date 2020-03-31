@@ -81,7 +81,12 @@ class AcUser(Base):
         :param server_id:
         :return:
         """
-        # TODO: implement
+        try:
+            new_server = DiscordServer(user_id=self.id, server_id=server_id)
+            session.add(new_server)
+            session.commit()
+        except:
+            logger.error(traceback.format_exc())
 
     def update_island(self, island_open):
         """
