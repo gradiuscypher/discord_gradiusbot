@@ -19,7 +19,7 @@ class AcManager:
     def build_db(self):
         Base.metadata.create_all(engine)
 
-    def add_user(self, discord_id):
+    def add_user(self, discord_id, server_id):
         """
         Create an animal crossing user
         :param discord_id
@@ -42,11 +42,20 @@ class TurnipEntry(Base):
     time_zone = Column(String)
 
 
+class DiscordServer(Base):
+    __tablename__ = 'discord_server'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('ac_user.id'))
+    server_id = Column(Integer)
+
+
 class AcUser(Base):
     __tablename__ = 'ac_user'
     id = Column(Integer, primary_key=True)
     turnip_prices = relationship("TurnipEntry", cascade="all, delete-orphan")
+    discord_servers = relationship("DiscordServer", cascade="all, delete-orphan")
     discord_id = Column(Integer)
+    server_id = Column(Integer)
     friend_code = Column(String)
     fruit = Column(String)
     island_open = Column(Boolean)
@@ -64,6 +73,10 @@ class AcUser(Base):
             session.commit()
         except:
             logger.error(traceback.format_exc())
+
+    def register_discord_server(self, server_id):
+        # TODO: implement
+        pass
 
     def update_island(self, island_open):
         """
