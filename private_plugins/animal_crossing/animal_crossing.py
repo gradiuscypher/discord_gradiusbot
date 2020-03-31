@@ -1,35 +1,17 @@
+# TODO: implement the ac_libs versions of each function, remove pickle code
+
 import asyncio
 import logging
 import os.path
 import pickle
 import traceback
 from datetime import datetime
+from libs.ac_libs import AcManager, AcUser, DiscordServer, TurnipEntry
 
 logger = logging.getLogger('gradiusbot')
 
 logger.info("[Private Plugin] <animal_crossing.py> Provides tools for the game Animal Crossing.")
 
-"""
-ac_data layout:
-{
-    "users": {"discord_id":
-        {
-            "friendcode": STR:FRIEND CODE,
-            "fruit": STR:FRUIT NAME
-            "island": BOOL:ISLAND OPEN STATUS
-            "turnip_price": INT:BELL PRICE,
-            "turnip_time": DATETIME: TIME INPUTTED
-        }
-    },
-    "turnips": [
-        {
-            "discord_id": INT:DISCORD ID,
-            "price": INT:BELL PRICE,
-            "time": DATETIME: TIME INPUTTED
-        }
-    ]
-}
-"""
 
 help_str = """Here's how to use the Animal Crossing bot, all commands start with `!ac`:
 
