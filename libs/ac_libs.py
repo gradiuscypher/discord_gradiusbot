@@ -23,6 +23,7 @@ class AcManager:
         """
         Create an animal crossing user
         :param discord_id
+        :param server_id
         :return:
         """
         try:
@@ -75,8 +76,12 @@ class AcUser(Base):
             logger.error(traceback.format_exc())
 
     def register_discord_server(self, server_id):
+        """
+        Adds a Discord ID to a user object for server-based messaging.
+        :param server_id:
+        :return:
+        """
         # TODO: implement
-        pass
 
     def update_island(self, island_open):
         """
