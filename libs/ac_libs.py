@@ -19,17 +19,28 @@ class AcManager:
     def build_db(self):
         Base.metadata.create_all(engine)
 
-    def add_user(self, discord_id, server_id):
+    def add_user(self, discord_id):
         """
         Create an animal crossing user
         :param discord_id
-        :param server_id
         :return:
         """
         try:
             new_user = AcUser(discord_id=discord_id, friend_code='', fruit='', island_open=False, dodo_code='', time_zone='')
             session.add(new_user)
             session.commit()
+            return new_user
+        except:
+            logger.error(traceback.format_exc())
+
+    def user_exists(self, discord_id):
+        try:
+            query = session.query(AcUser).filter(discord_id==discord_id).first()
+
+            if query:
+                return query
+            else:
+                return None
         except:
             logger.error(traceback.format_exc())
 
@@ -69,7 +80,7 @@ class AcUser(Base):
         :return:
         """
         try:
-            new_price = TurnipEntry(user_id=self.id, price=price, timezone=timezone, time=datetime.utcnow())
+            new_price = TurnipEntry(user_id=self.id, price=price, time_zone=timezone, time=datetime.utcnow())
             session.add(new_price)
             session.commit()
         except:
@@ -88,13 +99,14 @@ class AcUser(Base):
         except:
             logger.error(traceback.format_exc())
 
-    def update_island(self, island_open):
+    def update_island(self, island_open, dodo_code=''):
         """
         Update the user's island to either be open or closed
         :return:
         """
         try:
             self.island_open = island_open
+            self.dodo_code = dodo_code
             session.commit()
         except:
             logger.error(traceback.format_exc())

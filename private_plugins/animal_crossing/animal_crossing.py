@@ -32,28 +32,7 @@ CHANNEL COMMANDS:
 ```
 """
 
-
-def load_pickle(file_name):
-    if os.path.exists(file_name):
-        with open(file_name, 'rb') as ac_pickle:
-            ac_data = pickle.load(ac_pickle)
-            return ac_data
-    else:
-        return {
-            "users": {},
-            "turnips": []
-        }
-
-
-def save_pickle(save_data, file_name):
-    try:
-        with open(file_name, 'wb') as ac_pickle:
-            pickle.dump(save_data, ac_pickle)
-        return True
-
-    except:
-        logger.error(traceback.format_exc())
-        return False
+ac_manager = AcManager()
 
 
 @asyncio.coroutine
@@ -84,7 +63,7 @@ async def action(**kwargs):
             if split_msg[2] == 'add' and len(split_msg) == 4:
                 try:
                     turnip_price = int(split_msg[3])
-                    success = add_turnip(config, sender_id, turnip_price)
+                    success = add_turnip(sender_id, turnip_price)
 
                     if success:
                         await message.add_reaction("🆗")
@@ -100,7 +79,7 @@ async def action(**kwargs):
             friendcode = split_msg[2]
 
             try:
-                success = set_friendcode(config, sender_id, friendcode)
+                success = set_friendcode(sender_id, friendcode)
 
                 if success:
                     await message.add_reaction("🆗")
@@ -118,7 +97,7 @@ async def action(**kwargs):
             fruit_list = ['apple', 'pear', 'cherry', 'peach', 'orange']
 
             if target_fruit in fruit_list:
-                success = set_fruit(config, sender_id, target_fruit)
+                success = set_fruit(sender_id, target_fruit)
 
                 if success:
                     await message.add_reaction("🆗")
@@ -135,14 +114,14 @@ async def action(**kwargs):
 
             if split_msg[2] == 'open':
                 if len(split_msg) == 3:
-                    success = set_island(config, sender_id, True)
+                    success = set_island(sender_id, True)
                 if len(split_msg) == 4:
                     dodo_code = split_msg[3]
-                    success = set_island(config, sender_id, True, dodo_code=dodo_code)
+                    success = set_island(sender_id, True, dodo_code=dodo_code)
 
             elif split_msg[2] == 'close':
                 if len(split_msg) == 3:
-                    success = set_island(config, sender_id, False, dodo_code='')
+                    success = set_island(sender_id, False, dodo_code='')
 
             if success:
                 await message.add_reaction("🆗")
@@ -157,163 +136,99 @@ async def action(**kwargs):
             logger.debug(f"FAILED COMMAND - {message.author.id} : {message.content}")
 
 
-def add_turnip(config, discord_id, turnip_price):
+def add_turnip(discord_id, turnip_price):
     """
     Adds the most current turnip price to the users data and saves the old value to historical data
-    :param config:
     :param discord_id:
     :param turnip_price:
+    :param server_id:
     :return:
     """
-    # load the most current pickle data
-    pickle_file = config.get("animalcrossing", "pickle_file")
-    ac_data = load_pickle(pickle_file)
-
     try:
-        if discord_id in ac_data['users'].keys():
-            user = ac_data['users'][discord_id]
-            hist_turnips = ac_data['turnips']
+        # check if the user exists, if they don't create them
+        # add the new price to the users data
+        # return true
+        target_user = ac_manager.user_exists(discord_id)
 
-            # save old turnip price to historical data
-            hist_turnips.append({'discord_id': discord_id, 'price': user['turnip_price'], 'time': user['turnip_time']})
-
-            # set new values to userdict
-            user['turnip_price'] = turnip_price
-            user['turnip_time'] = datetime.now()
-
-            # save the data pickle
-            save_pickle(ac_data, pickle_file)
-
-            return True
-
+        if target_user:
+            # the user does exist
+            target_user.add_price(turnip_price)
         else:
-            ac_data['users'][discord_id] = {
-                'friend_code': '',
-                'fruit': '',
-                'island': False,
-                'turnip_price': turnip_price,
-                'turnip_time': datetime.now(),
-                'dodo_code': ''
-            }
+            new_user = ac_manager.add_user(discord_id)
+            new_user.add_price(turnip_price)
 
-            # save the data pickle
-            save_pickle(ac_data, pickle_file)
-
-            return True
+        return True
 
     except:
         logger.error(traceback.format_exc())
         return False
 
 
-def set_friendcode(config, discord_id, friendcode):
+def set_friendcode(discord_id, friendcode):
     """
     Sets the friendcode for the discord ID
-    :param config:
     :param discord_id:
     :param friendcode:
     :return:
     """
-    # load the most current pickle data
-    pickle_file = config.get("animalcrossing", "pickle_file")
-    ac_data = load_pickle(pickle_file)
-
     try:
-        if discord_id in ac_data['users'].keys():
-            ac_data['users'][discord_id]['friend_code'] = friendcode
-            save_pickle(ac_data, pickle_file)
-            return True
+        target_user = ac_manager.user_exists(discord_id)
 
+        if target_user:
+            target_user.update_friend_code(friendcode)
         else:
-            ac_data['users'][discord_id] = {
-                'friend_code': friendcode,
-                'fruit': '',
-                'island': False,
-                'turnip_price': None,
-                'turnip_time': None,
-                'dodo_code': ''
-            }
+            new_user = ac_manager.add_user(discord_id)
+            new_user.update_friend_code(friendcode)
 
-            # save the data pickle
-            save_pickle(ac_data, pickle_file)
+        return True
 
-            return True
     except:
         logger.error(traceback.format_exc())
         return False
 
 
-def set_fruit(config, discord_id, fruit):
+def set_fruit(discord_id, fruit):
     """
     Sets the fruit for the discord ID
-    :param config:
     :param discord_id:
     :param fruit:
     :return:
     """
-    # load the most current pickle data
-    pickle_file = config.get("animalcrossing", "pickle_file")
-    ac_data = load_pickle(pickle_file)
-
     try:
-        if discord_id in ac_data['users'].keys():
-            ac_data['users'][discord_id]['fruit'] = fruit
-            save_pickle(ac_data, pickle_file)
-            return True
+        target_user = ac_manager.user_exists(discord_id)
 
+        if target_user:
+            target_user.update_fruit(fruit)
         else:
-            ac_data['users'][discord_id] = {
-                'friend_code': '',
-                'fruit': fruit,
-                'island': False,
-                'turnip_price': None,
-                'turnip_time': None,
-                'dodo_code': ''
-            }
+            new_user = ac_manager.add_user(discord_id)
+            new_user.update_fruit(fruit)
 
-            # save the data pickle
-            save_pickle(ac_data, pickle_file)
+        return True
 
-            return True
     except:
         logger.error(traceback.format_exc())
         return False
 
 
-def set_island(config, discord_id, island_open, dodo_code=''):
+def set_island(discord_id, island_open, dodo_code=''):
     """
     Sets the boolean whether the Island is open or not.
-    :param config:
     :param discord_id:
     :param island_open:
     :param dodo_code:
     :return:
     """
-    # load the most current pickle data
-    pickle_file = config.get("animalcrossing", "pickle_file")
-    ac_data = load_pickle(pickle_file)
-
     try:
-        if discord_id in ac_data['users'].keys():
-            ac_data['users'][discord_id]['island'] = island_open
-            ac_data['users'][discord_id]['dodo_code'] = dodo_code
-            save_pickle(ac_data, pickle_file)
-            return True
+        target_user = ac_manager.user_exists(discord_id)
 
+        if target_user:
+            target_user.update_island(island_open, dodo_code)
         else:
-            ac_data['users'][discord_id] = {
-                'friend_code': '',
-                'fruit': '',
-                'island': island_open,
-                'turnip_price': None,
-                'turnip_time': None,
-                'dodo_code': dodo_code
-            }
+            new_user = ac_manager.add_user(discord_id)
+            new_user.update_island(island_open, dodo_code)
 
-            # save the data pickle
-            save_pickle(ac_data, pickle_file)
+        return True
 
-            return True
     except:
         logger.error(traceback.format_exc())
         return False
