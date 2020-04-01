@@ -7,6 +7,7 @@ import pickle
 import traceback
 from datetime import datetime
 from libs.ac_libs import AcManager, AcUser, DiscordServer, TurnipEntry
+from pytz import all_timezones
 
 logger = logging.getLogger('gradiusbot')
 
@@ -24,6 +25,8 @@ DM COMMANDS:
 !ac island open [DODO CODE] - set your island to appear as open on the status chart. Include the DODO CODE if you'd like anyone to be able to join you.
 !ac island close - set your island to appear as closed on the status chart.
 !ac fruit <apple, pear, cherry, peach, orange> - set your native fruit for the status chart. Please use the names listed.
+!ac timezone help - get more information about the timezone command, as well as a list of valid time zones.
+!ac timezone set <TIME ZONE> - set your time zone to the provided time zone. Please copy/paste directly from the list.
 
 CHANNEL COMMANDS:
 !ac stonks - show the turnip prices that have been registered
@@ -128,6 +131,30 @@ async def action(**kwargs):
             else:
                 await message.add_reaction("❌")
                 logger.debug(f"FAILED COMMAND - {message.author.id} : {message.content}")
+
+        elif split_msg[1] == 'timezone':
+            if split_msg[2] == 'help':
+                await message.channel.send(
+                    "Set your time zone for more accurate tracking. The list of time zones can be found here: https://gist.github.com/gradiuscypher/92905b1cc24dea2b17cc1e8959d18999")
+                await message.channel.send("Please copy/paste the time zone exactly as you find it on the list.")
+
+            elif split_msg[2] == 'set' and len(split_msg) >= 4:
+                timezone_str = split_msg[3]
+
+                if timezone_str in all_timezones:
+                    success = set_timezone(sender_id, timezone_str)
+
+                    if success:
+                        await message.add_reaction("🆗")
+                    else:
+                        await message.add_reaction("❌")
+                        logger.debug(f"FAILED COMMAND - {message.author.id} : {message.content}")
+                else:
+                    await message.add_reaction("❌")
+                    await message.channel.send(
+                        "Not a valid time zone. Refer to the link in the `!ac timezone help` command for the list of time zones.")
+                    logger.debug(f"FAILED COMMAND - {message.author.id} : {message.content}")
+
         elif split_msg[1] == 'help':
             await message.channel.send(help_str)
 
@@ -226,6 +253,29 @@ def set_island(discord_id, island_open, dodo_code=''):
         else:
             new_user = ac_manager.add_user(discord_id)
             new_user.update_island(island_open, dodo_code)
+
+        return True
+
+    except:
+        logger.error(traceback.format_exc())
+        return False
+
+
+def set_timezone(discord_id, timezone_str):
+    """
+    Set the user's timezone string
+    :param discord_id:
+    :param timezone_str:
+    :return:
+    """
+    try:
+        target_user = ac_manager.user_exists(discord_id)
+
+        if target_user:
+            target_user.update_timezone(timezone_str)
+        else:
+            new_user = ac_manager.add_user(discord_id)
+            new_user.update_timezone(timezone_str)
 
         return True
 
