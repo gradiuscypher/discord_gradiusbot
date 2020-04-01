@@ -1,11 +1,11 @@
-# TODO: highlight the highest / lowest price for turnips in the chart
-
 import asyncio
 import logging
 import os.path
 import pickle
+import pytz
 import traceback
 from tabulate import tabulate
+from libs.ac_libs import AcManager
 
 logger = logging.getLogger('gradiusbot')
 
@@ -22,6 +22,8 @@ DM COMMANDS:
 !ac island open [DODO CODE] - set your island to appear as open on the status chart. Include the DODO CODE if you'd like anyone to be able to join you.
 !ac island close - set your island to appear as closed on the status chart.
 !ac fruit <apple, pear, cherry, peach, orange> - set your native fruit for the status chart. Please use the names listed.
+!ac timezone help - get more information about the timezone command, as well as a list of valid time zones.
+!ac timezone set <TIME ZONE> - set your time zone to the provided time zone. Please copy/paste directly from the list.
 
 CHANNEL COMMANDS:
 !ac stonks - show the turnip prices that have been registered
@@ -31,29 +33,7 @@ CHANNEL COMMANDS:
 """
 
 DISPLAY_CHAR_LIMIT = 32
-
-
-def load_pickle(file_name):
-    if os.path.exists(file_name):
-        with open(file_name, 'rb') as ac_pickle:
-            ac_data = pickle.load(ac_pickle)
-            return ac_data
-    else:
-        return {
-            "users": {},
-            "turnips": []
-        }
-
-
-def save_pickle(save_data, file_name):
-    try:
-        with open(file_name, 'wb') as ac_pickle:
-            pickle.dump(save_data, ac_pickle)
-        return True
-
-    except:
-        logger.error(traceback.format_exc())
-        return False
+ac_manager = AcManager()
 
 
 @asyncio.coroutine
@@ -76,15 +56,18 @@ async def action(**kwargs):
     sender_id = message.author.id
     if split_msg[0] == '!ac' and len(split_msg) > 1:
         if split_msg[1] == 'stonks':
-            chart = turnip_chart(config, message.guild)
+            user_list = ac_manager.user_list()
+            chart = turnip_chart(user_list, message.guild)
             await message.channel.send(f"```\n{chart}\n```")
 
         elif split_msg[1] == 'travel':
-            chart = travel_chart(config, message.guild)
+            user_list = ac_manager.user_list()
+            chart = travel_chart(user_list, message.guild)
             await message.channel.send(f"```\n{chart}\n```")
 
         elif split_msg[1] == 'social':
-            chart = social_chart(config, message.guild)
+            user_list = ac_manager.user_list()
+            chart = social_chart(user_list, message.guild)
             await message.channel.send(f"```\n{chart}\n```")
 
         elif split_msg[1] == 'help':
@@ -98,73 +81,57 @@ async def action(**kwargs):
         await message.author.send(help_str)
 
 
-def turnip_chart(config, guild):
+def turnip_chart(user_list, guild):
     """
     Builds the chart for displaying turnip prices
-    :param config:
+    :param user_list:
     :param guild:
     :return:
     """
-    # load the most current pickle data
-    pickle_file = config.get("animalcrossing", "pickle_file")
-    ac_data = load_pickle(pickle_file)
-
     out_table = []
-    for discord_user in ac_data['users']:
-        discord_name = clean_string(guild.get_member(discord_user).display_name, max_length=DISPLAY_CHAR_LIMIT)
-        t_price = ac_data['users'][discord_user]['turnip_price']
 
-        if ac_data['users'][discord_user]['turnip_time']:
-            t_time = ac_data['users'][discord_user]['turnip_time'].strftime("%d/%m %H:%M PDT")
-        else:
-            t_time = ''
-
-        out_table.append([discord_name, t_price, t_time])
+    for user in user_list:
+        discord_name = clean_string(guild.get_member(user.discord_id).display_name, max_length=DISPLAY_CHAR_LIMIT)
+        t_price = user.turnip_prices[-1].price
+        t_time = user.turnip_prices[-1].time.replace(tzinfo=pytz.utc).astimezone(pytz.timezone(user.time_zone))
+        tz_formatted = t_time.strftime("%d/%m %H:%M ") + user.time_zone
+        out_table.append([discord_name, t_price, tz_formatted])
 
     return tabulate(out_table, headers=['User', 'Turnip 🔔', 'Turnip ⏲️'], disable_numparse=True)
 
 
-def social_chart(config, guild):
+def social_chart(user_list, guild):
     """
     Builds the chart to display social data for Animal Crossing
-    :param config:
+    :param user_list:
     :param guild:
     :return:
     """
-    # load the most current pickle data
-    pickle_file = config.get("animalcrossing", "pickle_file")
-    ac_data = load_pickle(pickle_file)
-
     out_table = []
 
-    for discord_user in ac_data['users']:
-        discord_name = clean_string(guild.get_member(discord_user).display_name, max_length=DISPLAY_CHAR_LIMIT)
-        friend_code = clean_string(ac_data['users'][discord_user]['friend_code'], max_length=18)
+    for user in user_list:
+        discord_name = clean_string(guild.get_member(user.discord_id).display_name, max_length=DISPLAY_CHAR_LIMIT)
+        friend_code = clean_string(user.friend_code, max_length=18)
         out_table.append([discord_name, friend_code])
 
     return tabulate(out_table, headers=['User', 'Friend Code'], disable_numparse=True)
 
 
-def travel_chart(config, guild):
+def travel_chart(user_list, guild):
     """
     Builds the chart to display travel data for Animal Crossing
-    :param config:
+    :param user_list:
     :param guild:
     :return:
     """
-    # load the most current pickle data
-    pickle_file = config.get("animalcrossing", "pickle_file")
-    ac_data = load_pickle(pickle_file)
-
     out_table = []
     fruit_lookup = {'apple': '🍎', 'pear': '🍐', 'cherry': '🍒', 'peach': '🍑', 'orange': '🍊'}
 
-    for discord_user in ac_data['users']:
-        discord_name = clean_string(guild.get_member(discord_user).display_name, max_length=DISPLAY_CHAR_LIMIT)
-        island_open = '✈️' if ac_data['users'][discord_user]['island'] else '⛔'
-        fruit = fruit_lookup[ac_data['users'][discord_user]['fruit']]
-        dodo_code = clean_string(ac_data['users'][discord_user]['dodo_code'], max_length=8)
-
+    for user in user_list:
+        discord_name = clean_string(guild.get_member(user.discord_id).display_name, max_length=DISPLAY_CHAR_LIMIT)
+        island_open = '✈️' if user.island_open else '⛔'
+        fruit = fruit_lookup[user.fruit]
+        dodo_code = clean_string(user.dodo_code, max_length=8)
         out_table.append([discord_name, dodo_code, island_open + fruit])
 
     return tabulate(out_table, headers=['User', 'Dodo', '🏝️  '], disable_numparse=True)

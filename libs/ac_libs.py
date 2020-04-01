@@ -44,6 +44,12 @@ class AcManager:
         except:
             logger.error(traceback.format_exc())
 
+    def user_list(self):
+        try:
+            return session.query(AcUser).all()
+        except:
+            logger.error(traceback.format_exc())
+
 
 class TurnipEntry(Base):
     __tablename__ = 'turnip_price'
