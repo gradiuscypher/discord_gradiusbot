@@ -11,28 +11,6 @@ logger = logging.getLogger('gradiusbot')
 
 logger.info("[Public Plugin] <animal_crossing.py> Provides tools for the game Animal Crossing.")
 
-"""
-ac_data layout:
-{
-    "users": {"discord_id":
-        {
-            "friendcode": STR:FRIEND CODE,
-            "fruit": STR:FRUIT NAME
-            "island": BOOL:ISLAND OPEN STATUS
-            "turnip_price": INT:BELL PRICE,
-            "turnip_time": DATETIME: TIME INPUTTED
-        }
-    },
-    "turnips": [
-        {
-            "discord_id": INT:DISCORD ID,
-            "price": INT:BELL PRICE,
-            "time": DATETIME: TIME INPUTTED
-        }
-    ]
-}
-"""
-
 help_str = """Here's how to use the Animal Crossing bot, all commands start with `!ac`:
 
 Optional input is surrounded by `[]`, required input is surrounded by `<>`. Please do not include the `[]<>` symbols, though.

@@ -1,5 +1,3 @@
-# TODO: implement the ac_libs versions of each function, remove pickle code
-
 import asyncio
 import logging
 import os.path
