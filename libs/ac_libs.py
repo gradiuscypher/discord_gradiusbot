@@ -1,4 +1,6 @@
 import logging
+import pickle
+import pytz
 import traceback
 from datetime import datetime
 from sqlalchemy import Column, Boolean, Integer, String, ForeignKey, create_engine, DateTime, Float
@@ -13,6 +15,37 @@ Base.metadata.bind = engine
 session_factory = sessionmaker(bind=engine)
 Session = scoped_session(session_factory)
 session = Session()
+
+
+def migrate_data(filename):
+    """
+    Migrate old AC bot data from the pickle file to a database.
+    :param filename:
+    :return:
+    """
+    am = AcManager()
+    am.build_db()
+    tz = pytz.timezone("America/Los_Angeles")
+
+    with open(filename, 'rb') as ac_file:
+        ac_data = pickle.load(ac_file)
+
+    # create the users
+    for user in ac_data['users']:
+        userblob = ac_data['users'][user]
+        new_user = am.add_user(user)
+        new_user.update_fruit(userblob['fruit'])
+        new_user.update_friend_code(userblob['friend_code'].replace('SW-', ''))
+
+    # add the users turnip prices
+    for entry in ac_data['turnips']:
+        user = am.user_exists(entry['discord_id'])
+        price = entry['price']
+        old_time = entry['time']
+
+        if user and price and old_time:
+            time = tz.normalize(tz.localize(old_time)).astimezone(pytz.utc)
+            user.add_price(price, time)
 
 
 class AcManager:
@@ -57,7 +90,6 @@ class TurnipEntry(Base):
     user_id = Column(Integer, ForeignKey('ac_user.id'))
     price = Column(Integer)
     time = Column(DateTime)
-    time_zone = Column(String)
 
 
 class DiscordServer(Base):
@@ -80,13 +112,13 @@ class AcUser(Base):
     dodo_code = Column(String)
     time_zone = Column(String)
 
-    def add_price(self, price, timezone=None):
+    def add_price(self, price, time=datetime.utcnow()):
         """
         Add a turnip price to a user's list of prices
         :return:
         """
         try:
-            new_price = TurnipEntry(user_id=self.id, price=price, time_zone=timezone, time=datetime.utcnow())
+            new_price = TurnipEntry(user_id=self.id, price=price, time=time)
             session.add(new_price)
             session.commit()
         except:
