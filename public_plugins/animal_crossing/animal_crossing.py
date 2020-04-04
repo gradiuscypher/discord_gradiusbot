@@ -151,7 +151,7 @@ def travel_chart(user_list, guild):
             discord_name = user.discord_id
 
         island_open = '✈️' if user.island_open else '⛔'
-        fruit = fruit_lookup[user.fruit]
+        fruit = fruit_lookup[user.fruit] if user.fruit != '' else ''
         dodo_code = clean_string(user.dodo_code, max_length=8)
         out_table.append([discord_name, dodo_code, island_open + fruit])
 
