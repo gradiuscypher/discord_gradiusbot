@@ -91,10 +91,21 @@ def turnip_chart(user_list, guild):
     out_table = []
 
     for user in user_list:
-        discord_name = clean_string(guild.get_member(user.discord_id).display_name, max_length=DISPLAY_CHAR_LIMIT)
-        t_price = user.turnip_prices[-1].price
-        t_time = user.turnip_prices[-1].time.replace(tzinfo=pytz.utc).astimezone(pytz.timezone(user.time_zone))
-        tz_formatted = t_time.strftime("%d/%m %H:%M ") + user.time_zone
+        discord_user = guild.get_member(user.discord_id)
+        if discord_user:
+            discord_name = clean_string(discord_user.display_name, max_length=DISPLAY_CHAR_LIMIT)
+        else:
+            discord_name = user.discord_id
+        last_price = user.turnip_prices[-1] if len(user.turnip_prices) > 0 else None
+
+        if last_price:
+            t_price = user.turnip_prices[-1].price
+            t_time = user.turnip_prices[-1].time.replace(tzinfo=pytz.utc).astimezone(pytz.timezone(user.time_zone))
+            tz_formatted = t_time.strftime("%d/%m %H:%M ") + user.time_zone
+        else:
+            t_price = ""
+            tz_formatted = ""
+
         out_table.append([discord_name, t_price, tz_formatted])
 
     return tabulate(out_table, headers=['User', 'Turnip 🔔', 'Turnip ⏲️'], disable_numparse=True)
@@ -110,7 +121,12 @@ def social_chart(user_list, guild):
     out_table = []
 
     for user in user_list:
-        discord_name = clean_string(guild.get_member(user.discord_id).display_name, max_length=DISPLAY_CHAR_LIMIT)
+        discord_user = guild.get_member(user.discord_id)
+        if discord_user:
+            discord_name = clean_string(discord_user.display_name, max_length=DISPLAY_CHAR_LIMIT)
+        else:
+            discord_name = user.discord_id
+
         friend_code = clean_string(user.friend_code, max_length=18)
         out_table.append([discord_name, friend_code])
 
@@ -128,7 +144,12 @@ def travel_chart(user_list, guild):
     fruit_lookup = {'apple': '🍎', 'pear': '🍐', 'cherry': '🍒', 'peach': '🍑', 'orange': '🍊'}
 
     for user in user_list:
-        discord_name = clean_string(guild.get_member(user.discord_id).display_name, max_length=DISPLAY_CHAR_LIMIT)
+        discord_user = guild.get_member(user.discord_id)
+        if discord_user:
+            discord_name = clean_string(discord_user.display_name, max_length=DISPLAY_CHAR_LIMIT)
+        else:
+            discord_name = user.discord_id
+
         island_open = '✈️' if user.island_open else '⛔'
         fruit = fruit_lookup[user.fruit]
         dodo_code = clean_string(user.dodo_code, max_length=8)
