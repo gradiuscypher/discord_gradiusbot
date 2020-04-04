@@ -1,37 +1,13 @@
 import asyncio
 import logging
-import os.path
-import pickle
 import traceback
-from datetime import datetime
-from libs.ac_libs import AcManager, AcUser, DiscordServer, TurnipEntry
+from libs.ac_libs import AcManager, help_str
 from pytz import all_timezones
 
 logger = logging.getLogger('gradiusbot')
 
 logger.info("[Private Plugin] <animal_crossing.py> Provides tools for the game Animal Crossing.")
 
-
-help_str = """Here's how to use the Animal Crossing bot, all commands start with `!ac`:
-
-Optional input is surrounded by `[]`, required input is surrounded by `<>`. Please do not include the `[]<>` symbols, though.
-```
-DM COMMANDS:
-!ac help - this command.
-!ac turnip add <PRICE> - set the current price that Turnips are for on your island. On Sundays this will be the buy price, all other days will be the sell price.
-!ac friendcode <FRIEND CODE> - set your Nintendo friend code if you'd like others to be able to add you. Include the numbers and dashes, but not `SW-`.
-!ac island open [DODO CODE] - set your island to appear as open on the status chart. Include the DODO CODE if you'd like anyone to be able to join you.
-!ac island close - set your island to appear as closed on the status chart.
-!ac fruit <apple, pear, cherry, peach, orange> - set your native fruit for the status chart. Please use the names listed.
-!ac timezone help - get more information about the timezone command, as well as a list of valid time zones.
-!ac timezone set <TIME ZONE> - set your time zone to the provided time zone. Please copy/paste directly from the list.
-
-CHANNEL COMMANDS:
-!ac stonks - show the turnip prices that have been registered
-!ac social - show the friend codes that have been registered
-!ac travel - show the islands that are open for travel and the native fruits
-```
-"""
 
 ac_manager = AcManager()
 
