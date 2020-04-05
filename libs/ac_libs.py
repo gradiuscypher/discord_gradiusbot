@@ -118,6 +118,12 @@ class AcManager:
         except:
             logger.error(traceback.format_exc())
 
+    def is_island_open(self, server_id):
+        try:
+            return session.query(AcUser).filter(AcUser.island_open==True).first()
+        except:
+            logger.error(traceback.format_exc())
+
 
 class TurnipEntry(Base):
     __tablename__ = 'turnip_price'

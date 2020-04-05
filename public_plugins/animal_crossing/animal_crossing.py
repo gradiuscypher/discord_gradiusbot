@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import pytz
-import traceback
 from tabulate import tabulate
 from libs.ac_libs import AcManager, help_str
 
