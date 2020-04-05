@@ -103,7 +103,7 @@ class AcManager:
 
     def user_exists(self, discord_id):
         try:
-            query = session.query(AcUser).filter(discord_id==discord_id).first()
+            query = session.query(AcUser).filter(AcUser.discord_id==discord_id).first()
 
             if query:
                 return query
