@@ -77,14 +77,14 @@ def turnip_chart(user_list, guild):
         if last_price:
             t_price = user.turnip_prices[-1].price
             t_time = user.turnip_prices[-1].time.replace(tzinfo=pytz.utc).astimezone(pytz.timezone(user.time_zone))
-            tz_formatted = t_time.strftime("%d/%m %H:%M ") + user.time_zone
+            tz_formatted = t_time.strftime("%d/%m %H:%M ") + pytz.timezone(user.time_zone).tzname(user.turnip_prices[-1].time)
         else:
             t_price = ""
             tz_formatted = ""
 
         out_table.append([discord_name, t_price, tz_formatted])
 
-    return tabulate(out_table, headers=['User', 'Turnip 🔔', 'Turnip ⏲️'], disable_numparse=True)
+    return tabulate(out_table, headers=['User', ' 🔔', 'Turnip ⏲️'], disable_numparse=True)
 
 
 def social_chart(user_list, guild):
