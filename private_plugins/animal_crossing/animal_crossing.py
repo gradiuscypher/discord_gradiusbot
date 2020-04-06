@@ -1,37 +1,13 @@
 import asyncio
 import logging
-import os.path
-import pickle
 import traceback
-from datetime import datetime
-from libs.ac_libs import AcManager, AcUser, DiscordServer, TurnipEntry
+from libs.ac_libs import AcManager, help_str
 from pytz import all_timezones
 
 logger = logging.getLogger('gradiusbot')
 
 logger.info("[Private Plugin] <animal_crossing.py> Provides tools for the game Animal Crossing.")
 
-
-help_str = """Here's how to use the Animal Crossing bot, all commands start with `!ac`:
-
-Optional input is surrounded by `[]`, required input is surrounded by `<>`. Please do not include the `[]<>` symbols, though.
-```
-DM COMMANDS:
-!ac help - this command.
-!ac turnip add <PRICE> - set the current price that Turnips are for on your island. On Sundays this will be the buy price, all other days will be the sell price.
-!ac friendcode <FRIEND CODE> - set your Nintendo friend code if you'd like others to be able to add you.
-!ac island open [DODO CODE] - set your island to appear as open on the status chart. Include the DODO CODE if you'd like anyone to be able to join you.
-!ac island close - set your island to appear as closed on the status chart.
-!ac fruit <apple, pear, cherry, peach, orange> - set your native fruit for the status chart. Please use the names listed.
-!ac timezone help - get more information about the timezone command, as well as a list of valid time zones.
-!ac timezone set <TIME ZONE> - set your time zone to the provided time zone. Please copy/paste directly from the list.
-
-CHANNEL COMMANDS:
-!ac stonks - show the turnip prices that have been registered
-!ac social - show the friend codes that have been registered
-!ac travel - show the islands that are open for travel and the native fruits
-```
-"""
 
 ac_manager = AcManager()
 
@@ -63,14 +39,21 @@ async def action(**kwargs):
         if split_msg[1] == 'turnip':
             if split_msg[2] == 'add' and len(split_msg) == 4:
                 try:
-                    turnip_price = int(split_msg[3])
-                    success = add_turnip(sender_id, turnip_price)
+                    target_user = ac_manager.user_exists(sender_id)
 
-                    if success:
-                        await message.add_reaction("🆗")
+                    if target_user and target_user.time_zone != '':
+                        turnip_price = int(split_msg[3])
+                        success = add_turnip(sender_id, turnip_price)
+
+                        if success:
+                            await message.add_reaction("🆗")
+                        else:
+                            await message.add_reaction("❌")
+                            logger.debug(f"FAILED COMMAND - {message.author.id} : {message.content}")
                     else:
                         await message.add_reaction("❌")
-                        logger.debug(f"FAILED COMMAND - {message.author.id} : {message.content}")
+                        await message.channel.send("Before adding Turnip prices, please set your time zone. Use `!ac timezone help` to get started.")
+
                 except:
                     await message.add_reaction("❌")
                     logger.debug(f"FAILED COMMAND - {message.author.id} : {message.content}")
@@ -132,9 +115,9 @@ async def action(**kwargs):
 
         elif split_msg[1] == 'timezone':
             if split_msg[2] == 'help':
-                await message.channel.send(
-                    "Set your time zone for more accurate tracking. The list of time zones can be found here: https://gist.github.com/gradiuscypher/92905b1cc24dea2b17cc1e8959d18999")
-                await message.channel.send("Please copy/paste the time zone exactly as you find it on the list.")
+                await message.channel.send("Set your time zone for more accurate tracking. The list of time zones can be found here: https://gist.github.com/gradiuscypher/92905b1cc24dea2b17cc1e8959d18999")
+                await message.channel.send("\nPlease copy/paste the time zone exactly as you find it on the list.")
+                await message.channel.send("\nExample Command: `!ac timezone set America/Los_Angeles`")
 
             elif split_msg[2] == 'set' and len(split_msg) >= 4:
                 timezone_str = split_msg[3]

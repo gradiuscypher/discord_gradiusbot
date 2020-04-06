@@ -16,6 +16,41 @@ session_factory = sessionmaker(bind=engine)
 Session = scoped_session(session_factory)
 session = Session()
 
+help_str = """Here's how to use the Animal Crossing bot, all commands start with `!ac`:
+
+Optional input is surrounded by `[]`, required input is surrounded by `<>`. Please do not include the `[]<>` symbols, though.
+
+**DM Commands (use in a DM with the bot):**
+
+```
+!ac help - this command.
+
+!ac turnip add <PRICE> - set the current price that Turnips are for on your island. On Sundays this will be the buy price, all other days will be the sell price.
+
+!ac friendcode <FRIEND CODE> - set your Nintendo friend code if you'd like others to be able to add you.
+
+!ac island open [DODO CODE] - set your island to appear as open on the status chart. Include the DODO CODE if you'd like anyone to be able to join you.
+
+!ac island close - set your island to appear as closed on the status chart.
+
+!ac fruit <apple, pear, cherry, peach, orange> - set your native fruit for the status chart. Please use the names listed.
+
+!ac timezone help - get more information about the timezone command, as well as a list of valid time zones.
+
+!ac timezone set <TIME ZONE> - set your time zone to the provided time zone. Please copy/paste directly from the list.
+```
+
+**Channel Commands (use in the Animal Crossing channel):**
+
+```
+!ac stonks - show the turnip prices that have been registered
+
+!ac social - show the friend codes that have been registered
+
+!ac travel - show the islands that are open for travel and the native fruits
+```
+"""
+
 
 def migrate_data(filename):
     """
@@ -68,7 +103,7 @@ class AcManager:
 
     def user_exists(self, discord_id):
         try:
-            query = session.query(AcUser).filter(discord_id==discord_id).first()
+            query = session.query(AcUser).filter(AcUser.discord_id==discord_id).first()
 
             if query:
                 return query
@@ -80,6 +115,12 @@ class AcManager:
     def user_list(self):
         try:
             return session.query(AcUser).all()
+        except:
+            logger.error(traceback.format_exc())
+
+    def is_island_open(self, server_id):
+        try:
+            return session.query(AcUser).filter(AcUser.island_open==True).first()
         except:
             logger.error(traceback.format_exc())
 
