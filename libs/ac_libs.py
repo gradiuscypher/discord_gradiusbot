@@ -112,13 +112,13 @@ class AcUser(Base):
     dodo_code = Column(String)
     time_zone = Column(String)
 
-    def add_price(self, price, time=datetime.utcnow()):
+    def add_price(self, price, default_time=datetime.utcnow):
         """
         Add a turnip price to a user's list of prices
         :return:
         """
         try:
-            new_price = TurnipEntry(user_id=self.id, price=price, time=time)
+            new_price = TurnipEntry(user_id=self.id, price=price, time=default_time())
             session.add(new_price)
             session.commit()
         except:
