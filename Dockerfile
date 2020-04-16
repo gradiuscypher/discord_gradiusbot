@@ -1,10 +1,6 @@
 # Dockerfile to build a discord_gradiusbot container
-# TODO:
-# install the bot from target git branch
-# install prereqs
-# start the bot
-# load a config
-# log to central logging using an environment variable
+# docker build --tag gradiusbot . --no-cache
+# docker run -d -it --name gradiusbot -v "$(pwd)"/config.conf:/discord_gradiusbot/botconfig.conf gradiusbot
 
 # Set the base image to Python3 
 FROM python:3
