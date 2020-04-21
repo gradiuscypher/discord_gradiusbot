@@ -18,6 +18,9 @@ RUN git clone --single-branch --branch dockerdeploy https://github.com/gradiuscy
 # Set the working directory
 WORKDIR discord_gradiusbot
 
+# touch the logfile so we can mount it
+RUN touch /discord_gradiusbot/gradiusbot.log
+
 # install the requirements
 RUN pip install --no-cache-dir -r requirements.txt
 
