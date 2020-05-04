@@ -11,10 +11,11 @@ services/
 *.log
 *.pickle
 roles.json
+gradiusbot.json
 gapps-auth.json
 token.json
-roles_msg_id.tmp
 namecolors.json
+roles_msg_id.tmp
 
 #Gradius Wants
 !item_definitions.sqlite

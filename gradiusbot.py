@@ -7,7 +7,9 @@ import logging
 import traceback
 from sys import argv
 from libs import plugin_loader
+from libs.json_logging import CustomJsonFormatter
 from asyncio import ensure_future
+from pythonjsonlogger import jsonlogger
 
 # Setup Config
 config = configparser.RawConfigParser()
@@ -20,13 +22,17 @@ except:
 # TODO: Setup levels via config
 logger = logging.getLogger('gradiusbot')
 logger.setLevel(logging.DEBUG)
-fh = logging.FileHandler('gradiusbot.log')
+
+fh = logging.FileHandler('gradiusbot.json')
 fh.setLevel(logging.DEBUG)
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
+
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-fh.setFormatter(formatter)
+json_formatter = CustomJsonFormatter()
+fh.setFormatter(json_formatter)
 ch.setFormatter(formatter)
+
 logger.addHandler(fh)
 logger.addHandler(ch)
 
