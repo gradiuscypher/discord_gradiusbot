@@ -16,18 +16,7 @@ banpool_manager = banpool.BanPoolManager()
 banpool_config = banpool_configuration.BanpoolConfigManager()
 
 # Setup Logging
-logger = logging.getLogger('banpool_manager')
-logger.setLevel(logging.DEBUG)
-fh = logging.FileHandler('banpool.log')
-fh.setLevel(logging.DEBUG)
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch.setFormatter(formatter)
-fh.setFormatter(formatter)
-logger.addHandler(ch)
-logger.addHandler(fh)
-
+logger = logging.getLogger('gradiusbot')
 logger.info("[Public Plugin] <banpool_manager.py>: This plugin manages the banpool.")
 
 help_string = """
