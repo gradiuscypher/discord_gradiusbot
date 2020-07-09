@@ -17,10 +17,12 @@ state = {
         "state": "<STATE STRING>",
         "user_list": "<USERLIST>",
         "timestamp": "<LAST CHANGE DATETIME>"
+        "remove_message": ""
     }
 }
 """
 state = {}
+default_remove_msg = "You are being kicked from {} due to inactivity."
 
 
 async def action(**kwargs):
@@ -79,23 +81,33 @@ async def action(**kwargs):
                     await message.channel.send(message_entry)
 
             # !cleanup confirm: confirm that you are ready to kick the current list of inactive users
-            if split_msg[1] == 'confirm':
-                pass
+            if split_msg[1] == 'confirm' and sender_id in state.keys():
+                cleanup_list = state[sender_id]['user_list']
+                for user in cleanup_list:
+                    # TODO: send message that was configured during setup
+                    await user.send("")
+                    await guild.kick(user, reason=f"User cleaned up via command run by {message.author.name}")
 
         elif len(split_msg) > 3:
-            # TODO: keep working on role removal
+            # !cleanup message: the message to send to users that are kicked
+            if split_msg[1] == 'message' and sender_id in state.keys():
+                state[sender_id]['remove_message'] = split_msg[2:]
+
             if split_msg[1] == 'remove' and sender_id in state.keys():
                 # !cleanup remove <ROLE NAME> : remove anyone who's in this role from cleanup
                 if split_msg[2] == 'role':
-                    target_role = discord.utils.get(guild.roles, name=split_msg[3:])
+                    target_role = discord.utils.get(guild.roles, name=' '.join(split_msg[3:]))
                     if target_role:
-                        print("found role:", target_role.name)
+                        remove_list = []
                         for target_member in state[sender_id]['user_list']:
                             if target_role.id in [r.id for r in target_member.roles]:
                                 state[sender_id]['user_list'].remove(target_member)
-                                await message.channel.send(f"<@{target_member.id}> was removed from the cleanup list.")
-                    else:
-                        print("could not file role", split_msg[3:])
+                                remove_list.append(target_member)
+
+                        await message.channel.send(f"**Removing these users from cleanup:**")
+                        message_list = member_report(remove_list)
+                        for message_entry in message_list[:-1]:
+                            await message.channel.send(message_entry)
 
                 # !cleanup remove userid <USER ID> : remove a specific user ID from cleanup
                 if split_msg[2] == 'userid' and split_msg[3].isdigit():
@@ -138,4 +150,3 @@ def build_embed(current_channels, total_channels, current_members, total_members
     new_embed.add_field(name="Active Members", value=f"{current_members}/{total_members}", inline=False)
 
     return new_embed
-
