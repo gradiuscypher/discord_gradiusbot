@@ -42,7 +42,16 @@ async def action(client, config):
                 # Iterate through each server, looking for banned user IDs
                 for guild in client.guilds:
                     # Build a list of all banned user IDs
-                    guild_banlist = await guild.bans()
+                    try:
+                        guild_banlist = await guild.bans()
+
+                    except:
+                        guild_banlist = None
+                        logger.error(f"Failed to get ban list on {guild.name} [{guild.id}]")
+                        logger.error(traceback.format_exc())
+                        print(f"Failed to get ban list on {guild.name} [{guild.id}]")
+                        print(traceback.format_exc())
+
                     banned_user_ids = []
                     all_banpool_list = banpool_manager.banpool_list()
 
@@ -71,7 +80,7 @@ async def action(client, config):
                             if user and bot_perms.ban_members:
                                 is_exception = banpool_manager.is_user_in_exceptions(user_id, guild.id)
 
-                                if not is_exception:
+                                if not is_exception and guild_banlist:
                                     try:
                                         ban_entry = discord.utils.get(guild_banlist, user__id=user_id)
 
