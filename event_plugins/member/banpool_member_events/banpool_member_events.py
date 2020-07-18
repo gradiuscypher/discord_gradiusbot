@@ -10,7 +10,7 @@ banpool_manager = banpool.BanPoolManager()
 banpool_config = banpool_configuration.BanpoolConfigManager()
 
 # Setup Logging
-logger = logging.getLogger('banpool_manager')
+logger = logging.getLogger('gradiusbot')
 logger.setLevel(logging.DEBUG)
 
 logger.info("[Event Plugin] <banpool_events.py>: This plugin manages banpool related events.")
