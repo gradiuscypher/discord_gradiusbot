@@ -140,8 +140,8 @@ async def action(client, config):
             logger.error(traceback.format_exc())
 
     @banpool_tasks.before_loop
-    async def before_tasks(self):
-        logger.info("Waiting for client to log in...")
-        await self.bot.wait_unti_ready()
+    async def before_tasks():
+        logger.info("Waiting for client to log in before starting banpool task...")
+        await client.wait_until_ready()
 
     banpool_tasks.start()

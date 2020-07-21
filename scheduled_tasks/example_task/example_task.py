@@ -13,4 +13,9 @@ async def action(client, config):
         print(client.user)
         print("This is an example task.")
 
+    @example_task.before_loop
+    async def before_example():
+        print("waiting for user to log in...")
+        await client.wait_until_ready()
+
     example_task.start()
