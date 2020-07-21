@@ -2,8 +2,9 @@ import asyncio
 import discord
 import logging
 import traceback
-from discord import Embed, Color, Permissions
 from concurrent.futures import CancelledError
+from discord import Embed, Color, Permissions
+from discord.ext.tasks import loop
 
 from libs import banpool, banpool_configuration
 
@@ -17,25 +18,17 @@ logger.setLevel(logging.DEBUG)
 logger.info("[Scheduled Task] <banpool_tasks.py>: Scheduled tasks for the banpool.")
 
 
-@asyncio.coroutine
 async def action(client, config):
     admin_server_id = config.getint('banpool', 'admin_server_id')
     admin_chan_name = config.get('banpool', 'admin_chan')
     task_length = config.getint('banpool', 'task_length')
     mute_alerts = config.getboolean('banpool', 'mute_alerts')
-    admin_chan = None
 
-    setting_up = True
-    while setting_up:
-        logger.info("Waiting for client to log in...")
-        if client.is_ready():
-            # Setup Admin Messaging
-            admin_server = discord.utils.get(client.guilds, id=admin_server_id)
-            admin_chan = discord.utils.get(admin_server.channels, name=admin_chan_name)
-            setting_up = False
-        await asyncio.sleep(5)
+    @loop(seconds=task_length)
+    async def banpool_tasks():
+        admin_server = discord.utils.get(client.guilds, id=admin_server_id)
+        admin_chan = discord.utils.get(admin_server.channels, name=admin_chan_name)
 
-    while True:
         try:
             if client.is_ready():
                 # Check each server for a user with a matching User ID and ban those found
@@ -56,7 +49,9 @@ async def action(client, config):
                     all_banpool_list = banpool_manager.banpool_list()
 
                     # create a list of pools that the guild is subscribed to
-                    banpool_list = [p for p in all_banpool_list if (banpool_config.is_guild_subscribed(guild.id, p.pool_name) or p.pool_name == 'global')]
+                    banpool_list = [p for p in all_banpool_list if
+                                    (banpool_config.is_guild_subscribed(guild.id,
+                                                                        p.pool_name) or p.pool_name == 'global')]
 
                     # for each subscribed pool, get the user ids of banned users
                     for pool in banpool_list:
@@ -94,11 +89,15 @@ async def action(client, config):
                                             banpool_manager.set_last_knowns(user_id, user.name, user.discriminator)
 
                                             # ban the user
-                                            await guild.ban(user, reason="Banpool Bot [{}] - {}".format(banpool_name, reason))
+                                            await guild.ban(user,
+                                                            reason="Banpool Bot [{}] - {}".format(banpool_name, reason))
 
-                                            logger.debug('member is in the banpool and has no exceptions: {}'.format(user_id))
+                                            logger.debug(
+                                                'member is in the banpool and has no exceptions: {}'.format(user_id))
                                             ban_embed = Embed(title="User Banned via Task", color=Color.green())
-                                            ban_embed.add_field(name="User Name", value=user.name + "#" + str(user.discriminator), inline=False)
+                                            ban_embed.add_field(name="User Name",
+                                                                value=user.name + "#" + str(user.discriminator),
+                                                                inline=False)
                                             ban_embed.add_field(name="Server ID", value=guild.id, inline=True)
                                             ban_embed.add_field(name="User ID", value=user_id, inline=True)
                                             ban_embed.add_field(name="Banpool Name", value=banpool_name, inline=False)
@@ -114,31 +113,35 @@ async def action(client, config):
 
                                             if announce_chan_id and not mute_alerts:
                                                 announce_chan = discord.utils.get(guild.channels, id=announce_chan_id)
-                                                announce_embed = Embed(title="User Banned via Task", color=Color.green())
-                                                announce_embed.add_field(name="User Name", value=user.name + "#" + str(user.discriminator), inline=True)
+                                                announce_embed = Embed(title="User Banned via Task",
+                                                                       color=Color.green())
+                                                announce_embed.add_field(name="User Name",
+                                                                         value=user.name + "#" + str(
+                                                                             user.discriminator),
+                                                                         inline=True)
                                                 announce_embed.add_field(name="Nickname", value=user.nick, inline=True)
-                                                announce_embed.add_field(name="User Profile", value=f"<@{user.id}>", inline=False)
+                                                announce_embed.add_field(name="User Profile", value=f"<@{user.id}>",
+                                                                         inline=False)
                                                 announce_embed.add_field(name="User ID", value=user_id, inline=False)
-                                                announce_embed.set_footer(icon_url=guild.icon_url, text="See Admin Mains for more details")
+                                                announce_embed.set_footer(icon_url=guild.icon_url,
+                                                                          text="See Admin Mains for more details")
                                                 await announce_chan.send(embed=announce_embed)
 
                                     except:
-                                        logger.error("Failed to execute user ban [{}] on {}[{}] server".format(user_id, guild.name, guild.id))
+                                        logger.error(
+                                            "Failed to execute user ban [{}] on {}[{}] server".format(user_id,
+                                                                                                      guild.name,
+                                                                                                      guild.id))
                                         logger.error(traceback.format_exc())
                                         print("Failed to execute ban on {}[{}] server".format(guild.name, guild.id))
                                         print(traceback.format_exc())
 
-            await asyncio.sleep(task_length)
-
-        # ref: https://stackoverflow.com/questions/38652819/from-concurrent-futures-to-asyncio
-        except CancelledError:
-            raise NotImplementedError
-
-        except RuntimeError:
-            logger.error(traceback.format_exc())
-            await asyncio.sleep(task_length)
-            exit(0)
-
         except:
             logger.error(traceback.format_exc())
-            await asyncio.sleep(task_length)
+
+    @banpool_tasks.before_loop
+    async def before_tasks(self):
+        logger.info("Waiting for client to log in...")
+        await self.bot.wait_unti_ready()
+
+    banpool_tasks.start()
