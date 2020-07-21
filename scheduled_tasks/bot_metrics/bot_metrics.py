@@ -25,8 +25,7 @@ async def action(client, config):
                     'total_guilds': len(client.guilds),
                     'guild_names': guild_names
                 }
-                logger.info(metrics_dict)
-                logger.debug("Metrics collection completed. Waiting 1 hour.")
+                logger.info("Metrics collection complete. Waiting 1 hour.", extra=metrics_dict)
                 await asyncio.sleep(3600)
             else:
                 await asyncio.sleep(10)
