@@ -14,6 +14,14 @@ To run discord_gradiusbot and it's plugins in Docker, we'll need to build the co
 * Under "Click to Reveal Token" click the "Copy" button to copy your bot's authentication token to your clipboard.
 * Disable the "Public Bot" switch unless you want other people to be able to invite your bot.
 
+### Inviting your bot to your Discord server
+* Open the [Discord API Permissions Calculator](https://discordapi.com/permissions.html)
+* Check any of the checkboxes related to the permission you want your bot to have. Some plugins require more permissions than others. For example, the `url_checker` plugin will require at least "Manage Messages"
+* On the Discord Developers page, click the "General Information" section for your bot and click the "Copy" button next to the "CLIENT ID" section
+* Paste this CLIENT ID into the "Client ID" section of the Permissions Calculator
+* Click the link at the bottom of the page to be redirected to Discord's site, where it'll ask you which server you want to invite your bot
+* Chose the server you want to invite it to, and click Continue
+
 ### Getting the discord_gradiusbot code and building the Docker container
 This is how you get the code responsible for running gradiusbot. These instructions are only tested in Ubuntu, but should work for any Linux system with `git` and `docker` installed.
 
