@@ -182,7 +182,10 @@ async def action(**kwargs):
                         result = banpool_manager.add_user_to_banpool(banpool_name, user_id, reason)
                         if result[1]:
                             # The add was successful
-                            notice_embed = Embed(title="BanPool Manager", color=Color.green(), description=result[0])
+                            notice_embed = Embed(title="BanPool Manager - User Added", color=Color.green(), description=result[0])
+                            notice_embed.add_field(name="User ID", value=user_id, inline=True)
+                            notice_embed.add_field(name="Banpool Name", value=banpool_name, inline=False)
+                            notice_embed.add_field(name="Ban Reason", value=reason, inline=False)
                         else:
                             # The add was not successful
                             notice_embed = Embed(title="BanPool Manager", color=Color.red(), description=result[0])
@@ -246,6 +249,8 @@ async def action(**kwargs):
                         if result[1]:
                             # The add was successful
                             notice_embed = Embed(title="BanPool Manager", color=Color.green(), description=result[0])
+                            notice_embed.add_field(name="User ID", value=user_id, inline=True)
+                            notice_embed.add_field(name="Banpool Name", value=banpool_name, inline=False)
                         else:
                             # The add was not successful
                             notice_embed = Embed(title="BanPool Manager", color=Color.red(), description=result[0])
