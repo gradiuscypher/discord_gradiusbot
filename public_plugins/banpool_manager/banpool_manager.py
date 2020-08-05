@@ -178,7 +178,6 @@ async def action(**kwargs):
                         banpool_name = split_content[2]
                         user_id = split_content[3]
                         target_user = client.get_user(int(user_id))
-                        print("tuser", target_user)
                         reason = ' '.join(split_content[4:])
                         result = banpool_manager.add_user_to_banpool(banpool_name, user_id, reason)
                         if result[1]:
