@@ -64,7 +64,6 @@ def chunks(l, n):
         yield l[i:i + n]
 
 
-@asyncio.coroutine
 async def action(**kwargs):
     message = kwargs['message']
     config = kwargs['config']
@@ -178,11 +177,17 @@ async def action(**kwargs):
                     if split_content[1] == 'adduser' and len(split_content) > 4:
                         banpool_name = split_content[2]
                         user_id = split_content[3]
+                        target_user = client.get_user(int(user_id))
+                        print("tuser", target_user)
                         reason = ' '.join(split_content[4:])
                         result = banpool_manager.add_user_to_banpool(banpool_name, user_id, reason)
                         if result[1]:
                             # The add was successful
                             notice_embed = Embed(title="BanPool Manager - User Added", color=Color.green(), description=result[0])
+                            if target_user:
+                                notice_embed.add_field(name="User Name",
+                                                    value=target_user.name + "#" + str(target_user.discriminator),
+                                                    inline=False)
                             notice_embed.add_field(name="User ID", value=user_id, inline=True)
                             notice_embed.add_field(name="Banpool Name", value=banpool_name, inline=False)
                             notice_embed.add_field(name="Ban Reason", value=reason, inline=False)
