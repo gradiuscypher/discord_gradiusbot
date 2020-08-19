@@ -93,7 +93,7 @@ async def action(**kwargs):
                 else:
                     status_embed = Embed(title="Planetary Production Corp Target - Update", color=Color.green(),
                                          description="These are the Planetary Production items you should produce for the corporation")
-                    status_embed.add_field(name="Target Items", value="\n".join(valid_items), inline=False)
+                    status_embed.add_field(name="Needed Items", value="\n".join(valid_items), inline=False)
 
                     with open('echoes_pp_target_msg_id', 'r') as id_file:
                         old_id = id_file.read()
