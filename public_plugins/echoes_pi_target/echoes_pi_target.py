@@ -1,5 +1,5 @@
 # TODO: calculate distance between gates: https://github.com/kaelspencer/everest
-# TODO: configure PI targets
+# TODO: https://everest.kaelspencer.com/jump/1C-953/G-0Q86/
 
 from discord import Embed, Color
 import logging
