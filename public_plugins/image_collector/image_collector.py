@@ -1,5 +1,6 @@
 import logging
 from discord import Embed, Color
+from datetime import datetime
 
 logger = logging.getLogger('gradiusbot')
 
@@ -24,6 +25,7 @@ async def action(**kwargs):
                 status_embed = Embed(title="Image Collection Script", color=Color.orange(), description="Starting image collection script...")
 
                 message_count = 0
+                file_count = 0
                 if target_channel:
                     status_message = await message.channel.send(embed=status_embed)
 
@@ -32,18 +34,23 @@ async def action(**kwargs):
 
                         # collect message attachments
                         if len(msg.attachments) > 0:
+                            timestamp = msg.created_at
+                            author = msg.author.id
+
                             for attachment in msg.attachments:
-                                await message.channel.send(msg.author.id)
-                                await message.channel.send(attachment.filename)
+                                await attachment.save(f"images/{author}-{int(timestamp.timestamp())}")
+                                file_count += 1
 
                         if message_count % 50 == 0:
                             status_embed = Embed(title="Image Collection Script", color=Color.orange(),
                                                  description="Starting image collection script...")
                             status_embed.add_field(name="Messages processed", value=str(message_count))
+                            status_embed.add_field(name="Files Saved", value=str(file_count))
                             await status_message.edit(embed=status_embed)
 
                     # Send final update
                     status_embed = Embed(title="Image Collection Script", color=Color.green(),
                                          description="Image collection script complete.")
                     status_embed.add_field(name="Messages processed", value=str(message_count))
+                    status_embed.add_field(name="Files Saved", value=str(file_count))
                     await status_message.edit(embed=status_embed)
