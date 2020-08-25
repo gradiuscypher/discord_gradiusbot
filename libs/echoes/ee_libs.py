@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 import traceback
 import csv
+import requests
 from sys import argv
 from sqlalchemy import Column, Boolean, Integer, String, ForeignKey, create_engine, DateTime, func
 from sqlalchemy.ext.declarative import declarative_base
@@ -74,11 +75,12 @@ class ResourceLocation(Base):
     pid = Column(Integer)
     resource = Column(String)
     jumps = Column(Integer)
-    quality = Column(String)
+    richness = Column(String)
     planet = Column(String)
     const = Column(String)
     system = Column(String)
     output = Column(Integer)
+    start = Column(String)
 
 
 def planet_lookup():
@@ -114,14 +116,64 @@ def fill_db():
             session.commit()
 
 
-def best_planets(region):
+def best_planets():
+    best_locations_dict = {}
+    jump_lookup = {}
+    all_system_set = set()
+
+    # iterate over every product and find locations that have either Rich or Perfect for the product
     for product in product_strings:
-        print(f"Building lookup for {product}")
-        # query = session.query(Planet).filter(Planet.region == region, func.lower(Planet.resource) == product, Planet.richness == 'Rich', Planet.richness == 'Perfect')
-        query = session.query(Planet).filter(Planet.region == region, func.lower(Planet.resource) == product, (Planet.richness == 'Rich') | (Planet.richness == 'Perfect'))
-        print(query.count())
-        # for r in query:
-        #     print(r)
+        query = session.query(Planet).filter((Planet.region == 'Curse') | (Planet.region == 'Great Wildlands') | (Planet.region == 'Scalding Pass'), func.lower(Planet.resource) == product, (Planet.richness == 'Rich') | (Planet.richness == 'Perfect'))
+
+        for r in query:
+            all_system_set.add(r.system)
+
+            if product not in best_locations_dict.keys():
+                best_locations_dict[product] = [r]
+            else:
+                best_locations_dict[product].append(r)
+
+    # iterate over the all system set and calculate jump distance and store
+    print("Getting jump values...")
+    r = requests.post('https://everest.kaelspencer.com/jump/batch/', json={'source': 'G-0Q86', 'destinations': list(all_system_set)})
+    for destination in r.json()['destinations']:
+        jump_lookup[destination['destination']] = destination['jumps']
+
+    # Create the DB entries for every product, location, and jump value
+    for product in product_strings:
+        for planet in best_locations_dict[product]:
+            new_resource_location = ResourceLocation(pid=planet.pid, resource=product, jumps=jump_lookup[planet.system],
+                                                     richness=planet.richness, planet=planet.name, const=planet.const,
+                                                     system=planet.system, output=planet.output, start='G-0Q86')
+            session.add(new_resource_location)
+            session.commit()
+
+
+def get_best_planets(resource, max_locations=10):
+    return_list = []
+    query = session.query(ResourceLocation).filter(ResourceLocation.resource == resource).order_by(ResourceLocation.jumps)
+
+    jump_amount = None
+    result_count = 1
+
+    for result in query:
+        if not jump_amount:
+            jump_amount = result.jumps
+            return_list.append(result)
+            result_count += 1
+
+        elif jump_amount == result.jumps:
+            return_list.append(result)
+
+        elif jump_amount != result.jumps and result_count <= max_locations:
+            jump_amount = result.jumps
+            return_list.append(result)
+            result_count += 1
+
+        elif jump_amount != result.jumps and result_count > max_locations:
+            break
+
+    return return_list
 
 
 if __name__ == '__main__':

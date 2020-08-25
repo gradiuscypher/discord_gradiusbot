@@ -84,12 +84,14 @@ async def action(**kwargs):
                         invalid_items.append(target_item)
                     else:
                         valid_items.append(target_item)
+
                 if len(invalid_items) > 0:
                     status_embed = Embed(title="Planetary Production Corp Target - Update Failed", color=Color.red(),
                                          description="Some invalid items were found. List valid item names with `!pp list`")
                     status_embed.add_field(name="Valid Items", value="\n".join(valid_items), inline=False)
                     status_embed.add_field(name="Invalid Items", value="\n".join(invalid_items), inline=False)
                     await message.channel.send(embed=status_embed)
+
                 else:
                     status_embed = Embed(title="Planetary Production Corp Target - Update", color=Color.green(),
                                          description="These are the Planetary Production items you should produce for the corporation")
