@@ -1,8 +1,11 @@
 # TODO: calculate distance between gates: https://github.com/kaelspencer/everest
 # TODO: https://everest.kaelspencer.com/jump/1C-953/G-0Q86/
 
-from discord import Embed, Color
 import logging
+import discord.utils
+from discord import Embed, Color
+from tabulate import tabulate
+from libs.echoes import ee_libs
 
 logger = logging.getLogger('gradiusbot')
 
@@ -68,9 +71,12 @@ async def action(**kwargs):
     config = kwargs['config']
     client = kwargs['client']
 
+    required_user_role = config.get('echoes', 'industry_role')
+    in_industry_role = discord.utils.get(message.author.roles, name=required_user_role)
+
     split_content = message.content.split()
 
-    if split_content[0] == '!pp':
+    if split_content[0] == '!pp' and in_industry_role:
         if split_content[1] == 'update':
             if len(split_content) >= 3:
                 pi_targets = ' '.join(split_content[2:]).split(',')
@@ -108,6 +114,15 @@ async def action(**kwargs):
                                 await message.channel.send("Unable to unpin old message. Please unpin manually.")
 
                     new_message = await message.channel.send(embed=status_embed)
+
+                    for t_item in valid_items:
+                        out_msg_list = []
+                        best_locations = ee_libs.get_best_planets(t_item, max_locations=5)
+                        for location in best_locations:
+                            out_msg_list.append([location.jumps, location.planet, location.richness, location.output])
+                        location_table = tabulate(out_msg_list, headers=["Jumps", "Planet", "Richness", "Output"])
+                        await message.channel.send(f"**{t_item}**\n```\n{location_table}\n```")
+
                     await new_message.pin()
                     with open('echoes_pp_target_msg_id', 'w') as id_file:
                         id_file.write(str(new_message.id))
