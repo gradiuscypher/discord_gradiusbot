@@ -1,4 +1,7 @@
+# TODO: capitalize words or the bot is fired.
+
 #! /usr/bin/env python3
+
 import traceback
 import csv
 import requests
