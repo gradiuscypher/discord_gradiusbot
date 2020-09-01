@@ -1,3 +1,6 @@
+# TODO: get_attribute function
+# TODO: add base attribute to all pilots
+
 import traceback
 import requests
 from sqlalchemy import Column, Boolean, Integer, String, ForeignKey, create_engine, DateTime, func
@@ -28,16 +31,28 @@ class PilotManager:
         :return:
         """
         new_pilot = Pilot(discord_id=discord_id, discord_name=discord_name, discord_discriminator=discord_discriminator)
+        session.add(new_pilot)
+        session.commit()
 
-        if character_names and len(character_names) > 0:
+        if character_names:
             for character in character_names:
-                # TODO: add characters to the pilot
-                pass
+                new_character = Character(pilot_id=new_pilot.id, name=character)
+                session.add(new_character)
+            session.commit()
+
+    def get_pilot(self, discord_id):
+        pilot_query = session.query(Pilot).filter(Pilot.discord_id == discord_id)
+
+        if pilot_query.count() > 0:
+            return pilot_query.first()
+        else:
+            return None
 
 
 class Pilot(Base):
     __tablename__ = 'pilots'
     id = Column(Integer, primary_key=True)
+    attribute_groups = relationship('AttributeGroup')
     characters = relationship('Character')
     discord_id = Column(Integer)
     discord_name = Column(String)
@@ -52,6 +67,12 @@ class Pilot(Base):
         :param attribute_group:
         :return:
         """
+        attr_group_query = session.query(AttributeGroup).filter(AttributeGroup.name == attribute_group)
+        if attr_group_query.count() > 0:
+            attr_group_id = attr_group_query.first().id
+            new_attribute = Attribute(key=key, value=value, friendly_name=friendly_name, attribute_group_id=attr_group_id)
+            session.add(new_attribute)
+            session.commit()
 
     def add_attribute_group(self, name, description):
         """
@@ -60,6 +81,19 @@ class Pilot(Base):
         :param description:
         :return:
         """
+        new_attribute_group = AttributeGroup(name=name, description=description, pilot_id=self.id)
+        session.add(new_attribute_group)
+        session.commit()
+
+    def add_character(self, character_name):
+        """
+        Adds a character to a pilot profile
+        :param character_name:
+        :return:
+        """
+        new_character = Character(pilot_id=self.id, name=character_name)
+        session.add(new_character)
+        session.commit()
 
 
 class Character(Base):
@@ -72,6 +106,7 @@ class Character(Base):
 class AttributeGroup(Base):
     __tablename__ = 'attributegroups'
     id = Column(Integer, primary_key=True)
+    pilot_id = Column(Integer, ForeignKey('pilots.id'))
     attributes = relationship('Attribute')
     name = Column(String)
     description = Column(String)
