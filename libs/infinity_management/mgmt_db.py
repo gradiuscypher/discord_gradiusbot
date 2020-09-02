@@ -1,12 +1,7 @@
-# TODO: get_attribute function
-# TODO: add base attribute to all pilots
-
 import traceback
-import requests
-from sqlalchemy import Column, Boolean, Integer, String, ForeignKey, create_engine, DateTime, func
+from sqlalchemy import Column, Boolean, Integer, String, ForeignKey, create_engine, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker, scoped_session
-from datetime import datetime
 
 
 Base = declarative_base()
@@ -32,6 +27,8 @@ class PilotManager:
         """
         new_pilot = Pilot(discord_id=discord_id, discord_name=discord_name, discord_discriminator=discord_discriminator)
         session.add(new_pilot)
+        session.commit()
+        new_pilot.add_attribute_group('base', "A base attribute group included for all pilots.")
         session.commit()
 
         if character_names:
@@ -94,6 +91,20 @@ class Pilot(Base):
         new_character = Character(pilot_id=self.id, name=character_name)
         session.add(new_character)
         session.commit()
+
+    def get_attribute(self, attribute_group, attribute_name):
+        attr_group_query = session.query(AttributeGroup).filter(AttributeGroup.name == attribute_group, AttributeGroup.pilot_id == self.id)
+
+        if attr_group_query.count() > 0:
+            attr_group = attr_group_query.first()
+            attr_query = session.query(Attribute).filter(Attribute.attribute_group_id == attr_group.id, Attribute.key == attribute_name)
+
+            if attr_query.count() > 0:
+                return attr_query.first().value
+            else:
+                return None
+        else:
+            return None
 
 
 class Character(Base):
