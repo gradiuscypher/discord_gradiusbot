@@ -3,6 +3,7 @@
 venv3/
 venv/
 services/
+images/
 *.conf
 *.db
 *.db-journal
@@ -16,6 +17,7 @@ gapps-auth.json
 token.json
 namecolors.json
 roles_msg_id.tmp
+pilots.csv
 
 #Gradius Wants
 !item_definitions.sqlite

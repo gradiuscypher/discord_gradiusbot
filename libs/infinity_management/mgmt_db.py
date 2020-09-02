@@ -25,17 +25,20 @@ class PilotManager:
         Adds a pilot to the database
         :return:
         """
-        new_pilot = Pilot(discord_id=discord_id, discord_name=discord_name, discord_discriminator=discord_discriminator)
-        session.add(new_pilot)
-        session.commit()
-        new_pilot.add_attribute_group('base', "A base attribute group included for all pilots.")
-        session.commit()
+        pilot_query = session.query(Pilot).filter(Pilot.discord_id == discord_id)
 
-        if character_names:
-            for character in character_names:
-                new_character = Character(pilot_id=new_pilot.id, name=character)
-                session.add(new_character)
+        if pilot_query.count() == 0:
+            new_pilot = Pilot(discord_id=discord_id, discord_name=discord_name, discord_discriminator=discord_discriminator)
+            session.add(new_pilot)
             session.commit()
+            new_pilot.add_attribute_group('base', "A base attribute group included for all pilots.")
+            session.commit()
+
+            if character_names:
+                for character in character_names:
+                    new_character = Character(pilot_id=new_pilot.id, name=character)
+                    session.add(new_character)
+                session.commit()
 
     def get_pilot(self, discord_id):
         pilot_query = session.query(Pilot).filter(Pilot.discord_id == discord_id)
