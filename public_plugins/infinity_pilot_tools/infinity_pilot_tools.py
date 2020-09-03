@@ -56,17 +56,18 @@ async def action(**kwargs):
                 message_list = []
                 result_string = ""
                 missing_count = 0
+                target_channel = guild.get_channel(722851595519262733)
+                for member in target_channel.members:
+                    if not member.bot:
+                        pilot = pilot_manager.get_pilot(member.id)
 
-                for member in guild.members:
-                    pilot = pilot_manager.get_pilot(member.id)
-
-                    if not pilot:
-                        missing_count += 1
-                        if len(result_string) >= 1900:
-                            message_list.append(result_string)
-                            result_string = f"{member.name}#{member.discriminator} - {[r.name for r in member.roles]}\n"
-                        else:
-                            result_string += f"{member.name}#{member.discriminator} - {[r.name for r in member.roles]}\n"
+                        if not pilot:
+                            missing_count += 1
+                            if len(result_string) >= 1900:
+                                message_list.append(result_string)
+                                result_string = f"{member.name}#{member.discriminator} - {[r.name for r in member.roles]}\n"
+                            else:
+                                result_string += f"{member.name}#{member.discriminator} - {[r.name for r in member.roles]}\n"
 
                 await message.channel.send(
                     f"Out of {len(guild.members)} members, {missing_count} either haven't provided a profile screenshot or provided one that couldn't be processed.")
