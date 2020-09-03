@@ -126,7 +126,7 @@ def best_planets():
 
     # iterate over every product and find locations that have either Rich or Perfect for the product
     for product in product_strings:
-        query = session.query(Planet).filter((Planet.region == 'Curse') | (Planet.region == 'Great Wildlands') | (Planet.region == 'Scalding Pass'), func.lower(Planet.resource) == product, (Planet.richness == 'Rich') | (Planet.richness == 'Perfect'))
+        query = session.query(Planet).filter((Planet.region == 'Catch') | (Planet.region == 'Stain') | (Planet.region == 'Impass'), func.lower(Planet.resource) == product, (Planet.richness == 'Rich') | (Planet.richness == 'Perfect'))
 
         for r in query:
             all_system_set.add(r.system)
@@ -138,7 +138,7 @@ def best_planets():
 
     # iterate over the all system set and calculate jump distance and store
     print("Getting jump values...")
-    r = requests.post('https://everest.kaelspencer.com/jump/batch/', json={'source': 'G-0Q86', 'destinations': list(all_system_set)})
+    r = requests.post('https://everest.kaelspencer.com/jump/batch/', json={'source': 'V2-VC2', 'destinations': list(all_system_set)})
     for destination in r.json()['destinations']:
         jump_lookup[destination['destination']] = destination['jumps']
 
@@ -147,14 +147,14 @@ def best_planets():
         for planet in best_locations_dict[product]:
             new_resource_location = ResourceLocation(pid=planet.pid, resource=product, jumps=jump_lookup[planet.system],
                                                      richness=planet.richness, planet=planet.name, const=planet.const,
-                                                     system=planet.system, output=planet.output, start='G-0Q86')
+                                                     system=planet.system, output=planet.output, start='V2-VC2')
             session.add(new_resource_location)
             session.commit()
 
 
-def get_best_planets(resource, max_locations=10):
+def get_best_planets(resource, max_locations=10, start='V2-VC2'):
     return_list = []
-    query = session.query(ResourceLocation).filter(ResourceLocation.resource == resource).order_by(ResourceLocation.jumps)
+    query = session.query(ResourceLocation).filter(ResourceLocation.resource == resource, ResourceLocation.start == start).order_by(ResourceLocation.jumps)
 
     jump_amount = None
     result_count = 1
