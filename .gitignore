@@ -18,6 +18,7 @@ token.json
 namecolors.json
 roles_msg_id.tmp
 pilots.csv
+gcloud.json
 
 #Gradius Wants
 !item_definitions.sqlite

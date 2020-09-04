@@ -54,6 +54,11 @@ def detect_text(img):
     return best
 
 
+def process_screenshot(target_image):
+    cropped_image = crop_profile(target_image)
+    print(detect_text(cropped_image))
+
+
 # if __name__ == "__main__":
 #     import sys
 #     import os

@@ -1,8 +1,8 @@
 # TODO: allow user to upload screenshot and validate their user names
 # TODO: report on users that aren't in the DB but in the discord
-# TODO: only report on users, not bots. only report on users that are in a member channel like #general
 # TODO: automatically format people's Discord names
 # TODO: add users to the DB when they're given a "member" role, but request that they send screenshots
+# TODO: add users to a verified role once they've provided account screenshots and confirmed names
 
 import csv
 import logging
