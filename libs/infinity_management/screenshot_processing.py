@@ -55,41 +55,8 @@ def detect_text(img):
 
 
 def process_screenshot(target_image):
-    cropped_image = crop_profile(target_image)
-    print(detect_text(cropped_image))
-
-
-# if __name__ == "__main__":
-#     import sys
-#     import os
-#     import os.path as path
-#
-#     if len(sys.argv) < 3:
-#         print("Usage: ocr.py <output csv file> <image file or directory of images>")
-#         exit(1)
-#
-#     exists = path.isfile(sys.argv[1])
-#     output = open(sys.argv[1], 'r+')
-#     data = {}
-#     csv_data = csv.reader(output)
-#     for row in csv_data:
-#         data[(row[0], row[1])] = row
-#
-#     dir = sys.argv[2]
-#     files = [dir]
-#     if path.isdir(dir):
-#         files = [f for f in os.listdir(dir) if path.isfile(path.join(dir, f))]
-#     output.seek(0, 2)
-#
-#     if not exists:
-#         print('discord_id,timestamp,name1,name2,name3', file=output)
-#     for f in files:
-#         (discord_id, timestamp, counter) = f.split('-')
-#         if counter == '1' and (discord_id, timestamp) in data:
-#             continue
-#         images = crop_profile(path.join(dir, f))
-#         names = []
-#         for img in images:
-#             names.append(detect_text(img).strip())
-#         print(f'{discord_id},{timestamp},{names[0]},{names[1]},{names[2]}',
-#               file=output, flush=True)
+    cropped_images = crop_profile(target_image)
+    name_list = []
+    for image in cropped_images:
+        name_list.append(detect_text(image))
+    return name_list

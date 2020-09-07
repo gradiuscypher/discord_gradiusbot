@@ -2,6 +2,7 @@ import discord
 import logging
 import requests
 from io import BytesIO
+from discord import Embed, Color
 from libs.infinity_management import mgmt_db
 from libs.infinity_management import screenshot_processing
 
@@ -26,9 +27,9 @@ async def action(**kwargs):
     if message.author.id in message_state.keys():
         if len(message.content) == 0:
             if message_state[message.author.id] == 'SEND_SCREENSHOT' and len(message.attachments) > 0:
-                print(f"FOUND {len(message.attachments)} FILES.")
-                profile_image = BytesIO(requests.get(message.attachements[0].url).content)
-                screenshot_processing.process_screenshot(profile_image)
+                profile_image = BytesIO(requests.get(message.attachments[0].url).content)
+                name_list = screenshot_processing.process_screenshot(profile_image)
+                await confirm_names(name_list, message)
                 message_state[message.author.id] = 'READY'
 
     elif len(split_message) == 2:
@@ -56,3 +57,13 @@ async def validate_screenshot(message):
                                "- Only include one screenshot each time you run the command. If you have alt accounts, run this command again.\n"
                                "- An example of an ideal screenshot can be found here: INCLUDE_LINK_HERE\n"
                                "- If you run into any issues, contact gradius#8902 on Discord.\n```")
+
+
+async def confirm_names(name_list, message):
+    await message.channel.send("The following messages will contain the detected character names...\n")
+
+    for name in name_list:
+        name_embed = Embed(title='Detected Character Name', description=f"{name}\nClick ✅ to confirm the character name.\nClick ✏️to edit the name.")
+        embed_message = await message.channel.send(embed=name_embed)
+        await embed_message.add_reaction("✅")
+        await embed_message.add_reaction("✏")
