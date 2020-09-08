@@ -13,6 +13,19 @@ logger.info("[Private Plugin] <infinity_user_pm.py> Infinity LTD commands for Pi
 pilot_manager = mgmt_db.PilotManager()
 
 message_state = {}
+char_name_dict = {}
+
+help_msg = """**Amos Bot - Command Help**\n
+**Pilot Services**
+```
+validate - starts the screenshot validation process
+```
+
+**Other Commands**
+```
+help - this command
+```
+"""
 
 
 async def action(**kwargs):
@@ -24,27 +37,33 @@ async def action(**kwargs):
 
     split_message = message.content.split()
 
+    # if the message author is in the state table, they may have already started a command, so check here first
     if message.author.id in message_state.keys():
-        if len(message.content) == 0:
+        if len(split_message) == 0:
             if message_state[message.author.id] == 'SEND_SCREENSHOT' and len(message.attachments) > 0:
                 profile_image = BytesIO(requests.get(message.attachments[0].url).content)
                 name_list = screenshot_processing.process_screenshot(profile_image)
                 await confirm_names(name_list, message)
+        if len(split_message) == 1:
+            if message_state[message.author.id] == 'VALIDATING' and split_message[0] == 'edit':
+                pass
+            if message_state[message.author.id] == 'VALIDATING' and split_message[0] == 'confirm':
+                await message.channel.send("Thank you for confirming, your names and screenshot will be shared with the interview channel.")
+                # TODO: add the user and their character names to the database
                 message_state[message.author.id] = 'READY'
 
-    elif len(split_message) == 2:
-        if split_message[0] == '!pilot':
-            if split_message[1] == 'screenshot':
-                """
-                when a user wants to provide a validation screenshot, required for a validated pilot account
-                """
-                await validate_screenshot(message)
+    elif len(split_message) == 1:
+        if split_message[0] == 'validate':
+            """
+            when a user wants to provide a validation screenshot, required for a validated pilot account
+            """
+            await validate_screenshot(message)
 
-            if split_message[1] == 'services':
-                """
-                interface for the services command: eg password for mumble etc
-                """
-                pass
+        if split_message[0] == 'help':
+            """
+            when a user wants to provide a validation screenshot, required for a validated pilot account
+            """
+            await message.channel.send(help_msg)
 
 
 async def validate_screenshot(message):
@@ -60,10 +79,25 @@ async def validate_screenshot(message):
 
 
 async def confirm_names(name_list, message):
-    await message.channel.send("The following messages will contain the detected character names...\n")
+    name_msg = ""
+    namecount = 1
+    char_name_dict[message.author.id] = {}
 
     for name in name_list:
-        name_embed = Embed(title='Detected Character Name', description=f"{name}\nClick ✅ to confirm the character name.\nClick ✏️to edit the name.")
-        embed_message = await message.channel.send(embed=name_embed)
-        await embed_message.add_reaction("✅")
-        await embed_message.add_reaction("✏")
+        char_name_dict[message.author.id][namecount] = name
+        name_msg += f"{namecount}) {name}\n"
+        namecount += 1
+
+    await message.channel.send(f"These were the detected character names, please verify that they are correct.\n"
+                               "If any of the names need to be corrected, use the edit command with the number associated with the name.\n"
+                               "For example: `edit 1 MrCorrectName` would be the command to modify the first name to 'MrCorrectName'\n"
+                               "Please be aware that both your screenshot and your provided names will be stored for future reference.\n\n"
+                               f"```\n{name_msg}\n```\n"
+                               f"If all listed names are correct please type `confirm`, otherwise please use the `edit` command.")
+
+    message_state[message.author.id] = 'VALIDATING'
+
+
+async def edit_names(message):
+    # TODO: complete edit command
+    print(char_name_dict[message.message.author.id])
