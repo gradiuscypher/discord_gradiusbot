@@ -90,7 +90,7 @@ async def confirm_names(name_list, message):
     char_name_dict[message.author.id] = {}
 
     for name in name_list:
-        clean_name = re.sub('\[.*\]', '', name).strip()
+        clean_name = re.sub('(\[|\().*(\]|\))', '', name).strip()
         char_name_dict[message.author.id][namecount] = clean_name
         name_msg += f"{namecount}) {clean_name}\n"
         namecount += 1
