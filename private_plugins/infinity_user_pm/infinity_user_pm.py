@@ -1,5 +1,6 @@
 import discord
 import logging
+import re
 import requests
 from io import BytesIO
 from discord import Embed, Color
@@ -44,13 +45,18 @@ async def action(**kwargs):
                 profile_image = BytesIO(requests.get(message.attachments[0].url).content)
                 name_list = screenshot_processing.process_screenshot(profile_image)
                 await confirm_names(name_list, message)
+
         if len(split_message) == 1:
-            if message_state[message.author.id] == 'VALIDATING' and split_message[0] == 'edit':
-                pass
             if message_state[message.author.id] == 'VALIDATING' and split_message[0] == 'confirm':
                 await message.channel.send("Thank you for confirming, your names and screenshot will be shared with the interview channel.")
                 # TODO: add the user and their character names to the database
                 message_state[message.author.id] = 'READY'
+
+        if len(split_message) >= 3:
+            print(message_state[message.author.id])
+            if message_state[message.author.id] == 'VALIDATING' and split_message[0] == 'edit':
+                # TODO: complete edit workflow
+                await edit_names(message)
 
     elif len(split_message) == 1:
         if split_message[0] == 'validate':
@@ -84,8 +90,9 @@ async def confirm_names(name_list, message):
     char_name_dict[message.author.id] = {}
 
     for name in name_list:
-        char_name_dict[message.author.id][namecount] = name
-        name_msg += f"{namecount}) {name}\n"
+        clean_name = re.sub('\[.*\]', '', name).strip()
+        char_name_dict[message.author.id][namecount] = clean_name
+        name_msg += f"{namecount}) {clean_name}\n"
         namecount += 1
 
     await message.channel.send(f"These were the detected character names, please verify that they are correct.\n"
@@ -100,4 +107,5 @@ async def confirm_names(name_list, message):
 
 async def edit_names(message):
     # TODO: complete edit command
-    print(char_name_dict[message.message.author.id])
+    split_message = message.content.split()
+    print(char_name_dict[message.author.id])
