@@ -1,5 +1,7 @@
 # TODO: after validation move character names to the DB
 # TODO: add a lot more logging
+# TODO: more error handling
+# TODO: integrate this workflow into when new players join the discord as well as re-validation of old players
 
 import logging
 import re
