@@ -1,4 +1,5 @@
 # TODO: after validation move character names to the DB
+# TODO: if we're adding a new pilot, just add them to the db, otherwise make sure that the add_pilot command will update names
 # TODO: add a lot more logging
 # TODO: more error handling
 # TODO: integrate this workflow into when new players join the discord as well as re-validation of old players
@@ -69,7 +70,10 @@ async def action(**kwargs):
                 await validate_screenshot(message)
 
             if message_state[message.author.id] == 'VALIDATING' and split_message[0] == 'confirm':
+                author = message.author
+                character_names = [char_name_dict[author.id][char_number] for char_number in char_name_dict[author.id].keys()]
                 await message.channel.send("Thank you for validating your character names.")
+                pilot_manager.add_pilot(author.id, author.name, author.discriminator, character_names=character_names)
                 message_state[message.author.id] = 'READY'
 
             if message_state[message.author.id] == 'EDIT' and split_message[0] == 'confirm':
@@ -98,6 +102,11 @@ async def action(**kwargs):
 
 
 async def validate_screenshot(message):
+    """
+    Puts the user in the SEND_SCREENSHOT state which allows the user to upload their screenshot.
+    :param message:
+    :return:
+    """
     message_state[message.author.id] = 'SEND_SCREENSHOT'
     await message.channel.send("Please provide a screenshot of the login screen showing the pilots on your account. Follow the guidelines below:\n```\n"
                                "- Include a screenshot *only*, do not upload a photo of your screen.\n"
@@ -145,6 +154,12 @@ async def confirm_edit(message, confirm):
 
 
 async def confirm_names(name_list, message):
+    """
+    Starts the name confirmation process once the screenshots have been detected.
+    :param name_list:
+    :param message:
+    :return:
+    """
     name_msg = ""
     namecount = 1
     char_name_dict[message.author.id] = {}
@@ -166,6 +181,11 @@ async def confirm_names(name_list, message):
 
 
 async def edit_names(message):
+    """
+    Starts the name editing process for a provided name
+    :param message:
+    :return:
+    """
     split_message = message.content.split()
 
     try:
