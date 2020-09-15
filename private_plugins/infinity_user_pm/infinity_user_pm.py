@@ -1,6 +1,5 @@
-# TODO: add a lot more logging
-# TODO: more error handling
 # TODO: integrate this workflow into when new players join the discord as well as re-validation of old players
+# TODO: consider using JSON logging so that it's easier to dashboard errors
 
 import logging
 import re
@@ -26,6 +25,7 @@ help_msg = """**Amos Bot - Command Help**\n
 validate : starts the screenshot validation process
 restart : restart the entire validation process, can be used at any time
 remove-characters : this removes the characters from your account. Your account will be unverified until you add characters again.
+list-characters: list the characters associated with your account.
 ```
 
 **Other Commands**
@@ -70,6 +70,12 @@ async def action(**kwargs):
                 """
                 await remove_characters(message)
 
+            if split_message[0] == 'list-characters':
+                """
+                user is requesting to list stored characters
+                """
+                await list_characters(message)
+
             if split_message[0] == 'restart':
                 """
                 Allows the user to restart the entire process.
@@ -86,8 +92,13 @@ async def action(**kwargs):
                 author = message.author
                 character_names = [char_name_dict[author.id][char_number] for char_number in char_name_dict[author.id].keys()]
                 await message.channel.send("Thank you for validating your character names.")
-                pilot_manager.add_pilot(author.id, author.name, author.discriminator, character_names=character_names)
-                message_state[message.author.id] = 'READY'
+
+                try:
+                    pilot_manager.add_pilot(author.id, author.name, author.discriminator, character_names=character_names)
+                    logger.info(f"Creating a new Pilot <{author.id}, {author.name}, {author.discriminator}> [{character_names}]")
+                    message_state[message.author.id] = 'READY'
+                except:
+                    logger.info(f"Error while creating a new Pilot <{author.id}>\n{traceback.format_exc()}")
 
             if message_state[message.author.id] == 'EDIT' and split_message[0] == 'confirm':
                 await confirm_edit(message, True)
@@ -133,6 +144,7 @@ async def confirm_edit(message, confirm):
     if confirm:
         name_bucket = temp_name_bucket[message.author.id]
         char_name_dict[message.author.id][name_bucket[0]] = name_bucket[1]
+        logger.info(f"Replacing <{message.author.id}> {char_name_dict[message.author.id][name_bucket[0]]} with {name_bucket[1]}")
         character_names = char_name_dict[message.author.id]
         name_msg = ""
 
@@ -229,3 +241,15 @@ async def edit_names(message):
         await message.channel.send(f"You would like to replace `{old_name}` with `{correct_name}`. If that is correct, please type `confirm` otherwise type `cancel`.")
     except:
         print(traceback.format_exc())
+
+
+async def list_characters(message):
+    """
+    Lists the Pilots characters.
+    :param message:
+    :return:
+    """
+    target_pilot = pilot_manager.get_pilot(message.author.id)
+    character_list = [character.name for character in target_pilot.characters]
+    character_string = '\n'.join(character_list)
+    await message.channel.send(f"Characters associated with this account:\n```\n{character_string}```\n")
