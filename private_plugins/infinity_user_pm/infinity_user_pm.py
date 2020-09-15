@@ -1,5 +1,3 @@
-# TODO: after validation move character names to the DB
-# TODO: if we're adding a new pilot, just add them to the db, otherwise make sure that the add_pilot command will update names
 # TODO: add a lot more logging
 # TODO: more error handling
 # TODO: integrate this workflow into when new players join the discord as well as re-validation of old players
@@ -25,13 +23,14 @@ temp_name_bucket = {}
 help_msg = """**Amos Bot - Command Help**\n
 **Pilot Services**
 ```
-validate - starts the screenshot validation process
-restart - restart the entire validation process, can be used at any time
+validate : starts the screenshot validation process
+restart : restart the entire validation process, can be used at any time
+remove-characters : this removes the characters from your account. Your account will be unverified until you add characters again.
 ```
 
 **Other Commands**
 ```
-help - this command
+help : this command
 ```
 """
 
@@ -44,6 +43,8 @@ async def action(**kwargs):
     client = kwargs['client']
 
     split_message = message.content.split()
+    if message.author.id not in message_state.keys():
+        message_state[message.author.id] = 'READY'
 
     # if the message author is in the state table, they may have already started a command, so check here first
     if message.author.id in message_state.keys():
@@ -57,6 +58,18 @@ async def action(**kwargs):
                 await confirm_names(name_list, message)
 
         if len(split_message) == 1:
+            if split_message[0] == 'help':
+                """
+                user is requesting the help documentation
+                """
+                await message.channel.send(help_msg)
+
+            if split_message[0] == 'remove-characters':
+                """
+                user is requesting to delete stored characters
+                """
+                await remove_characters(message)
+
             if split_message[0] == 'restart':
                 """
                 Allows the user to restart the entire process.
@@ -79,26 +92,18 @@ async def action(**kwargs):
             if message_state[message.author.id] == 'EDIT' and split_message[0] == 'confirm':
                 await confirm_edit(message, True)
 
+            if message_state[message.author.id] == 'REMOVING' and split_message[0] == 'confirm':
+                await remove_characters(message)
+
             if message_state[message.author.id] == 'EDIT' and split_message[0] == 'cancel':
                 await confirm_edit(message, False)
+
+            if message_state[message.author.id] == 'REMOVING' and split_message[0] == 'cancel':
+                await remove_characters(message)
 
         if len(split_message) >= 3:
             if message_state[message.author.id] == 'VALIDATING' and split_message[0] == 'edit':
                 await edit_names(message)
-
-    elif len(split_message) == 1:
-        if split_message[0] == 'help':
-            """
-            user is requesting the help documentation
-            """
-            await message.channel.send(help_msg)
-
-        if split_message[0] == 'validate':
-            """
-            when a user wants to provide a validation screenshot, required for a validated pilot account
-            the user currently has no state value
-            """
-            await validate_screenshot(message)
 
 
 async def validate_screenshot(message):
@@ -178,6 +183,32 @@ async def confirm_names(name_list, message):
                                f"If all listed names are correct please type `confirm`, otherwise please use the `edit` command.")
 
     message_state[message.author.id] = 'VALIDATING'
+
+
+async def remove_characters(message):
+    """
+    The user wants to restart the character name adding process by removing their characters.
+    Preventing someone from removing individual characters limits people trying to hid alt names
+    :param message:
+    :return:
+    """
+    if message_state[message.author.id] == 'REMOVING':
+        if message.content == 'cancel':
+            await message.channel.send("Canceling the request to remove your characters.")
+            message_state[message.author.id] = 'READY'
+
+        else:
+            await message.channel.send("Removing your character names. Please use the `validate` command to add another screenshot like before.")
+            message_state[message.author.id] = 'READY'
+            target_pilot = pilot_manager.get_pilot(message.author.id)
+            target_pilot.remove_characters()
+
+    elif message_state[message.author.id] == 'READY':
+        await message.channel.send("This will allow you to remove your current character names and start over with the screenshot validation. "
+                                   "This is useful if you delete a character and no longer want it tracked. "
+                                   "Until you add your characters back, you will be unable to use any Pilot services that require character names. "
+                                   "If you want to remove your characters now, type `confirm`, otherwise type `cancel`")
+        message_state[message.author.id] = 'REMOVING'
 
 
 async def edit_names(message):

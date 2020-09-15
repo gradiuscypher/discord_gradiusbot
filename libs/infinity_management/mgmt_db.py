@@ -39,6 +39,16 @@ class PilotManager:
                     new_character = Character(pilot_id=new_pilot.id, name=character)
                     session.add(new_character)
                 session.commit()
+        if pilot_query.count() == 1:
+            target_pilot = pilot_query.first()
+
+            for name in character_names:
+                character_query = session.query(Character).filter(Character.name == name, Character.pilot_id == target_pilot.id)
+
+                if character_query.count() == 0:
+                    new_character = Character(pilot_id=target_pilot.id, name=name)
+                    session.add(new_character)
+            session.commit()
 
     def get_pilot(self, discord_id):
         pilot_query = session.query(Pilot).filter(Pilot.discord_id == discord_id)
@@ -108,6 +118,11 @@ class Pilot(Base):
                 return None
         else:
             return None
+
+    def remove_characters(self):
+        for character in self.characters:
+            session.delete(character)
+        session.commit()
 
 
 class Character(Base):
