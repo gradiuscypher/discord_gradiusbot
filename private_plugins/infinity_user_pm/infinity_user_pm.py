@@ -1,5 +1,9 @@
 # TODO: integrate this workflow into when new players join the discord as well as re-validation of old players
 # TODO: consider using JSON logging so that it's easier to dashboard errors
+# TODO: allow users to send in bug reports
+# TODO: log events to an IT alert channel
+# TODO: store the screenshot images
+# TODO: complete delete_name method
 
 import logging
 import re
@@ -57,12 +61,25 @@ async def action(**kwargs):
                 name_list = screenshot_processing.process_screenshot(profile_image)
                 await confirm_names(name_list, message)
 
+            if message_state[message.author.id] == 'DEBUG':
+                await debug_test(message)
+
         if len(split_message) == 1:
+            if message_state[message.author.id] == 'DEBUG' and split_message[0] == 'exit':
+                await message.channel.send("Exiting debug mode.")
+                message_state[message.author.id] = 'READY'
+
             if split_message[0] == 'help':
                 """
                 user is requesting the help documentation
                 """
                 await message.channel.send(help_msg)
+
+            if split_message[0] == 'debug-test':
+                """
+                set the user in debug test mode
+                """
+                await debug_test(message)
 
             if split_message[0] == 'remove-characters':
                 """
@@ -81,6 +98,7 @@ async def action(**kwargs):
                 Allows the user to restart the entire process.
                 """
                 message_state[message.author.id] = 'READY'
+                message.channel.send("Restarting the user validation process.")
 
             if message_state[message.author.id] == 'READY' and split_message[0] == 'validate':
                 """
@@ -88,29 +106,38 @@ async def action(**kwargs):
                 """
                 await validate_screenshot(message)
 
-            if message_state[message.author.id] == 'VALIDATING' and split_message[0] == 'confirm':
-                author = message.author
-                character_names = [char_name_dict[author.id][char_number] for char_number in char_name_dict[author.id].keys()]
-                await message.channel.send("Thank you for validating your character names.")
+            if split_message[0] == 'confirm':
+                if message_state[message.author.id] == 'EDIT':
+                    await confirm_edit(message, True)
 
-                try:
-                    pilot_manager.add_pilot(author.id, author.name, author.discriminator, character_names=character_names)
-                    logger.info(f"Creating a new Pilot <{author.id}, {author.name}, {author.discriminator}> [{character_names}]")
-                    message_state[message.author.id] = 'READY'
-                except:
-                    logger.info(f"Error while creating a new Pilot <{author.id}>\n{traceback.format_exc()}")
+                elif message_state[message.author.id] == 'REMOVING':
+                    await remove_characters(message)
 
-            if message_state[message.author.id] == 'EDIT' and split_message[0] == 'confirm':
-                await confirm_edit(message, True)
+                elif message_state[message.author.id] == 'DELETING':
+                    await delete_name(message)
 
-            if message_state[message.author.id] == 'REMOVING' and split_message[0] == 'confirm':
-                await remove_characters(message)
+                elif message_state[message.author.id] == 'VALIDATING':
+                    author = message.author
+                    character_names = [char_name_dict[author.id][char_number] for char_number in char_name_dict[author.id].keys()]
+                    await message.channel.send("Thank you for validating your character names.")
 
-            if message_state[message.author.id] == 'EDIT' and split_message[0] == 'cancel':
-                await confirm_edit(message, False)
+                    try:
+                        pilot_manager.add_pilot(author.id, author.name, author.discriminator, character_names=character_names)
+                        logger.info(f"Creating a new Pilot <{author.id}, {author.name}, {author.discriminator}> [{character_names}]")
+                        message_state[message.author.id] = 'READY'
+                    except:
+                        logger.info(f"Error while creating a new Pilot <{author.id}>\n{traceback.format_exc()}")
 
-            if message_state[message.author.id] == 'REMOVING' and split_message[0] == 'cancel':
-                await remove_characters(message)
+            if split_message[0] == 'cancel':
+                if message_state[message.author.id] == 'EDIT':
+                    await confirm_edit(message, False)
+
+                if message_state[message.author.id] == 'REMOVING':
+                    await remove_characters(message)
+
+        if len(split_message) == 2:
+            if message_state[message.author.id] == 'VALIDATING' and split_message[0] == 'delete':
+                await delete_name(message)
 
         if len(split_message) >= 3:
             if message_state[message.author.id] == 'VALIDATING' and split_message[0] == 'edit':
@@ -187,14 +214,43 @@ async def confirm_names(name_list, message):
         name_msg += f"{namecount}) {clean_name}\n"
         namecount += 1
 
-    await message.channel.send(f"These were the detected character names, please verify that they are correct.\n"
+    await message.channel.send(f"These were the detected character names, please verify that they are correct.\n\n"
                                "If any of the names need to be corrected, use the edit command with the number associated with the name.\n"
-                               "For example: `edit 1 MrCorrectName` would be the command to modify the first name to 'MrCorrectName'\n"
+                               "For example: `edit 1 MrCorrectName` would be the command to modify the first name to 'MrCorrectName'\n\n"
+                               "If you would like to remove a character from the list, use the `delete` command.\n"
+                               "For example: `delete 2` would delete the second character from the list before submitting.\n\n"
                                "Please be aware that both your screenshot and your provided names will be stored for future reference.\n\n"
                                f"```\n{name_msg}\n```\n"
                                f"If all listed names are correct please type `confirm`, otherwise please use the `edit` command.")
 
     message_state[message.author.id] = 'VALIDATING'
+
+
+async def debug_test(message):
+    """
+    A debug method that shows what text is being detected in images
+    :return:
+    """
+    if message_state[message.author.id] == 'DEBUG':
+        profile_image = BytesIO(requests.get(message.attachments[0].url).content)
+        text_list = screenshot_processing.process_screenshot(profile_image, debug=True)
+        await message.channel.send(f"{text_list}")
+
+    elif message_state[message.author.id] == 'READY':
+        await message.channel.send("Send your debug image now to see what is detected.")
+        message_state[message.author.id] = 'DEBUG'
+
+
+async def delete_name(message):
+    """
+    Allows the player to delete a name from the list before submitting, in the case of a bugged text detection.
+    :param message:
+    :return:
+    """
+    if message_state[message.author.id] == 'VALIDATING':
+        pass
+    elif message_state[message.author.id] == 'DELETING':
+        pass
 
 
 async def remove_characters(message):

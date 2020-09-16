@@ -33,15 +33,19 @@ def crop_profile(path):
     return cropped
 
 
-def detect_text(img):
+def detect_text(img, debug=False):
     """Detects text in the image buffer."""
     image = vision.types.Image(content=img)
 
     response = client.text_detection(image=image)
     texts = response.text_annotations
+    debug_list = []
 
     best = ''
     for text in texts:
+        if debug:
+            debug_list.append(text)
+
         if len(text.description) > len(best):
             best = text.description
 
@@ -51,12 +55,19 @@ def detect_text(img):
             'https://cloud.google.com/apis/design/errors'.format(
                 response.error.message))
 
-    return best
+    if debug:
+        return debug_list
+    else:
+        return best
 
 
-def process_screenshot(target_image):
+def process_screenshot(target_image, debug=False):
     cropped_images = crop_profile(target_image)
     name_list = []
     for image in cropped_images:
-        name_list.append(detect_text(image))
+        name_text = detect_text(image, debug)
+
+        if len(name_text) > 0:
+            name_list.append(name_text)
+
     return name_list
