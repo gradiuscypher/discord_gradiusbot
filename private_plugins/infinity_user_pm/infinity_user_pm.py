@@ -3,7 +3,6 @@
 # TODO: allow users to send in bug reports
 # TODO: log events to an IT alert channel
 # TODO: store the screenshot images
-# TODO: complete delete_name method
 
 import logging
 import re
@@ -22,19 +21,100 @@ pilot_manager = mgmt_db.PilotManager()
 message_state = {}
 char_name_dict = {}
 temp_name_bucket = {}
+temp_delete_bucket = {}
+
+validate_screenshot_description = """Please provide a screenshot of the login screen showing the pilots on your account. Follow the guidelines below:
+```
+- Include a screenshot *only*, do not upload a photo of your screen.
+- Please insure that the character screen is horizontal and not vertical.
+- Do not edit the screenshot in any way or you may prevent the software from capturing your character's names.
+- Only include a screenshot of the game itself, if you're capturing from an emulator, do not capture the emulator window.
+- Only include one screenshot each time you run the command. If you have alt accounts, run this command again.
+- An example of an ideal screenshot can be found here: INCLUDE_LINK_HERE
+- If you run into any issues, contact gradius#8902 on Discord.
+```
+
+**At any point in time, you can request for help regarding the step you're on by using the `help` command.**
+"""
 
 help_msg = """**Amos Bot - Command Help**\n
 **Pilot Services**
-```
-validate : starts the screenshot validation process
-restart : restart the entire validation process, can be used at any time
-remove-characters : this removes the characters from your account. Your account will be unverified until you add characters again.
-list-characters: list the characters associated with your account.
-```
+`validate` : starts the screenshot validation process
+
+`restart` : restart the entire validation process, can be used at any time
+
+`remove-characters` : this removes the characters from your account. Your account will be unverified until you add characters again.
+
+`list-characters` : list the characters associated with your account.
 
 **Other Commands**
+
+"""
+
+validate_help_msg = """**Amos Bot - Validation Help**\n
+You are currently validating your character names.
+
+Here are the currently available commands:
 ```
 help : this command
+confirm : confirm the current character names listed
+delete <CHARACTER_NUMBER> : delete the character before validation. Example: delete 1
+edit <CHARACTER_NUMBER> <NEW_NAME> : edit the character name. Example: edit 1 Mr NewCharacter
+list-characters : list the characters associated with your account.
+restart : restart the validation process. use the validate command to start over.
+```
+"""
+
+edit_help_message = """**Amos Bot - Edit Help**\n
+You're currently editing a name. You can either confirm or cancel the edit.
+
+Here are the currently available commands:
+```
+help : this command
+confirm : confirm the current character name edit
+cancel : cancel the current character name edit
+list-characters : list the characters associated with your account.
+restart : restart the validation process. use the validate command to start over.
+```
+"""
+
+
+delete_help_message = """**Amos Bot - Deleting Help**\n
+You're currently deleting a name. You can either confirm or cancel the delete.
+
+Here are the currently available commands:
+```
+help : this command
+confirm : confirm the current character name delete
+cancel : cancel the current character name delete
+list-characters : list the characters associated with your account.
+restart : restart the validation process. use the validate command to start over.
+```
+"""
+
+
+removing_help_message = """**Amos Bot - Removing Help**\n
+You're currently removing your character data. You can either confirm or cancel this action.
+
+Here are the currently available commands:
+```
+help : this command
+confirm : confirm the current character data removal
+cancel : cancel the current character data removal
+list-characters : list the characters associated with your account.
+restart : restart the validation process. use the validate command to start over.
+```
+"""
+
+
+screenshot_help_message = """**Amos Bot - Screenshot Validation Help**\n
+You're currently validating a screenshot. You can either upload a screenshot of your character screen or run an available command.
+
+Here are the currently available commands:
+```
+help : this command
+cancel : cancel the screenshot upload process
+restart : restart the entire validation process, can be used at any time
 ```
 """
 
@@ -73,7 +153,18 @@ async def action(**kwargs):
                 """
                 user is requesting the help documentation
                 """
-                await message.channel.send(help_msg)
+                if message_state[message.author.id] == 'READY':
+                    await message.channel.send(help_msg)
+                if message_state[message.author.id] == 'EDIT':
+                    await message.channel.send(edit_help_message)
+                if message_state[message.author.id] == 'DELETING':
+                    await message.channel.send(delete_help_message)
+                if message_state[message.author.id] == 'VALIDATING':
+                    await message.channel.send(validate_help_msg)
+                if message_state[message.author.id] == 'SEND_SCREENSHOT':
+                    await message.channel.send(screenshot_help_message)
+                if message_state[message.author.id] == 'REMOVING':
+                    await message.channel.send(removing_help_message)
 
             if split_message[0] == 'debug-test':
                 """
@@ -98,7 +189,7 @@ async def action(**kwargs):
                 Allows the user to restart the entire process.
                 """
                 message_state[message.author.id] = 'READY'
-                message.channel.send("Restarting the user validation process.")
+                await message.channel.send("Restarting the user validation process.")
 
             if message_state[message.author.id] == 'READY' and split_message[0] == 'validate':
                 """
@@ -117,6 +208,7 @@ async def action(**kwargs):
                     await delete_name(message)
 
                 elif message_state[message.author.id] == 'VALIDATING':
+                    # TODO: move logic to helper function
                     author = message.author
                     character_names = [char_name_dict[author.id][char_number] for char_number in char_name_dict[author.id].keys()]
                     await message.channel.send("Thank you for validating your character names.")
@@ -124,16 +216,24 @@ async def action(**kwargs):
                     try:
                         pilot_manager.add_pilot(author.id, author.name, author.discriminator, character_names=character_names)
                         logger.info(f"Creating a new Pilot <{author.id}, {author.name}, {author.discriminator}> [{character_names}]")
+                        char_name_dict[author.id] = {}
                         message_state[message.author.id] = 'READY'
                     except:
                         logger.info(f"Error while creating a new Pilot <{author.id}>\n{traceback.format_exc()}")
 
             if split_message[0] == 'cancel':
+                if message_state[message.author.id] == 'SEND_SCREENSHOT':
+                    await message.channel.send("Canceling the screenshot upload process. Please restart this process with the `validate` command.")
+                    message_state[message.author.id] = 'READY'
+
                 if message_state[message.author.id] == 'EDIT':
                     await confirm_edit(message, False)
 
                 if message_state[message.author.id] == 'REMOVING':
                     await remove_characters(message)
+
+                if message_state[message.author.id] == 'DELETING':
+                    await delete_name(message)
 
         if len(split_message) == 2:
             if message_state[message.author.id] == 'VALIDATING' and split_message[0] == 'delete':
@@ -151,14 +251,7 @@ async def validate_screenshot(message):
     :return:
     """
     message_state[message.author.id] = 'SEND_SCREENSHOT'
-    await message.channel.send("Please provide a screenshot of the login screen showing the pilots on your account. Follow the guidelines below:\n```\n"
-                               "- Include a screenshot *only*, do not upload a photo of your screen.\n"
-                               "- Please insure that the character screen is horizontal and not vertical.\n"
-                               "- Do not edit the screenshot in any way or you may prevent the software from capturing your character's names.\n"
-                               "- Only include a screenshot of the game itself, if you're capturing from an emulator, do not capture the emulator window.\n"
-                               "- Only include one screenshot each time you run the command. If you have alt accounts, run this command again.\n"
-                               "- An example of an ideal screenshot can be found here: INCLUDE_LINK_HERE\n"
-                               "- If you run into any issues, contact gradius#8902 on Discord.\n```")
+    await message.channel.send(validate_screenshot_description)
 
 
 async def confirm_edit(message, confirm):
@@ -248,9 +341,23 @@ async def delete_name(message):
     :return:
     """
     if message_state[message.author.id] == 'VALIDATING':
-        pass
-    elif message_state[message.author.id] == 'DELETING':
-        pass
+        if len(char_name_dict[message.author.id]) > 1:
+            target_character_number = int(message.content.split()[1])
+            temp_delete_bucket[message.author.id] = target_character_number
+            await message.channel.send(f"You've chosen to delete the character named {char_name_dict[message.author.id][target_character_number]}. To confirm, type `confirm`, otherwise type `cancel` to return to the validation process without deleting.")
+            message_state[message.author.id] = 'DELETING'
+        else:
+            await message.channel.send(f"You can only delete a character if you have more than one character detected.")
+
+    elif message_state[message.author.id] == 'DELETING' and message.content == 'confirm':
+        target_character_number = temp_delete_bucket[message.author.id]
+        del char_name_dict[message.author.id][target_character_number]
+        await message.channel.send("That character name has been deleted.")
+        message_state[message.author.id] = 'VALIDATING'
+
+    elif message_state[message.author.id] == 'DELETING' and message.content == 'cancel':
+        await message.channel.send("Canceling the request to delete the character.")
+        message_state[message.author.id] = 'VALIDATING'
 
 
 async def remove_characters(message):
@@ -307,5 +414,13 @@ async def list_characters(message):
     """
     target_pilot = pilot_manager.get_pilot(message.author.id)
     character_list = [character.name for character in target_pilot.characters]
-    character_string = '\n'.join(character_list)
-    await message.channel.send(f"Characters associated with this account:\n```\n{character_string}```\n")
+    unconfirmed_names = [char_name_dict[message.author.id][char_number] for char_number in char_name_dict[message.author.id].keys()]
+    unconfirmed_string = '\n'.join(unconfirmed_names)
+
+    if len(character_list) > 0:
+        character_string = '\n'.join(character_list)
+        await message.channel.send(f"**Characters associated with this account:**\n```\n{character_string}```\n\n"
+                                   f"**Unconfirmed character names:**\n```\n{unconfirmed_string}\n```")
+    else:
+        await message.channel.send("There are no characters associated with this account.\n\n"
+                                   f"**Unconfirmed character names:**\n```\n{unconfirmed_string}\n```")
