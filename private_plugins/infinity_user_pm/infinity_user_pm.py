@@ -1,6 +1,5 @@
 # TODO: consider using JSON logging so that it's easier to dashboard errors
 # TODO: allow users to send in bug reports
-# TODO: log events to an IT alert channel
 # TODO: integrate this workflow into when new players join the discord as well as re-validation of old players
 # TODO: more scoped try/except blocks
 # TODO: allow the bot's log level to be changed via command, where debug might also send a message to IT alert channel
@@ -136,149 +135,156 @@ async def action(**kwargs):
     config = kwargs['config']
     client = kwargs['client']
 
-    # grab the config values
-    screenshot_dir = config.get('infinity', 'screenshot_dir')
-    it_alert_chan_id = config.getint('infinity', 'it_alert_chan_id')
+    try:
+        # grab the config values
+        screenshot_dir = config.get('infinity', 'screenshot_dir')
+        it_alert_chan_id = config.getint('infinity', 'it_alert_chan_id')
 
-    split_message = message.content.split()
+        split_message = message.content.split()
 
-    if message.author.id not in message_state.keys():
-        message_state[message.author.id] = 'READY'
+        if message.author.id not in message_state.keys():
+            message_state[message.author.id] = 'READY'
 
-    # if the message author is in the state table, they may have already started a command, so check here first
-    if message.author.id in message_state.keys():
-        if len(split_message) == 0:
-            if message_state[message.author.id] == 'SEND_SCREENSHOT' and len(message.attachments) > 0:
-                """
-                The user has sent a screenshot, and we're in the SEND_SCREENSHOT state
-                """
-                # TODO: move logic to helper function
-                try:
-                    author_dir = f"{screenshot_dir}/{message.author.id}"
-                    timestamp = message.created_at
-                    attachment = message.attachments[0]
-                    attachment_content = requests.get(attachment.url).content
-                    pathlib.Path(author_dir).mkdir(parents=True, exist_ok=True)
-                    screenshot_name = f"{author_dir}/{int(timestamp.timestamp())}"
-
-                    # save the screenshot to our pilots screenshot dir
-                    with open(screenshot_name, 'wb') as screenshot_file:
-                        screenshot_file.write(attachment_content)
-
-                    # process the text in the screenshot and confirm names
-                    profile_image = BytesIO(attachment_content)
-                    name_list = screenshot_processing.process_screenshot(profile_image)
-                    await confirm_names(name_list, message)
-
-                except:
-                    logger.error(traceback.format_exc())
-
-            if message_state[message.author.id] == 'DEBUG':
-                await debug_test(message)
-
-        if len(split_message) == 1:
-            if message_state[message.author.id] == 'DEBUG' and split_message[0] == 'exit':
-                await message.channel.send("Exiting debug mode.")
-                message_state[message.author.id] = 'READY'
-
-            if split_message[0] == 'help':
-                """
-                user is requesting the help documentation
-                """
-                if message_state[message.author.id] == 'READY':
-                    await message.channel.send(help_msg)
-                if message_state[message.author.id] == 'EDIT':
-                    await message.channel.send(edit_help_message)
-                if message_state[message.author.id] == 'DELETING':
-                    await message.channel.send(delete_help_message)
-                if message_state[message.author.id] == 'VALIDATING':
-                    await message.channel.send(validate_help_msg)
-                if message_state[message.author.id] == 'SEND_SCREENSHOT':
-                    await message.channel.send(screenshot_help_message)
-                if message_state[message.author.id] == 'REMOVING':
-                    await message.channel.send(removing_help_message)
-
-            if split_message[0] == 'debug-test':
-                """
-                set the user in debug test mode
-                """
-                await debug_test(message)
-
-            if split_message[0] == 'remove-characters':
-                """
-                user is requesting to delete stored characters
-                """
-                await remove_characters(message)
-
-            if split_message[0] == 'list-characters':
-                """
-                user is requesting to list stored characters
-                """
-                await list_characters(message)
-
-            if split_message[0] == 'restart':
-                """
-                Allows the user to restart the entire process.
-                """
-                message_state[message.author.id] = 'READY'
-                await message.channel.send("Restarting the user validation process.")
-
-            if message_state[message.author.id] == 'READY' and split_message[0] == 'validate':
-                """
-                when a user wants to provide a validation screenshot, required for a validated pilot account
-                """
-                await validate_screenshot(message)
-
-            if split_message[0] == 'confirm':
-                if message_state[message.author.id] == 'EDIT':
-                    await confirm_edit(message, True)
-
-                elif message_state[message.author.id] == 'REMOVING':
-                    await remove_characters(message)
-
-                elif message_state[message.author.id] == 'DELETING':
-                    await delete_name(message)
-
-                elif message_state[message.author.id] == 'VALIDATING':
+        # if the message author is in the state table, they may have already started a command, so check here first
+        if message.author.id in message_state.keys():
+            if len(split_message) == 0:
+                if message_state[message.author.id] == 'SEND_SCREENSHOT' and len(message.attachments) > 0:
+                    """
+                    The user has sent a screenshot, and we're in the SEND_SCREENSHOT state
+                    """
                     # TODO: move logic to helper function
-                    author = message.author
-                    character_names = [char_name_dict[author.id][char_number] for char_number in char_name_dict[author.id].keys()]
-                    await message.channel.send("Thank you for validating your character names.")
-
                     try:
-                        pilot_manager.add_pilot(author.id, author.name, author.discriminator, character_names=character_names)
-                        logger.info(f"Creating a new Pilot <{author.id}, {author.name}, {author.discriminator}> [{character_names}]")
-                        char_name_dict[author.id] = {}
-                        message_state[message.author.id] = 'READY'
-                    except:
-                        logger.info(f"Error while creating a new Pilot <{author.id}>\n{traceback.format_exc()}")
+                        author_dir = f"{screenshot_dir}/{message.author.id}"
+                        timestamp = message.created_at
+                        attachment = message.attachments[0]
+                        attachment_content = requests.get(attachment.url).content
+                        pathlib.Path(author_dir).mkdir(parents=True, exist_ok=True)
+                        screenshot_name = f"{author_dir}/{int(timestamp.timestamp())}"
 
-            if split_message[0] == 'cancel':
-                if message_state[message.author.id] == 'SEND_SCREENSHOT':
-                    await message.channel.send("Canceling the screenshot upload process. Please restart this process with the `validate` command.")
+                        # save the screenshot to our pilots screenshot dir
+                        with open(screenshot_name, 'wb') as screenshot_file:
+                            screenshot_file.write(attachment_content)
+
+                        # process the text in the screenshot and confirm names
+                        profile_image = BytesIO(attachment_content)
+                        name_list = screenshot_processing.process_screenshot(profile_image)
+                        await confirm_names(name_list, message)
+
+                    except:
+                        logger.error(traceback.format_exc())
+
+                if message_state[message.author.id] == 'DEBUG':
+                    await debug_test(message)
+
+            if len(split_message) == 1:
+                if message_state[message.author.id] == 'DEBUG' and split_message[0] == 'exit':
+                    await message.channel.send("Exiting debug mode.")
                     message_state[message.author.id] = 'READY'
 
-                if message_state[message.author.id] == 'EDIT':
-                    await confirm_edit(message, False)
+                if split_message[0] == 'help':
+                    """
+                    user is requesting the help documentation
+                    """
+                    if message_state[message.author.id] == 'READY':
+                        await message.channel.send(help_msg)
+                    if message_state[message.author.id] == 'EDIT':
+                        await message.channel.send(edit_help_message)
+                    if message_state[message.author.id] == 'DELETING':
+                        await message.channel.send(delete_help_message)
+                    if message_state[message.author.id] == 'VALIDATING':
+                        await message.channel.send(validate_help_msg)
+                    if message_state[message.author.id] == 'SEND_SCREENSHOT':
+                        await message.channel.send(screenshot_help_message)
+                    if message_state[message.author.id] == 'REMOVING':
+                        await message.channel.send(removing_help_message)
 
-                if message_state[message.author.id] == 'REMOVING':
+                if split_message[0] == 'debug-test':
+                    """
+                    set the user in debug test mode
+                    """
+                    await debug_test(message)
+
+                if split_message[0] == 'remove-characters':
+                    """
+                    user is requesting to delete stored characters
+                    """
                     await remove_characters(message)
 
-                if message_state[message.author.id] == 'DELETING':
+                if split_message[0] == 'list-characters':
+                    """
+                    user is requesting to list stored characters
+                    """
+                    await list_characters(message)
+
+                if split_message[0] == 'restart':
+                    """
+                    Allows the user to restart the entire process.
+                    """
+                    message_state[message.author.id] = 'READY'
+                    await message.channel.send("Restarting the user validation process.")
+
+                if message_state[message.author.id] == 'READY' and split_message[0] == 'validate':
+                    """
+                    when a user wants to provide a validation screenshot, required for a validated pilot account
+                    """
+                    await validate_screenshot(message)
+
+                if split_message[0] == 'confirm':
+                    if message_state[message.author.id] == 'EDIT':
+                        await confirm_edit(message, True)
+
+                    elif message_state[message.author.id] == 'REMOVING':
+                        await remove_characters(message)
+
+                    elif message_state[message.author.id] == 'DELETING':
+                        await delete_name(message)
+
+                    elif message_state[message.author.id] == 'VALIDATING':
+                        # TODO: move logic to helper function
+                        author = message.author
+                        character_names = [char_name_dict[author.id][char_number] for char_number in char_name_dict[author.id].keys()]
+                        await message.channel.send("Thank you for validating your character names.")
+
+                        try:
+                            pilot_manager.add_pilot(author.id, author.name, author.discriminator, character_names=character_names)
+                            logger.info(f"Creating a new Pilot <{author.id}, {author.name}, {author.discriminator}> [{character_names}]")
+                            char_name_dict[author.id] = {}
+                            message_state[message.author.id] = 'READY'
+                        except:
+                            logger.info(f"Error while creating a new Pilot <{author.id}>\n{traceback.format_exc()}")
+
+                if split_message[0] == 'cancel':
+                    if message_state[message.author.id] == 'SEND_SCREENSHOT':
+                        await message.channel.send("Canceling the screenshot upload process. Please restart this process with the `validate` command.")
+                        message_state[message.author.id] = 'READY'
+
+                    if message_state[message.author.id] == 'EDIT':
+                        await confirm_edit(message, False)
+
+                    if message_state[message.author.id] == 'REMOVING':
+                        await remove_characters(message)
+
+                    if message_state[message.author.id] == 'DELETING':
+                        await delete_name(message)
+
+            if len(split_message) == 2:
+                if message_state[message.author.id] == 'VALIDATING' and split_message[0] == 'delete':
                     await delete_name(message)
 
-        if len(split_message) == 2:
-            if message_state[message.author.id] == 'VALIDATING' and split_message[0] == 'delete':
-                await delete_name(message)
+            if len(split_message) >= 2:
+                if split_message[0] == 'bug-report':
+                    await bug_report(message, client, it_alert_chan_id)
 
-        if len(split_message) >= 2:
-            if split_message[0] == 'bug-report':
-                await bug_report(message, client, it_alert_chan_id)
+            if len(split_message) >= 3:
 
-        if len(split_message) >= 3:
+                if message_state[message.author.id] == 'VALIDATING' and split_message[0] == 'edit':
+                    await edit_names(message)
+    except:
+        it_alert_chan_id = config.getint('infinity', 'it_alert_chan_id')
+        alert_chan = client.get_channel(it_alert_chan_id)
 
-            if message_state[message.author.id] == 'VALIDATING' and split_message[0] == 'edit':
-                await edit_names(message)
+        await alert_message("Uncaught Exception", traceback.format_exc(), channel=alert_chan, color=Color.red())
+        logger.error("An uncaught exception has occurred")
 
 
 async def validate_screenshot(message):
@@ -296,11 +302,15 @@ async def bug_report(message, client, it_alert_chan_id):
 
     report_content = ' '.join(split_message[1:])
     it_alert_chan = client.get_channel(it_alert_chan_id)
-    report_embed = Embed(title="Bug Report", color=Color.orange(), description=report_content)
-    report_embed.add_field(name='Reporter Name', value=f"{message.author.name}#{message.author.discriminator}",
-                           inline=True)
-    report_embed.add_field(name='Reporter', value=f"<@{message.author.id}>", inline=True)
-    await it_alert_chan.send(embed=report_embed)
+    fields = [
+        {
+            'name': "Reporter Name", 'value': f"{message.author.name}#{message.author.discriminator}"
+        },
+        {
+            'name': "Reporter", 'value': f"<@{message.author.id}>"
+        }
+    ]
+    await alert_message("User Report", report_content, channel=it_alert_chan, fields=fields, color=Color.orange())
 
 
 async def confirm_edit(message, confirm):
@@ -477,3 +487,15 @@ async def list_characters(message):
     else:
         await message.channel.send("There are no characters associated with this account.\n\n"
                                    f"**Unconfirmed character names:**\n```\n{unconfirmed_string}\n```")
+
+
+async def alert_message(title, message, channel, fields=None, color=Color.darker_gray):
+    if not channel:
+        pass
+
+    report_embed = Embed(title=title, color=color, description=message)
+
+    for field in fields:
+        report_embed.add_field(name=field['name'], value=field['value'], inline=True)
+
+    await channel.send(embed=report_embed)
