@@ -4,12 +4,14 @@
 # TODO: integrate this workflow into when new players join the discord as well as re-validation of old players
 # TODO: more scoped try/except blocks
 # TODO: allow the bot's log level to be changed via command, where debug might also send a message to IT alert channel
+# TODO: allow alerts to be reacted to and mark them green as read
 
 import logging
 import pathlib
 import re
 import requests
 import traceback
+from discord import Embed, Color
 from io import BytesIO
 from libs.infinity_management import mgmt_db
 from libs.infinity_management import screenshot_processing
@@ -35,8 +37,8 @@ validate_screenshot_description = """Please provide a screenshot of the login sc
 - Do not edit the screenshot in any way or you may prevent the bot from capturing your character's names.
 - Only include a screenshot of the game itself, if you're capturing an emulator screen, do not capture the emulator window.
 - Only include one screenshot each time you run the command. If you have alt accounts, run this command again.
-- An example of an ideal screenshot can be found here: INCLUDE_LINK_HERE
-- If you run into any issues, contact anyone with the IT role in Discord.
+- An example of an ideal screenshot can be found here: TODO:INCLUDE_LINK_HERE
+- If you run into any issues, use the bug-report command or message anyone in the IT role on Discord.
 ```
 
 **At any point in time, you can request for help regarding the step you're on by using the `help` command.**
@@ -50,6 +52,7 @@ validate : starts the screenshot validation process
 restart : restart the entire validation process, can be used at any time
 remove-characters : this removes the characters from your account. Your account will be unverified until you add characters again.
 list-characters : list the characters associated with your account.
+bug-report <MESSAGE>: Allows you to send a message to the IT team if you have any issues. Please include the message in a single line and be as detailed as possible.
 ```
 """
 
@@ -64,6 +67,7 @@ delete <CHARACTER_NUMBER> : delete the character before validation. Example: del
 edit <CHARACTER_NUMBER> <NEW_NAME> : edit the character name. Example: edit 1 Mr NewCharacter
 list-characters : list the characters associated with your account.
 restart : restart the validation process. use the validate command to start over.
+bug-report <MESSAGE>: Allows you to send a message to the IT team if you have any issues. Please include the message in a single line and be as detailed as possible.
 ```
 """
 
@@ -77,6 +81,7 @@ confirm : confirm the current character name edit
 cancel : cancel the current character name edit
 list-characters : list the characters associated with your account.
 restart : restart the validation process. use the validate command to start over.
+bug-report <MESSAGE>: Allows you to send a message to the IT team if you have any issues. Please include the message in a single line and be as detailed as possible.
 ```
 """
 
@@ -91,6 +96,7 @@ confirm : confirm the current character name delete
 cancel : cancel the current character name delete
 list-characters : list the characters associated with your account.
 restart : restart the validation process. use the validate command to start over.
+bug-report <MESSAGE>: Allows you to send a message to the IT team if you have any issues. Please include the message in a single line and be as detailed as possible.
 ```
 """
 
@@ -105,6 +111,7 @@ confirm : confirm the current character data removal
 cancel : cancel the current character data removal
 list-characters : list the characters associated with your account.
 restart : restart the validation process. use the validate command to start over.
+bug-report <MESSAGE>: Allows you to send a message to the IT team if you have any issues. Please include the message in a single line and be as detailed as possible.
 ```
 """
 
@@ -117,6 +124,7 @@ Here are the currently available commands:
 help : this command
 cancel : cancel the screenshot upload process
 restart : restart the entire validation process, can be used at any time
+bug-report <MESSAGE>: Allows you to send a message to the IT team if you have any issues. Please include the message in a single line and be as detailed as possible.
 ```
 """
 
@@ -128,9 +136,12 @@ async def action(**kwargs):
     config = kwargs['config']
     client = kwargs['client']
 
+    # grab the config values
     screenshot_dir = config.get('infinity', 'screenshot_dir')
+    it_alert_chan_id = config.getint('infinity', 'it_alert_chan_id')
 
     split_message = message.content.split()
+
     if message.author.id not in message_state.keys():
         message_state[message.author.id] = 'READY'
 
@@ -260,7 +271,12 @@ async def action(**kwargs):
             if message_state[message.author.id] == 'VALIDATING' and split_message[0] == 'delete':
                 await delete_name(message)
 
+        if len(split_message) >= 2:
+            if split_message[0] == 'bug-report':
+                await bug_report(message, client, it_alert_chan_id)
+
         if len(split_message) >= 3:
+
             if message_state[message.author.id] == 'VALIDATING' and split_message[0] == 'edit':
                 await edit_names(message)
 
@@ -273,6 +289,18 @@ async def validate_screenshot(message):
     """
     message_state[message.author.id] = 'SEND_SCREENSHOT'
     await message.channel.send(validate_screenshot_description)
+
+
+async def bug_report(message, client, it_alert_chan_id):
+    split_message = message.content.split()
+
+    report_content = ' '.join(split_message[1:])
+    it_alert_chan = client.get_channel(it_alert_chan_id)
+    report_embed = Embed(title="Bug Report", color=Color.orange(), description=report_content)
+    report_embed.add_field(name='Reporter Name', value=f"{message.author.name}#{message.author.discriminator}",
+                           inline=True)
+    report_embed.add_field(name='Reporter', value=f"<@{message.author.id}>", inline=True)
+    await it_alert_chan.send(embed=report_embed)
 
 
 async def confirm_edit(message, confirm):
