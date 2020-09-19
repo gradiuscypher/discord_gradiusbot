@@ -1,10 +1,12 @@
-# TODO: integrate this workflow into when new players join the discord as well as re-validation of old players
 # TODO: consider using JSON logging so that it's easier to dashboard errors
 # TODO: allow users to send in bug reports
 # TODO: log events to an IT alert channel
-# TODO: store the screenshot images
+# TODO: integrate this workflow into when new players join the discord as well as re-validation of old players
+# TODO: more scoped try/except blocks
+# TODO: allow the bot's log level to be changed via command, where debug might also send a message to IT alert channel
 
 import logging
+import pathlib
 import re
 import requests
 import traceback
@@ -24,14 +26,17 @@ temp_name_bucket = {}
 temp_delete_bucket = {}
 
 validate_screenshot_description = """Please provide a screenshot of the login screen showing the pilots on your account. Follow the guidelines below:
+
+**Note**: The screenshots you share with the bot and the names contained in them will be saved for Infinity LTD records.
+
 ```
 - Include a screenshot *only*, do not upload a photo of your screen.
 - Please insure that the character screen is horizontal and not vertical.
-- Do not edit the screenshot in any way or you may prevent the software from capturing your character's names.
-- Only include a screenshot of the game itself, if you're capturing from an emulator, do not capture the emulator window.
+- Do not edit the screenshot in any way or you may prevent the bot from capturing your character's names.
+- Only include a screenshot of the game itself, if you're capturing an emulator screen, do not capture the emulator window.
 - Only include one screenshot each time you run the command. If you have alt accounts, run this command again.
 - An example of an ideal screenshot can be found here: INCLUDE_LINK_HERE
-- If you run into any issues, contact gradius#8902 on Discord.
+- If you run into any issues, contact anyone with the IT role in Discord.
 ```
 
 **At any point in time, you can request for help regarding the step you're on by using the `help` command.**
@@ -39,16 +44,13 @@ validate_screenshot_description = """Please provide a screenshot of the login sc
 
 help_msg = """**Amos Bot - Command Help**\n
 **Pilot Services**
-`validate` : starts the screenshot validation process
 
-`restart` : restart the entire validation process, can be used at any time
-
-`remove-characters` : this removes the characters from your account. Your account will be unverified until you add characters again.
-
-`list-characters` : list the characters associated with your account.
-
-**Other Commands**
-
+```
+validate : starts the screenshot validation process
+restart : restart the entire validation process, can be used at any time
+remove-characters : this removes the characters from your account. Your account will be unverified until you add characters again.
+list-characters : list the characters associated with your account.
+```
 """
 
 validate_help_msg = """**Amos Bot - Validation Help**\n
@@ -126,6 +128,8 @@ async def action(**kwargs):
     config = kwargs['config']
     client = kwargs['client']
 
+    screenshot_dir = config.get('infinity', 'screenshot_dir')
+
     split_message = message.content.split()
     if message.author.id not in message_state.keys():
         message_state[message.author.id] = 'READY'
@@ -137,9 +141,26 @@ async def action(**kwargs):
                 """
                 The user has sent a screenshot, and we're in the SEND_SCREENSHOT state
                 """
-                profile_image = BytesIO(requests.get(message.attachments[0].url).content)
-                name_list = screenshot_processing.process_screenshot(profile_image)
-                await confirm_names(name_list, message)
+                # TODO: move logic to helper function
+                try:
+                    author_dir = f"{screenshot_dir}/{message.author.id}"
+                    timestamp = message.created_at
+                    attachment = message.attachments[0]
+                    attachment_content = requests.get(attachment.url).content
+                    pathlib.Path(author_dir).mkdir(parents=True, exist_ok=True)
+                    screenshot_name = f"{author_dir}/{int(timestamp.timestamp())}"
+
+                    # save the screenshot to our pilots screenshot dir
+                    with open(screenshot_name, 'wb') as screenshot_file:
+                        screenshot_file.write(attachment_content)
+
+                    # process the text in the screenshot and confirm names
+                    profile_image = BytesIO(attachment_content)
+                    name_list = screenshot_processing.process_screenshot(profile_image)
+                    await confirm_names(name_list, message)
+
+                except:
+                    logger.error(traceback.format_exc())
 
             if message_state[message.author.id] == 'DEBUG':
                 await debug_test(message)
@@ -263,8 +284,8 @@ async def confirm_edit(message, confirm):
     """
     if confirm:
         name_bucket = temp_name_bucket[message.author.id]
-        char_name_dict[message.author.id][name_bucket[0]] = name_bucket[1]
         logger.info(f"Replacing <{message.author.id}> {char_name_dict[message.author.id][name_bucket[0]]} with {name_bucket[1]}")
+        char_name_dict[message.author.id][name_bucket[0]] = name_bucket[1]
         character_names = char_name_dict[message.author.id]
         name_msg = ""
 
@@ -414,8 +435,12 @@ async def list_characters(message):
     """
     target_pilot = pilot_manager.get_pilot(message.author.id)
     character_list = [character.name for character in target_pilot.characters]
-    unconfirmed_names = [char_name_dict[message.author.id][char_number] for char_number in char_name_dict[message.author.id].keys()]
-    unconfirmed_string = '\n'.join(unconfirmed_names)
+
+    if message.author.id in char_name_dict.keys():
+        unconfirmed_names = [char_name_dict[message.author.id][char_number] for char_number in char_name_dict[message.author.id].keys()]
+        unconfirmed_string = '\n'.join(unconfirmed_names)
+    else:
+        unconfirmed_string = ''
 
     if len(character_list) > 0:
         character_string = '\n'.join(character_list)
