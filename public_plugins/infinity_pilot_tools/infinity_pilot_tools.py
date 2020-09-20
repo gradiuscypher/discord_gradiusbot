@@ -6,7 +6,7 @@
 import csv
 import logging
 import traceback
-from discord import Embed, Color
+from discord import Embed, Color, utils
 from libs.infinity_management import mgmt_db
 
 logger = logging.getLogger('gradiusbot')
@@ -36,6 +36,15 @@ async def action(**kwargs):
     admin_channel_id = config.getint('infinity', 'admin_channel_id')
     admin_id = config.getint('infinity', 'admin_id')
     guild = message.channel.guild
+    recruiter_id = config.getint('infinity', 'recruiter_id')
+
+    if utils.find(lambda r: r.id == recruiter_id, message.author.roles):
+        if len(split_message) == 2 and split_message[0] == '!amos-intro':
+            if len(message.mentions) > 0 and message.channel.name.startswith('ticket-'):
+                target_member = message.mentions[0]
+
+                if target_member in message.channel.members:
+                    await target_member.send("Please start the validation process by sending the command `validate` in this PM.")
 
     if message.channel.id == admin_channel_id and message.author.id == admin_id:
         if len(split_message) > 0 and split_message[0] == '!pt':
