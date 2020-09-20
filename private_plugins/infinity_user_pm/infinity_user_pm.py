@@ -137,6 +137,8 @@ async def action(**kwargs):
         # grab the config values
         screenshot_dir = config.get('infinity', 'screenshot_dir')
         it_alert_chan_id = config.getint('infinity', 'it_alert_chan_id')
+        guild_id = config.getint('infinity', 'guild_id')
+        validated_role_id = config.getint('infinity', 'validated_role_id')
 
         split_message = message.content.split()
 
@@ -245,6 +247,11 @@ async def action(**kwargs):
                         # TODO: move logic to helper function
                         author = message.author
                         character_names = [char_name_dict[author.id][char_number] for char_number in char_name_dict[author.id].keys()]
+                        target_guild = client.get_guild(guild_id)
+                        target_role = target_guild.get_role(validated_role_id)
+                        target_member = target_guild.get_member(message.author.id)
+
+                        await target_member.add_roles(target_role)
                         await message.channel.send("Thank you for validating your character names.")
 
                         try:
