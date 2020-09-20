@@ -1,9 +1,7 @@
 # TODO: consider using JSON logging so that it's easier to dashboard errors
-# TODO: allow users to send in bug reports
 # TODO: integrate this workflow into when new players join the discord as well as re-validation of old players
 # TODO: more scoped try/except blocks
 # TODO: allow the bot's log level to be changed via command, where debug might also send a message to IT alert channel
-# TODO: allow alerts to be reacted to and mark them green as read
 
 import logging
 import pathlib
@@ -32,7 +30,7 @@ validate_screenshot_description = """Please provide a screenshot of the login sc
 
 ```
 - Include a screenshot *only*, do not upload a photo of your screen.
-- Please insure that the character screen is horizontal and not vertical.
+- Please ensure that the character screen is horizontal and not vertical.
 - Do not edit the screenshot in any way or you may prevent the bot from capturing your character's names.
 - Only include a screenshot of the game itself, if you're capturing an emulator screen, do not capture the emulator window.
 - Only include one screenshot each time you run the command. If you have alt accounts, run this command again.
@@ -171,12 +169,16 @@ async def action(**kwargs):
                         await confirm_names(name_list, message)
 
                     except:
-                        logger.error(traceback.format_exc())
+                        logger.error("Failed to process screenshot", extra={'traceback': traceback.format_exc(),
+                                                                            'sender_id': message.author.id})
 
                 if message_state[message.author.id] == 'DEBUG':
                     await debug_test(message)
 
             if len(split_message) == 1:
+                # if split_message[0] == 'crash-test':
+                #     raise Exception
+
                 if message_state[message.author.id] == 'DEBUG' and split_message[0] == 'exit':
                     await message.channel.send("Exiting debug mode.")
                     message_state[message.author.id] = 'READY'
@@ -198,11 +200,11 @@ async def action(**kwargs):
                     if message_state[message.author.id] == 'REMOVING':
                         await message.channel.send(removing_help_message)
 
-                if split_message[0] == 'debug-test':
-                    """
-                    set the user in debug test mode
-                    """
-                    await debug_test(message)
+                # if split_message[0] == 'debug-test':
+                #     """
+                #     set the user in debug test mode
+                #     """
+                #     await debug_test(message)
 
                 if split_message[0] == 'remove-characters':
                     """
@@ -283,8 +285,12 @@ async def action(**kwargs):
         it_alert_chan_id = config.getint('infinity', 'it_alert_chan_id')
         alert_chan = client.get_channel(it_alert_chan_id)
 
-        await alert_message("Uncaught Exception", traceback.format_exc(), channel=alert_chan, color=Color.red())
-        logger.error("An uncaught exception has occurred")
+        tb_str = f"```python\n{traceback.format_exc()}\n```"
+        await alert_message("Uncaught Exception", "", channel=alert_chan, color=Color.red(), details=tb_str)
+        logger.error("Uncaught exception", extra={'traceback': traceback.format_exc(),
+                                                            'sender_id': message.author.id,
+                                                            'discord_message': message.content,
+                                                            'sender_name': f"{message.author.name}#{message.author.discriminator}"})
 
 
 async def validate_screenshot(message):
@@ -320,33 +326,39 @@ async def confirm_edit(message, confirm):
     :param confirm:
     :return:
     """
-    if confirm:
-        name_bucket = temp_name_bucket[message.author.id]
-        logger.info(f"Replacing <{message.author.id}> {char_name_dict[message.author.id][name_bucket[0]]} with {name_bucket[1]}")
-        char_name_dict[message.author.id][name_bucket[0]] = name_bucket[1]
-        character_names = char_name_dict[message.author.id]
-        name_msg = ""
+    try:
+        if confirm:
+            name_bucket = temp_name_bucket[message.author.id]
+            logger.info(f"Replacing <{message.author.id}> {char_name_dict[message.author.id][name_bucket[0]]} with {name_bucket[1]}")
+            char_name_dict[message.author.id][name_bucket[0]] = name_bucket[1]
+            character_names = char_name_dict[message.author.id]
+            name_msg = ""
 
-        for char_number in character_names.keys():
-            name_msg += f"{char_number}) {character_names[char_number]}\n"
+            for char_number in character_names.keys():
+                name_msg += f"{char_number}) {character_names[char_number]}\n"
 
-        await message.channel.send("Thank you for editing your character name. The current names are as follows:\n"
-                                   f"```\n{name_msg}\n```\n"
-                                   f"If you would like to edit another name, repeat the edit command like last time, otherwise type `confirm` to confirm your names.")
+            await message.channel.send("Thank you for editing your character name. The current names are as follows:\n"
+                                       f"```\n{name_msg}\n```\n"
+                                       f"If you would like to edit another name, repeat the edit command like last time, otherwise type `confirm` to confirm your names.")
 
-        message_state[message.author.id] = 'VALIDATING'
+            message_state[message.author.id] = 'VALIDATING'
 
-    else:
-        character_names = char_name_dict[message.author.id]
-        name_msg = ""
+        else:
+            character_names = char_name_dict[message.author.id]
+            name_msg = ""
 
-        for char_number in character_names.keys():
-            name_msg += f"{char_number}) {character_names[char_number]}\n"
+            for char_number in character_names.keys():
+                name_msg += f"{char_number}) {character_names[char_number]}\n"
 
-        await message.channel.send(f"Canceling the name edit command. Your current names are as follows:\n"
-                                   f"```\n{name_msg}\n```\n"
-                                   f"If you would like to edit another name, repeat the edit command like last time, otherwise type `confirm` to confirm your names.")
-        message_state[message.author.id] = 'VALIDATING'
+            await message.channel.send(f"Canceling the name edit command. Your current names are as follows:\n"
+                                       f"```\n{name_msg}\n```\n"
+                                       f"If you would like to edit another name, repeat the edit command like last time, otherwise type `confirm` to confirm your names.")
+            message_state[message.author.id] = 'VALIDATING'
+    except:
+        logger.error("Uncaught exception", extra={'traceback': traceback.format_exc(),
+                                                  'sender_id': message.author.id,
+                                                  'discord_message': message.content,
+                                                  'sender_name': f"{message.author.name}#{message.author.discriminator}"})
 
 
 async def confirm_names(name_list, message):
@@ -489,13 +501,17 @@ async def list_characters(message):
                                    f"**Unconfirmed character names:**\n```\n{unconfirmed_string}\n```")
 
 
-async def alert_message(title, message, channel, fields=None, color=Color.darker_gray):
+async def alert_message(title, message, channel, fields=None, color=Color.darker_gray, details=None):
     if not channel:
         pass
 
     report_embed = Embed(title=title, color=color, description=message)
 
-    for field in fields:
-        report_embed.add_field(name=field['name'], value=field['value'], inline=True)
+    if fields:
+        for field in fields:
+            report_embed.add_field(name=field['name'], value=field['value'], inline=True)
 
     await channel.send(embed=report_embed)
+
+    if details:
+        await channel.send(details)
