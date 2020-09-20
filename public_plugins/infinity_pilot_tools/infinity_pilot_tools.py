@@ -39,7 +39,7 @@ async def action(**kwargs):
     recruiter_id = config.getint('infinity', 'recruiter_id')
 
     if utils.find(lambda r: r.id == recruiter_id, message.author.roles):
-        if len(split_message) == 2 and split_message[0] == '!amos-intro':
+        if len(split_message) >= 2 and split_message[0] == '!amos-intro':
             if len(message.mentions) > 0 and message.channel.name.startswith('ticket-'):
                 target_member = message.mentions[0]
 

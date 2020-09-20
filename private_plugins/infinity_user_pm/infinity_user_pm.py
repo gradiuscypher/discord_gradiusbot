@@ -8,7 +8,7 @@ import pathlib
 import re
 import requests
 import traceback
-from discord import Embed, Color
+from discord import Embed, Color, utils
 from io import BytesIO
 from libs.infinity_management import mgmt_db
 from libs.infinity_management import screenshot_processing
@@ -23,6 +23,7 @@ message_state = {}
 char_name_dict = {}
 temp_name_bucket = {}
 temp_delete_bucket = {}
+temp_attachment_urls = {}
 
 validate_screenshot_description = """Please provide a screenshot of the login screen showing the pilots on your account. Follow the guidelines below:
 
@@ -139,6 +140,7 @@ async def action(**kwargs):
         it_alert_chan_id = config.getint('infinity', 'it_alert_chan_id')
         guild_id = config.getint('infinity', 'guild_id')
         validated_role_id = config.getint('infinity', 'validated_role_id')
+        member_role_id = config.getint('infinity', 'member_role_id')
 
         split_message = message.content.split()
 
@@ -157,6 +159,7 @@ async def action(**kwargs):
                         author_dir = f"{screenshot_dir}/{message.author.id}"
                         timestamp = message.created_at
                         attachment = message.attachments[0]
+                        temp_attachment_urls[message.author.id] = attachment.url
                         attachment_content = requests.get(attachment.url).content
                         pathlib.Path(author_dir).mkdir(parents=True, exist_ok=True)
                         screenshot_name = f"{author_dir}/{int(timestamp.timestamp())}"
@@ -212,7 +215,7 @@ async def action(**kwargs):
                     """
                     user is requesting to delete stored characters
                     """
-                    await remove_characters(message)
+                    await remove_characters(message, config, client)
 
                 if split_message[0] == 'list-characters':
                     """
@@ -238,7 +241,7 @@ async def action(**kwargs):
                         await confirm_edit(message, True)
 
                     elif message_state[message.author.id] == 'REMOVING':
-                        await remove_characters(message)
+                        await remove_characters(message, config, client)
 
                     elif message_state[message.author.id] == 'DELETING':
                         await delete_name(message)
@@ -250,9 +253,7 @@ async def action(**kwargs):
                         target_guild = client.get_guild(guild_id)
                         target_role = target_guild.get_role(validated_role_id)
                         target_member = target_guild.get_member(message.author.id)
-
-                        await target_member.add_roles(target_role)
-                        await message.channel.send("Thank you for validating your character names.")
+                        member_role = target_guild.get_role(member_role_id)
 
                         try:
                             pilot_manager.add_pilot(author.id, author.name, author.discriminator, character_names=character_names)
@@ -261,6 +262,18 @@ async def action(**kwargs):
                             message_state[message.author.id] = 'READY'
                         except:
                             logger.info(f"Error while creating a new Pilot <{author.id}>\n{traceback.format_exc()}")
+
+                        await target_member.add_roles(target_role)
+                        await message.channel.send("Thank you for validating your character names.")
+
+                        # check to see if this user is part of a ticket channel and if so, message the channel with the screenshot and character names
+                        # also, check to ensure they're not already a member to avoid spamming ticket channels when recuriters validate
+                        if member_role not in target_member.roles:
+                            for guild_channel in target_guild.channels:
+                                if guild_channel.name.startswith('ticket-') and target_member in guild_channel.members:
+                                    character_name_str = "\n".join(character_names)
+                                    await guild_channel.send(f"{author.name} has completed their validation process. The character names are:\n```\n{character_name_str}\n```")
+                                    await guild_channel.send(f"The validation screenshot sent in was: {temp_attachment_urls[author.id]}")
 
                 if split_message[0] == 'cancel':
                     if message_state[message.author.id] == 'SEND_SCREENSHOT':
@@ -271,7 +284,7 @@ async def action(**kwargs):
                         await confirm_edit(message, False)
 
                     if message_state[message.author.id] == 'REMOVING':
-                        await remove_characters(message)
+                        await remove_characters(message, config, client)
 
                     if message_state[message.author.id] == 'DELETING':
                         await delete_name(message)
@@ -291,13 +304,16 @@ async def action(**kwargs):
     except:
         it_alert_chan_id = config.getint('infinity', 'it_alert_chan_id')
         alert_chan = client.get_channel(it_alert_chan_id)
+        exception_alerts = config.getboolean('infinity', 'exception_alerts')
 
         tb_str = f"```python\n{traceback.format_exc()}\n```"
-        await alert_message("Uncaught Exception", "", channel=alert_chan, color=Color.red(), details=tb_str)
         logger.error("Uncaught exception", extra={'traceback': traceback.format_exc(),
                                                             'sender_id': message.author.id,
                                                             'discord_message': message.content,
                                                             'sender_name': f"{message.author.name}#{message.author.discriminator}"})
+
+        if exception_alerts:
+            await alert_message("Uncaught Exception", "", channel=alert_chan, color=Color.red(), details=tb_str)
 
 
 async def validate_screenshot(message):
@@ -438,11 +454,13 @@ async def delete_name(message):
         message_state[message.author.id] = 'VALIDATING'
 
 
-async def remove_characters(message):
+async def remove_characters(message, config, client):
     """
     The user wants to restart the character name adding process by removing their characters.
     Preventing someone from removing individual characters limits people trying to hid alt names
     :param message:
+    :param config:
+    :param client:
     :return:
     """
     if message_state[message.author.id] == 'REMOVING':
@@ -455,6 +473,16 @@ async def remove_characters(message):
             message_state[message.author.id] = 'READY'
             target_pilot = pilot_manager.get_pilot(message.author.id)
             target_pilot.remove_characters()
+
+            guild_id = config.getint('infinity', 'guild_id')
+            validated_role_id = config.getint('infinity', 'validated_role_id')
+            target_guild = client.get_guild(guild_id)
+            target_role = target_guild.get_role(validated_role_id)
+            target_member = target_guild.get_member(message.author.id)
+            await target_member.remove_roles(target_role, reason="[Amos BOT] - The user has removed their validated character names.")
+            logger.info("Removing all characters", extra={'sender_id': message.author.id,
+                                                          'discord_message': message.content,
+                                                          'sender_name': f"{message.author.name}#{message.author.discriminator}"})
 
     elif message_state[message.author.id] == 'READY':
         await message.channel.send("This will allow you to remove your current character names and start over with the screenshot validation. "
@@ -491,7 +519,11 @@ async def list_characters(message):
     :return:
     """
     target_pilot = pilot_manager.get_pilot(message.author.id)
-    character_list = [character.name for character in target_pilot.characters]
+
+    if target_pilot:
+        character_list = [character.name for character in target_pilot.characters]
+    else:
+        character_list = []
 
     if message.author.id in char_name_dict.keys():
         unconfirmed_names = [char_name_dict[message.author.id][char_number] for char_number in char_name_dict[message.author.id].keys()]
