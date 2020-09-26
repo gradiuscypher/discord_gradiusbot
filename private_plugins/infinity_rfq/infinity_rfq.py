@@ -58,14 +58,16 @@ async def action(**kwargs):
             <{airtable_url}>
 
             - Submit the form multiple times to request multiple materials. 
-            - Use the `!rfq update` command to update this RFQ.
-            - Use the `!rfq submit` to submit the request to the RFQ admins
+            - Use the {rfq_libs.emoji_dict['refresh']} reaction to update this RFQ.
+            - Use the {rfq_libs.emoji_dict['confirm']} reaction to submit the request to the RFQ admins
             """
             description_str = f"**Requested Materials**\n```\n```"
             rfq_embed = Embed(title="RFQ - Open Request", color=Color.green(), description=description_str)
 
             await message.channel.send(cleandoc(start_str))
             embed_msg = await message.channel.send(embed=rfq_embed)
+            await embed_msg.add_reaction(rfq_libs.emoji_dict['refresh'])
+            await embed_msg.add_reaction(rfq_libs.emoji_dict['confirm'])
 
             rfq_sessions[message.author.id] = {
                 'materials': {},

@@ -12,6 +12,11 @@ session_factory = sessionmaker(bind=engine)
 Session = scoped_session(session_factory)
 session = Session()
 
+emoji_dict = {
+    'refresh': '🔄',
+    'confirm': '✅'
+}
+
 
 class RfqManager:
     def build_db(self):
@@ -20,7 +25,6 @@ class RfqManager:
         :return:
         """
         Base.metadata.create_all(engine)
-
 
     class Request(Base):
         __tablename__ = 'requests'
