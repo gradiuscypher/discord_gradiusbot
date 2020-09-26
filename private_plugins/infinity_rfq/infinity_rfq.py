@@ -5,8 +5,9 @@
 import logging
 from airtable import Airtable
 from discord import Embed, Color, utils
-from libs.infinity_management import rfq_libs
 from inspect import cleandoc
+from libs.infinity_management import rfq_libs
+from event_plugins.reactions.infinity_rfq.infinity_rfq import add_rfq_session
 
 
 logger = logging.getLogger('gradiusbot')
@@ -69,37 +70,7 @@ async def action(**kwargs):
             await embed_msg.add_reaction(rfq_libs.emoji_dict['refresh'])
             await embed_msg.add_reaction(rfq_libs.emoji_dict['confirm'])
 
-            rfq_sessions[message.author.id] = {
-                'materials': {},
-                'embed_id': embed_msg.id
-            }
-
-        if split_message[1] == 'update':
-            if message.author.id not in rfq_sessions.keys():
-                await message.channel.send("Please start an RFQ session with `!rfq start`.")
-
-            else:
-                rfq_session = rfq_sessions[message.author.id]
-                new_materials = rfq_libs.update_rfq_order(message.author.id, airtable_obj)
-
-                for material in new_materials:
-                    if material in rfq_session['materials'].keys():
-                        rfq_session['materials'][material] += new_materials[material]
-                    else:
-                        rfq_session['materials'][material] = new_materials[material]
-
-                embed_id = rfq_session['embed_id']
-                materials_str = ""
-
-                for material in rfq_session['materials']:
-                    materials_str += f"{material} : {rfq_session['materials'][material]}\n"
-
-                description_str = f"**Requested Materials**\n```{materials_str}\n```"
-                rfq_embed = Embed(title="RFQ - Open Request", color=Color.green(), description=description_str)
-                target_message = await message.channel.fetch_message(embed_id)
-                await target_message.delete()
-                new_message = await message.channel.send(embed=rfq_embed)
-                rfq_session['embed_id'] = new_message.id
+            add_rfq_session(message.author.id)
 
         if split_message[1] == 'submit':
             pass
