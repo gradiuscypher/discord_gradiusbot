@@ -59,7 +59,7 @@ async def action(**kwargs):
             rfq_admin_channel_id = config.getint('infinity', 'rfq_admin_channel_id')
             rfq_admin_channel = client.get_channel(rfq_admin_channel_id)
 
-            instruction_str = f"Click {rfq_libs.emoji_dict['confirm']} to confirm that the materials have been sent. This will notify the requester.\n\n" \
+            instruction_str = f"Click {rfq_libs.emoji_dict['filled']} to confirm that the materials have been sent. This will notify the requester.\n\n" \
                               f"Click {rfq_libs.emoji_dict['close']} to mark the request as closed without sending materials. This will notify the requester."
             rfq_ticket = Embed(title="", color=Color.green(), description=instruction_str)
             rfq_ticket.add_field(name="Requester", value=f"<@{message.author.id}>", inline=True)
