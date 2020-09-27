@@ -14,7 +14,9 @@ session = Session()
 
 emoji_dict = {
     'refresh': '🔄',
-    'confirm': '✅'
+    'confirm': '✅',
+    'close': '❌',
+    'filled': '👍'
 }
 
 

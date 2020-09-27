@@ -43,7 +43,7 @@ async def action(**kwargs):
         airtable_apikey = config.get('infinity', 'airtable_apikey')
         airtable_obj = Airtable(airtable_basekey, airtable_tablename, airtable_apikey)
 
-    split_message = message.content.split()
+    split_message = [s.lower() for s in message.content.split()]
 
     airtable_url = config.get('infinity', 'airtable_url')
 
@@ -71,6 +71,3 @@ async def action(**kwargs):
             await embed_msg.add_reaction(rfq_libs.emoji_dict['confirm'])
 
             add_rfq_session(message.author.id)
-
-        if split_message[1] == 'submit':
-            pass
