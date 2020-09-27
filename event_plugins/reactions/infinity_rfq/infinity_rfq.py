@@ -35,10 +35,10 @@ async def action(**kwargs):
         message = reaction.message
 
         if reaction_sender != client.user:
-            if str(reaction.emoji) == emoji_dict['refresh']:
-                await update_rfq_message(reaction_sender, reaction, reaction_sender.id, airtable_obj)
-            if str(reaction.emoji) == emoji_dict['confirm']:
-                await confirm_rfq(reaction_sender, reaction, config, client)
+            # if str(reaction.emoji) == emoji_dict['refresh']:
+            #     await update_rfq_message(reaction_sender, reaction, reaction_sender.id, airtable_obj)
+            # if str(reaction.emoji) == emoji_dict['confirm']:
+            #     await confirm_rfq(reaction_sender, reaction, config, client)
             if str(reaction.emoji) == emoji_dict['filled']:
                 await request_filled(reaction, reaction_sender)
             if str(reaction.emoji) == emoji_dict['close']:
@@ -92,7 +92,7 @@ async def confirm_rfq(user, reaction, config, client):
     for material in rfq_session:
         materials_str += f"{material} : {rfq_session[material]}\n"
 
-    instruction_str = f"Click {rfq_libs.emoji_dict['confirm']} to confirm that the materials have been sent. This will notify the requester.\n" \
+    instruction_str = f"Click {rfq_libs.emoji_dict['filled']} to confirm that the materials have been sent. This will notify the requester.\n" \
                       f"Click {rfq_libs.emoji_dict['close']} to mark the request as closed without sending materials. This will notify the requester.\n\n"
     description_str = instruction_str + f"**Requested Materials**\n```{materials_str}\n```"
     rfq_ticket = Embed(title='RFQ - Request Opened', color=Color.green(), description=description_str)
