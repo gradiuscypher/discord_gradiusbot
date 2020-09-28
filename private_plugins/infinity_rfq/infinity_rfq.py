@@ -1,6 +1,10 @@
-# TODO: turn data into ticket, remove data from airtable when request is filled
-# TODO: change these to reactions
-# TODO: include request ID, requester name
+"""
+# TODO: Worflow:
+* User starts a ticket with `!rfq start <ORDER_ID>`
+* Opens up a channel with RFQ Admins and the user under the RFQ section
+* Sends a control panel Embed and pins the embed to the channel for easy access
+  * Embed includes all request information
+"""
 
 import logging
 from airtable import Airtable
