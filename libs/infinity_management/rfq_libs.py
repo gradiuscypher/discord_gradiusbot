@@ -16,7 +16,9 @@ emoji_dict = {
     'refresh': '🔄',
     'confirm': '✅',
     'close': '❌',
-    'filled': '👍'
+    'filled': '👍',
+    'canceled': '🛑',
+    'assign': '🛠️'
 }
 
 
