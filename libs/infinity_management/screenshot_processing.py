@@ -1,9 +1,11 @@
 import io
-from PIL import Image
+from configparser import RawConfigParser
 from google.cloud import vision
+from google.oauth2 import service_account
+from PIL import Image
 
-
-client = vision.ImageAnnotatorClient()
+credentials = service_account.Credentials.from_service_account_file('/etc/discord_gradiusbot/google.json')
+client = vision.ImageAnnotatorClient(credentials=credentials)
 
 
 def crop_profile(path):

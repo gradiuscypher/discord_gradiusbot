@@ -1,7 +1,6 @@
 # TODO: consider using JSON logging so that it's easier to dashboard errors
 # TODO: integrate this workflow into when new players join the discord as well as re-validation of old players
 # TODO: more scoped try/except blocks
-# TODO: allow the bot's log level to be changed via command, where debug might also send a message to IT alert channel
 
 import logging
 import pathlib
@@ -129,6 +128,13 @@ bug-report <MESSAGE>: Allows you to send a message to the IT team if you have an
 
 async def action(**kwargs):
     """
+    [infinity]
+    screenshot_dir =
+    it_alert_chan_id =
+    guild_id =
+    validated_role_id =
+    member_role_id =
+    exception_alerts =
     """
     message = kwargs['message']
     config = kwargs['config']
@@ -142,7 +148,7 @@ async def action(**kwargs):
         validated_role_id = config.getint('infinity', 'validated_role_id')
         member_role_id = config.getint('infinity', 'member_role_id')
 
-        split_message = message.content.split()
+        split_message = [s.lower() for s in message.content.split()]
 
         if message.author.id not in message_state.keys():
             message_state[message.author.id] = 'READY'
@@ -306,14 +312,15 @@ async def action(**kwargs):
         alert_chan = client.get_channel(it_alert_chan_id)
         exception_alerts = config.getboolean('infinity', 'exception_alerts')
 
-        tb_str = f"```python\n{traceback.format_exc()}\n```"
+        tb_str = traceback.format_exc()[:1950]
+        tb_msg_str = f"```python\n{tb_str}\n```"
         logger.error("Uncaught exception", extra={'traceback': traceback.format_exc(),
                                                             'sender_id': message.author.id,
                                                             'discord_message': message.content,
                                                             'sender_name': f"{message.author.name}#{message.author.discriminator}"})
 
         if exception_alerts:
-            await alert_message("Uncaught Exception", "", channel=alert_chan, color=Color.red(), details=tb_str)
+            await alert_message("Uncaught Exception", "", channel=alert_chan, color=Color.red(), details=tb_msg_str)
 
 
 async def validate_screenshot(message):
@@ -540,7 +547,7 @@ async def list_characters(message):
                                    f"**Unconfirmed character names:**\n```\n{unconfirmed_string}\n```")
 
 
-async def alert_message(title, message, channel, fields=None, color=Color.darker_gray, details=None):
+async def alert_message(title, message, channel, fields=None, color=Color.darker_grey(), details=None):
     if not channel:
         pass
 
