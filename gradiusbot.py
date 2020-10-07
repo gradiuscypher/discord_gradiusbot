@@ -9,7 +9,6 @@ from sys import argv
 from libs import plugin_loader
 from libs.json_logging import CustomJsonFormatter
 from asyncio import ensure_future
-from pythonjsonlogger import jsonlogger
 
 # Setup Config
 config = configparser.RawConfigParser()
