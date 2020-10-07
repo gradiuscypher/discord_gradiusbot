@@ -27,6 +27,10 @@ help_str = """*Amos Pilot Tools - help*
 
 async def action(**kwargs):
     """
+    [infinity]
+    admin_channel_id =
+    admin_id =
+    recruiter_id =
     """
     message = kwargs['message']
     config = kwargs['config']

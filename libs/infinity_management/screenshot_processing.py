@@ -37,7 +37,7 @@ def crop_profile(path):
 
 def detect_text(img, debug=False):
     """Detects text in the image buffer."""
-    image = vision.types.Image(content=img)
+    image = vision.Image(content=img)
 
     response = client.text_detection(image=image)
     texts = response.text_annotations

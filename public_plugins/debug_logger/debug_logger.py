@@ -25,28 +25,29 @@ async def action(**kwargs):
 
     split_message = message.content.split()
 
-    if message.author.id == owner_id and split_message[0] == 'public-debug-on':
-        debug_enabled = True
-        await message.channel.send("Public debug message logging has been ENABLED.")
+    if len(split_message) > 0:
+        if message.author.id == owner_id and split_message[0] == 'public-debug-on':
+            debug_enabled = True
+            await message.channel.send("Public debug message logging has been ENABLED.")
 
-    elif message.author.id == owner_id and split_message[0] == 'public-debug-off':
-        debug_enabled = False
-        await message.channel.send("Public debug message logging has been DISABLED.")
+        elif message.author.id == owner_id and split_message[0] == 'public-debug-off':
+            debug_enabled = False
+            await message.channel.send("Public debug message logging has been DISABLED.")
 
-    else:
-        if debug_enabled:
-            role_list = [role.name for role in message.author.roles]
+        else:
+            if debug_enabled:
+                role_list = [role.name for role in message.author.roles]
 
-            log_json = {
-                'log_type': 'public_debug',
-                'message.author.id': message.author.id,
-                'message.author.name': message.author.name,
-                'message.author.discriminator': message.author.discriminator,
-                'message.id': message.id,
-                'message.channel.name': message.channel.name,
-                'message.channel.id': message.channel.id,
-                'message.guild.name': message.guild.name,
-                'message.guild.id': message.guild.id,
-                'roles': role_list
-            }
-            logger.debug(message.content, extra=log_json)
+                log_json = {
+                    'log_type': 'public_debug',
+                    'message.author.id': message.author.id,
+                    'message.author.name': message.author.name,
+                    'message.author.discriminator': message.author.discriminator,
+                    'message.id': message.id,
+                    'message.channel.name': message.channel.name,
+                    'message.channel.id': message.channel.id,
+                    'message.guild.name': message.guild.name,
+                    'message.guild.id': message.guild.id,
+                    'roles': role_list
+                }
+                logger.debug(message.content, extra=log_json)
