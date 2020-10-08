@@ -22,6 +22,7 @@ WORKDIR discord_gradiusbot
 RUN touch /discord_gradiusbot/gradiusbot.json
 
 # install the requirements
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Run gradiusbot.py with the config file passed as a volume
