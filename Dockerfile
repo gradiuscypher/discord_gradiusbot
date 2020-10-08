@@ -13,7 +13,7 @@ RUN apt update && apt install -y git
 
 # Git clone the target branch of discord_gradiusbot from Github
 # TODO: remove this so that we build off main later
-RUN git clone --single-branch https://github.com/gradiuscypher/discord_gradiusbot.git --depth=1
+RUN git clone --branch infinity-mgmt --single-branch https://github.com/gradiuscypher/discord_gradiusbot.git --depth=1
 
 # Set the working directory
 WORKDIR discord_gradiusbot
