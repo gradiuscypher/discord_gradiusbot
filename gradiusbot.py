@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# Discord 1.0 docs: http://discordpy.readthedocs.io/en/rewrite/index.html
 import configparser
 import discord
 import elasticsearch
@@ -48,7 +47,11 @@ else:
     elastic = None
 
 # Create Discord Client
-client = discord.Client()
+# set the bot's intents
+# https://discordpy.readthedocs.io/en/latest/intents.html
+
+intents = discord.Intents.all()
+client = discord.Client(intents=intents)
 
 
 async def background_tasks():

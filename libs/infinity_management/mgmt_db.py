@@ -1,4 +1,7 @@
+import logging
 import traceback
+from airtable import Airtable
+from configparser import RawConfigParser
 from sqlalchemy import Column, Boolean, Integer, String, ForeignKey, create_engine, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker, scoped_session
@@ -12,7 +15,17 @@ Session = scoped_session(session_factory)
 session = Session()
 
 
+# Setup Logging
+logger = logging.getLogger('gradiusbot')
+
+
 class PilotManager:
+    def __init__(self):
+        config = RawConfigParser()
+        config.read('infinity_mgmt.conf')
+        self.airtable_basekey = config.get('airtable', 'airtable_basekey')
+        self.airtable_apikey = config.get('airtable', 'airtable_apikey')
+
     def build_db(self):
         """
         Creates the database and tables
@@ -49,6 +62,98 @@ class PilotManager:
                     new_character = Character(pilot_id=target_pilot.id, name=name)
                     session.add(new_character)
             session.commit()
+
+    def copy_to_airtable(self):
+        """
+        copies the DB to airtables
+        """
+        try:
+            logger.debug('Starting Airtable copy...')
+
+            # set the ready state to false to indicate that it's not ready
+            state_table = Airtable(self.airtable_basekey, 'State', self.airtable_apikey)
+            ready_id = state_table.match('key', 'ready')['id']
+            fields = {'key': 'ready', 'value': 'false'}
+            state_table.replace(ready_id, fields)
+
+            # delete previous table entries
+            logger.debug("Deleting previous table entries...")
+            pilot_table = Airtable(self.airtable_basekey, 'Pilots', self.airtable_apikey)
+            character_table = Airtable(self.airtable_basekey, 'Characters', self.airtable_apikey)
+            attribute_table = Airtable(self.airtable_basekey, 'Attributes', self.airtable_apikey)
+            attribute_groups_table = Airtable(self.airtable_basekey, 'AttributeGroups', self.airtable_apikey)
+            pilot_table.batch_delete([entry['id'] for entry in pilot_table.get_all()])
+            character_table.batch_delete([entry['id'] for entry in character_table.get_all()])
+            attribute_table.batch_delete([entry['id'] for entry in attribute_table.get_all()])
+            attribute_groups_table.batch_delete([entry['id'] for entry in attribute_groups_table.get_all()])
+            logger.debug("Previous table entries deleted!")
+
+            # copy pilots table
+            logger.debug("Copying Pilots table...")
+            pilots = session.query(Pilot)
+            pilot_records = []
+            for pilot in pilots:
+                pilot_records.append({
+                    'id': pilot.id,
+                    'discord_id': pilot.discord_id,
+                    'discord_name': pilot.discord_name,
+                    'discord_discriminator': pilot.discord_discriminator
+                })
+            pilot_table.batch_insert(pilot_records)
+            logger.debug("Pilots table copied!")
+
+            # copy characters table
+            logger.debug("Copying Characters table...")
+            characters = session.query(Character)
+            character_records = []
+            for character in characters:
+                character_records.append({
+                    'id': character.id,
+                    'pilot_id': character.pilot_id,
+                    'name': character.name
+                })
+            character_table.batch_insert(character_records)
+            logger.debug("Characters table copied!")
+
+            # copy attributes
+            logger.debug("Copying Attribute table...")
+            attributes = session.query(Attribute)
+            attribute_records = []
+            for attribute in attributes:
+                attribute_records.append({
+                    'id': attribute.id,
+                    'attribute_group_id': attribute.attribute_group_id,
+                    'key': attribute.key,
+                    'value': attribute.value,
+                    'friendly_name': attribute.friendly_name
+                })
+            attribute_table.batch_insert(attribute_records)
+            logger.debug("Attribute table copied!")
+
+            # copy attributegroups
+            logger.debug("Copying AttributeGroup table...")
+            attribute_groups = session.query(AttributeGroup)
+            attribute_group_records = []
+            for attribute_group in attribute_groups:
+                attribute_group_records.append({
+                    'id': attribute_group.id,
+                    'pilot_id': attribute_group.pilot_id,
+                    'name': attribute_group.name,
+                    'description': attribute_group.description
+                })
+            attribute_groups_table.batch_insert(attribute_group_records)
+            logger.debug("AttributeGroup table copied!")
+
+            # set the ready state to true to indicate that it's ready
+            state_table = Airtable(self.airtable_basekey, 'State', self.airtable_apikey)
+            ready_id = state_table.match('key', 'ready')['id']
+            fields = {'key': 'ready', 'value': 'true'}
+            state_table.replace(ready_id, fields)
+
+            logger.debug('Airtable copy complete!')
+
+        except:
+            logger.error(f"Failed to copy to airtable:\n{traceback.format_exc()}")
 
     def get_pilot(self, discord_id):
         pilot_query = session.query(Pilot).filter(Pilot.discord_id == discord_id)

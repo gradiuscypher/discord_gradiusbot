@@ -72,12 +72,17 @@ async def action(**kwargs):
 
                 if split_message[1] == 'builddb':
                     pilot_manager.build_db()
-                    print("DB build complete.")
+                    await message.channel.send("DB build complete.")
+
+                if split_message[1] == 'at-update':
+                    pilot_manager.copy_to_airtable()
+                    await message.channel.send("Airtable copy complete.")
 
                 if split_message[1] == 'audit':
                     message_list = []
                     result_string = ""
                     missing_count = 0
+                    # TODO: hardcoded channel ID
                     target_channel = guild.get_channel(722851595519262733)
                     for member in target_channel.members:
                         if not member.bot:
