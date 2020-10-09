@@ -40,14 +40,14 @@ async def action(**kwargs):
 
                 log_json = {
                     'log_type': 'public_debug',
-                    'message.author.id': message.author.id,
-                    'message.author.name': message.author.name,
-                    'message.author.discriminator': message.author.discriminator,
-                    'message.id': message.id,
-                    'message.channel.name': message.channel.name,
-                    'message.channel.id': message.channel.id,
-                    'message.guild.name': message.guild.name,
-                    'message.guild.id': message.guild.id,
+                    'author.id': message.author.id,
+                    'author.name': message.author.name,
+                    'author.discriminator': message.author.discriminator,
+                    'message_id': message.id,
+                    'channel.name': message.channel.name,
+                    'channel.id': message.channel.id,
+                    'guild.name': message.guild.name,
+                    'guild.id': message.guild.id,
                     'roles': role_list
                 }
                 logger.debug(message.content, extra=log_json)

@@ -1,6 +1,8 @@
 # TODO: consider using JSON logging so that it's easier to dashboard errors
 # TODO: integrate this workflow into when new players join the discord as well as re-validation of old players
 # TODO: more scoped try/except blocks
+# TODO: let the user know when a bug report was successful
+# TODO: give users a step by step instruction with help.
 
 import logging
 import pathlib
@@ -41,7 +43,7 @@ validate_screenshot_description = """Please provide a screenshot of the login sc
 **At any point in time, you can request for help regarding the step you're on by using the `help` command.**
 """
 
-help_msg = """**Amos Bot - Command Help**\n
+help_msg = """**Command Help**\n
 **Pilot Services**
 
 ```
@@ -53,7 +55,7 @@ bug-report <MESSAGE>: Allows you to send a message to the IT team if you have an
 ```
 """
 
-validate_help_msg = """**Amos Bot - Validation Help**\n
+validate_help_msg = """**Validation Help**\n
 You are currently validating your character names.
 
 Here are the currently available commands:
@@ -68,7 +70,7 @@ bug-report <MESSAGE>: Allows you to send a message to the IT team if you have an
 ```
 """
 
-edit_help_message = """**Amos Bot - Edit Help**\n
+edit_help_message = """**Edit Help**\n
 You're currently editing a name. You can either confirm or cancel the edit.
 
 Here are the currently available commands:
@@ -83,7 +85,7 @@ bug-report <MESSAGE>: Allows you to send a message to the IT team if you have an
 """
 
 
-delete_help_message = """**Amos Bot - Deleting Help**\n
+delete_help_message = """**Deleting Help**\n
 You're currently deleting a name. You can either confirm or cancel the delete.
 
 Here are the currently available commands:
@@ -98,7 +100,7 @@ bug-report <MESSAGE>: Allows you to send a message to the IT team if you have an
 """
 
 
-removing_help_message = """**Amos Bot - Removing Help**\n
+removing_help_message = """**Removing Help**\n
 You're currently removing your character data. You can either confirm or cancel this action.
 
 Here are the currently available commands:
@@ -113,7 +115,7 @@ bug-report <MESSAGE>: Allows you to send a message to the IT team if you have an
 """
 
 
-screenshot_help_message = """**Amos Bot - Screenshot Validation Help**\n
+screenshot_help_message = """**Screenshot Validation Help**\n
 You're currently validating a screenshot. You can either upload a screenshot of your character screen or run an available command.
 
 Here are the currently available commands:

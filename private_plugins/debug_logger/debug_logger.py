@@ -38,9 +38,9 @@ async def action(**kwargs):
             if debug_enabled:
                 log_json = {
                     'log_type': 'pm_debug',
-                    'message.author.id': message.author.id,
-                    'message.author.name': message.author.name,
-                    'message.author.discriminator': message.author.discriminator,
-                    'message.id': message.id
+                    'author.id': message.author.id,
+                    'author.name': message.author.name,
+                    'author.discriminator': message.author.discriminator,
+                    'message_id': message.id
                 }
                 logger.debug(message.content, extra=log_json)

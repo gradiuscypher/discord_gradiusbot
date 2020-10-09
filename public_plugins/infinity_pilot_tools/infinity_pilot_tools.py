@@ -15,7 +15,7 @@ logger.info("[Public Plugin] <infinity_pilot_tools.py> Tools for managing Pilot 
 
 pilot_manager = mgmt_db.PilotManager()
 
-help_str = """*Amos Pilot Tools - help*
+help_str = """*Pilot Tools - help*
 
 ```
 !pt help - this message
