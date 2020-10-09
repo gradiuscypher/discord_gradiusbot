@@ -44,8 +44,19 @@ validate_screenshot_description = """Please provide a screenshot of the login sc
 """
 
 help_msg = """**Command Help**\n
-**Pilot Services**
+This process is important because it allows us to automatically track our Pilot's character names and provide them with corp and alliance services.
 
+**Your Current Progress**
+">>>" - you are currently on this step
+```
+>>> 1) Start the validation process with the validate command
+2) Send a screenshot of your Character Selection screen to this DM conversation
+3) Edit any names that don't match your character names
+4) Delete any names that the bot added that don't actually exist in your account. Please do not delete any valid characters, even if they aren't a part of the alliance.
+5) Validate that all of the names are correct and send the confirm command to confirm your character names
+```
+
+Here are the currently available commands:
 ```
 validate : starts the screenshot validation process
 restart : restart the entire validation process, can be used at any time
@@ -56,7 +67,16 @@ bug-report <MESSAGE>: Allows you to send a message to the IT team if you have an
 """
 
 validate_help_msg = """**Validation Help**\n
-You are currently validating your character names.
+
+**Your Current Progress**
+">>>" - you are currently on this step
+```
+1) Start the validation process with the validate command
+2) Send a screenshot of your Character Selection screen to this DM conversation
+3) Edit any names that don't match your character names
+4) Delete any names that the bot added that don't actually exist in your account. Please do not delete any valid characters, even if they aren't a part of the alliance.
+>>> 5) Validate that all of the names are correct and send the confirm command to confirm your character names
+```
 
 Here are the currently available commands:
 ```
@@ -73,6 +93,16 @@ bug-report <MESSAGE>: Allows you to send a message to the IT team if you have an
 edit_help_message = """**Edit Help**\n
 You're currently editing a name. You can either confirm or cancel the edit.
 
+**Your Current Progress**
+">>>" - you are currently on this step
+```
+1) Start the validation process with the validate command
+2) Send a screenshot of your Character Selection screen to this DM conversation
+>>> 3) Edit any names that don't match your character names
+4) Delete any names that the bot added that don't actually exist in your account. Please do not delete any valid characters, even if they aren't a part of the alliance.
+5) Validate that all of the names are correct and send the confirm command to confirm your character names
+```
+
 Here are the currently available commands:
 ```
 help : this command
@@ -86,7 +116,21 @@ bug-report <MESSAGE>: Allows you to send a message to the IT team if you have an
 
 
 delete_help_message = """**Deleting Help**\n
+
 You're currently deleting a name. You can either confirm or cancel the delete.
+
+**Please do not delete any character names that actually appear in the screen shot. If you do so, the screenshot will not be considered valid and will be subject to investigation.**
+**Deleting valid character names prevents the bot from properly processing and tracking Pilots and their characters. Only delete names that we're found that don't actually exist.**
+
+**Your Current Progress**
+">>>" - you are currently on this step
+```
+1) Start the validation process with the validate command
+2) Send a screenshot of your Character Selection screen to this DM conversation
+3) Edit any names that don't match your character names
+>>> 4) Delete any names that the bot added that don't actually exist in your account. Please do not delete any valid characters, even if they aren't a part of the alliance.
+5) Validate that all of the names are correct and send the confirm command to confirm your character names
+```
 
 Here are the currently available commands:
 ```
@@ -117,6 +161,16 @@ bug-report <MESSAGE>: Allows you to send a message to the IT team if you have an
 
 screenshot_help_message = """**Screenshot Validation Help**\n
 You're currently validating a screenshot. You can either upload a screenshot of your character screen or run an available command.
+
+**Your Current Progress**
+">>>" - you are currently on this step
+```
+1) Start the validation process with the validate command
+>>> 2) Send a screenshot of your Character Selection screen to this DM conversation
+3) Edit any names that don't match your character names
+4) Delete any names that the bot added that don't actually exist in your account. Please do not delete any valid characters, even if they aren't a part of the alliance.
+5) Validate that all of the names are correct and send the confirm command to confirm your character names
+```
 
 Here are the currently available commands:
 ```
