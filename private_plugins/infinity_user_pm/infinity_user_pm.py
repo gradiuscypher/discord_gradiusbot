@@ -75,7 +75,7 @@ validate_help_msg = """**Validation Help**\n
 2) Send a screenshot of your Character Selection screen to this DM conversation
 3) Edit any names that don't match your character names
 4) Delete any names that the bot added that don't actually exist in your account. Please do not delete any valid characters, even if they aren't a part of the alliance.
->>> 5) Validate that all of the names are correct and send the confirm command to confirm your character names
+>>> 5) Validate that all of the names are correct and send the confirm command to confirm your character names. Please type confirm to save your names.
 ```
 
 Here are the currently available commands:
@@ -241,6 +241,9 @@ async def action(**kwargs):
 
                 if message_state[message.author.id] == 'DEBUG':
                     await debug_test(message)
+
+                else:
+                    await message.channel.send("It looks like you've tried to upload a screenshot without first typing `validate`. Please type `validate` to start a screenshot upload process.")
 
             if len(split_message) == 1:
                 # if split_message[0] == 'crash-test':
