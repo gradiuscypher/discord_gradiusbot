@@ -46,6 +46,8 @@ validate_screenshot_description = """Please provide a screenshot of the login sc
 help_msg = """**Command Help**\n
 This process is important because it allows us to automatically track our Pilot's character names and provide them with corp and alliance services.
 
+Start the validation process by typing `validate`.
+
 **Your Current Progress**
 ">>>" - you are currently on this step
 ```
