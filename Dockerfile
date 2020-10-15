@@ -12,8 +12,10 @@ MAINTAINER gradiuscypher
 RUN apt update && apt install -y git
 
 # Git clone the target branch of discord_gradiusbot from Github
-# TODO: remove this so that we build off main later
-RUN git clone --branch master --single-branch https://github.com/gradiuscypher/discord_gradiusbot.git --depth=1
+# RUN git clone --branch master --single-branch https://github.com/gradiuscypher/discord_gradiusbot.git --depth=1
+
+# Copy the local files to the app directory
+ADD . /discord_gradiusbot
 
 # Set the working directory
 WORKDIR discord_gradiusbot
@@ -23,7 +25,7 @@ RUN touch /discord_gradiusbot/gradiusbot.json
 
 # install the requirements
 RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Run gradiusbot.py with the config file passed as a volume
 CMD ["python", "gradiusbot.py", "botconfig.conf"]
