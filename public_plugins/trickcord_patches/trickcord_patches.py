@@ -44,24 +44,19 @@ async def action(**kwargs):
             await message.channel.send(trickcord_state)
 
         # add the author to the spooked role
-        if trickcord_state == 'STANDBY':
-            if message.content == 'h!trick' or message.content == 'h!treat':
-                await message.author.add_roles(spooked_role, reason='User was spooked.')
-                await message.channel.send("You sent the wrong command and were spooked by the trick-or-treater! 👻")
-
         elif trickcord_state == 'TRICK':
             if message.content == 'h!treat':
                 await message.author.add_roles(spooked_role, reason='User was spooked.')
-                await message.channel.send("You sent the wrong command and were spooked by the trick-or-treater! 👻")
+                await message.channel.send(f"<@{message.author.id}> sent the wrong command and was spooked by the trick-or-treater! 👻")
             elif message.content == 'h!trick' and (message.created_at - trickcord_time).microseconds/1000 < allowed_delay:
                 await message.author.add_roles(spooked_role, reason='User was spooked.')
-                await message.channel.send("You replied too fast and were spooked by the trick-or-treater! 👻")
+                await message.channel.send(f"@<{message.author.id}> replied too fast and was spooked by the trick-or-treater! 👻")
 
         elif trickcord_state == 'TREAT':
             if message.content == 'h!trick':
                 await message.author.add_roles(spooked_role, reason='User was spooked.')
-                await message.channel.send("You sent the wrong command and were spooked by the trick-or-treater! 👻")
+                await message.channel.send(f"<@{message.author.id}> sent the wrong command and was spooked by the trick-or-treater! 👻")
             elif message.content == 'h!treat' and (message.created_at - trickcord_time).microseconds/1000 < allowed_delay:
                 await message.author.add_roles(spooked_role, reason='User was spooked.')
-                await message.channel.send("You replied too fast and were spooked by the trick-or-treater! 👻")
+                await message.channel.send(f"@<{message.author.id}> replied too fast and was spooked by the trick-or-treater! 👻")
 
