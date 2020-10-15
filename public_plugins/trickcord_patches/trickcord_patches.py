@@ -21,6 +21,7 @@ async def action(**kwargs):
     global trickcord_time
 
     spooked_role_id = config.getint('trickcord', 'spooked_role_id')
+    allowed_delay = config.getint('trickcord', 'allowed_delay')
     spooked_role = message.guild.get_role(spooked_role_id)
 
     if message.author.id == TRICKCORD_ID:
@@ -37,6 +38,11 @@ async def action(**kwargs):
 
     # if the author wasn't the trickortreater bot
     else:
+        # debug tools
+        if message.author.id == 101103243991465984 and message.content == 'showstate':
+            await message.delete()
+            await message.channel.send(trickcord_state)
+
         # add the author to the spooked role
         if trickcord_state == 'STANDBY':
             if message.content == 'h!trick' or message.content == 'h!treat':
@@ -47,12 +53,15 @@ async def action(**kwargs):
             if message.content == 'h!treat':
                 await message.author.add_roles(spooked_role, reason='User was spooked.')
                 await message.channel.send("You sent the wrong command and were spooked by the trick-or-treater! 👻")
+            elif message.content == 'h!trick' and (message.created_at - trickcord_time)/1000 < allowed_delay:
+                await message.author.add_roles(spooked_role, reason='User was spooked.')
+                await message.channel.send("You replied too fast and were spooked by the trick-or-treater! 👻")
 
         elif trickcord_state == 'TREAT':
             if message.content == 'h!trick':
                 await message.author.add_roles(spooked_role, reason='User was spooked.')
                 await message.channel.send("You sent the wrong command and were spooked by the trick-or-treater! 👻")
+            elif message.content == 'h!treat' and (message.created_at - trickcord_time)/1000 < allowed_delay:
+                await message.author.add_roles(spooked_role, reason='User was spooked.')
+                await message.channel.send("You replied too fast and were spooked by the trick-or-treater! 👻")
 
-        elif message.author.id == 101103243991465984 and message.content == 'showstate':
-            await message.delete()
-            print(trickcord_state)
