@@ -29,6 +29,7 @@ async def action(**kwargs):
         # someone claimed the trickortreater, go to standby
         elif len(after.embeds) > 0 and after.embeds[0].title == 'Happy Halloween!':
             trickcord_patches.trickcord_state = 'STANDBY'
+            await remove_spooked(after, spooked_role_id)
 
         elif after.author.id == 101103243991465984:
             if after.content == 'DEBUG-TRICK':
