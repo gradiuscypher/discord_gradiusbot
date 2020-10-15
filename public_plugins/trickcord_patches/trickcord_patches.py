@@ -53,7 +53,7 @@ async def action(**kwargs):
             if message.content == 'h!treat':
                 await message.author.add_roles(spooked_role, reason='User was spooked.')
                 await message.channel.send("You sent the wrong command and were spooked by the trick-or-treater! 👻")
-            elif message.content == 'h!trick' and (message.created_at - trickcord_time)/1000 < allowed_delay:
+            elif message.content == 'h!trick' and (message.created_at - trickcord_time).microseconds/1000 < allowed_delay:
                 await message.author.add_roles(spooked_role, reason='User was spooked.')
                 await message.channel.send("You replied too fast and were spooked by the trick-or-treater! 👻")
 
@@ -61,7 +61,7 @@ async def action(**kwargs):
             if message.content == 'h!trick':
                 await message.author.add_roles(spooked_role, reason='User was spooked.')
                 await message.channel.send("You sent the wrong command and were spooked by the trick-or-treater! 👻")
-            elif message.content == 'h!treat' and (message.created_at - trickcord_time)/1000 < allowed_delay:
+            elif message.content == 'h!treat' and (message.created_at - trickcord_time).microseconds/1000 < allowed_delay:
                 await message.author.add_roles(spooked_role, reason='User was spooked.')
                 await message.channel.send("You replied too fast and were spooked by the trick-or-treater! 👻")
 
