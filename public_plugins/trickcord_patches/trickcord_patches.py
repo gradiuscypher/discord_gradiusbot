@@ -53,18 +53,24 @@ async def action(**kwargs):
 
         # add the author to the spooked role
         elif trickcord_state == 'TRICK':
+            response_time = (message.created_at - trickcord_time).microseconds / 1000
             if message.content == 'h!treat':
                 await message.author.add_roles(spooked_role, reason='User was spooked.')
                 await message.channel.send(f"<@{message.author.id}> sent the wrong command and was spooked by the trick-or-treater! 👻")
-            elif message.content == 'h!trick' and (message.created_at - trickcord_time).microseconds/1000 < allowed_delay:
+            elif message.content == 'h!trick' and response_time < allowed_delay:
                 await message.author.add_roles(spooked_role, reason='User was spooked.')
                 await message.channel.send(f"<@{message.author.id}> replied too fast and was spooked by the trick-or-treater! 👻")
+            elif message.content == 'h!trick' and response_time >= allowed_delay:
+                await message.channel.send(f"<@{message.author.id}> replied in {response_time} ms! So fast!")
 
         elif trickcord_state == 'TREAT':
+            response_time = (message.created_at - trickcord_time).microseconds / 1000
             if message.content == 'h!trick':
                 await message.author.add_roles(spooked_role, reason='User was spooked.')
                 await message.channel.send(f"<@{message.author.id}> sent the wrong command and was spooked by the trick-or-treater! 👻")
-            elif message.content == 'h!treat' and (message.created_at - trickcord_time).microseconds/1000 < allowed_delay:
+            elif message.content == 'h!treat' and response_time < allowed_delay:
                 await message.author.add_roles(spooked_role, reason='User was spooked.')
                 await message.channel.send(f"<@{message.author.id}> replied too fast and was spooked by the trick-or-treater! 👻")
+            elif message.content == 'h!treat' and response_time >= allowed_delay:
+                await message.channel.send(f"<@{message.author.id}> replied in {response_time} ms! So fast!")
 
