@@ -489,10 +489,11 @@ if __name__ == '__main__':
         client.loop.create_task(background_tasks())
 
         # Start the client
-        client.run(token)
+        is_user_token = config.getboolean('gradiusbot', 'is_user_token')
+        client.run(token, bot=is_user_token)
 
     except KeyboardInterrupt:
-        print("Killed by keboard!")
+        print("Killed by keyboard!")
         exit(0)
 
     except:

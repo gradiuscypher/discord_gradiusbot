@@ -1,5 +1,6 @@
 [gradiusbot]
 token =
+is_user_token = False
 debug = False
 debug_channel = debug
 # Plugins
