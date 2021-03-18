@@ -74,6 +74,21 @@ class WhAlert(Base):
             logger.error("Unable to remove alert.")
             logger.error(traceback.format_exc())
             return "ERROR"
+    
+    def list_alerts(self, discord_id):
+        try:
+            alerts = session.query(WhAlert).filter(WhAlert.discord_id==discord_id)
+
+            if alerts.count > 0:
+                alert_string = ""
+                for alert in alerts:
+                    alert_string += f"{alert.id}) {alert.start_system_name} > {alert.end_system_name}\n"
+            else:
+                return None
+        except:
+            logger.error("Unable to list alerts.")
+            logger.error(traceback.format_exc())
+            return "ERROR"
 
 
 def load_thera_holes():

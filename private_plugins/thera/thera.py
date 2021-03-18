@@ -55,12 +55,28 @@ async def action(**kwargs):
             if split_message[0] == '!wh':
                 if split_message[1] == 'add':
                     try:
-                        result = alerts.add_alert()
+                        start_system_name = split_message[2]
+                        end_system_name = split_message[3]
+                        result = alerts.add_alert(message.author.id, start_system_name, end_system_name)
+
+                        if result == 'ADDED':
+                            await message.channel.send("The alert has been added successfully.")
+                        if result == 'NO_SYSTEM':
+                            await message.channel.send("Unable to find the system in your command, please double check the name.")
+                        if result == 'ERROR':
+                            await message.channel.send("There was an error with the command, please contact gradius.")
                     except:
                         pass
                 if split_message[1] == 'remove':
                     try:
-                        result = alerts.remove_alert()
+                        result = alerts.remove_alert(message.author.id)
+
+                        if result == 'REMOVED':
+                            await message.channel.send("The alert has been removed successfully.")
+                        if result == 'NO_ALERT':
+                            await message.channel.send("Unable to find the alert ID.")
+                        if result == 'ERROR':
+                            await message.channel.send("There was an error with the command, please contact gradius.")
                     except:
                         pass
 
