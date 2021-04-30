@@ -63,10 +63,10 @@ async def action(client, config):
 
                     # Validate bot's permissions
                     # bot_perms = admin_chan.permissions_for(guild.me)
-                    bot_perms.ban_members = True
+                    # bot_perms.ban_members = True
 
                     # TODO: Fix this permission check, wtf was I thinking here? Right now just hacking it in to get it working.
-                    if not bot_perms.ban_members:
+                    if not True:
                         logger.error("The bot does not have ban permissions on {}[{}]".format(guild.name, guild.id))
 
                     else:
@@ -74,7 +74,7 @@ async def action(client, config):
                             user = guild.get_member(user_id)
 
                             # If a user was found, check to see if there's an exception. If not, ban them.
-                            if user and bot_perms.ban_members:
+                            if user:
                                 is_exception = banpool_manager.is_user_in_exceptions(user_id, guild.id)
 
                                 if not is_exception and guild_banlist:
