@@ -62,8 +62,10 @@ async def action(client, config):
                                 banned_user_ids.append(user.user_id)
 
                     # Validate bot's permissions
-                    bot_perms = admin_chan.permissions_for(guild.me)
+                    # bot_perms = admin_chan.permissions_for(guild.me)
+                    bot_perms.ban_members = True
 
+                    # TODO: Fix this permission check, wtf was I thinking here? Right now just hacking it in to get it working.
                     if not bot_perms.ban_members:
                         logger.error("The bot does not have ban permissions on {}[{}]".format(guild.name, guild.id))
 
