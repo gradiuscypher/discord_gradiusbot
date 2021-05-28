@@ -1,17 +1,2 @@
 [gradiusbot]
 token =
-is_user_token = False
-debug = False
-debug_channel = debug
-# Plugins
-public_plugins = []
-private_plugins = []
-scheduled_tasks = []
-event_plugins.messages = []
-event_plugins.reactions = []
-event_plugins.private = []
-event_plugins.guild = []
-event_plugins.client = []
-event_plugins.member = []
-event_plugins.relationships = []
-event_plugins.group = []
