@@ -1,0 +1,31 @@
+{
+    "name": "options",
+    "description": "Demo slash command with options.",
+    "options": [
+        {
+            "name": "option1",
+            "description": "The first option.",
+            "type": 3,
+            "required": "True",
+            "choices": [
+                {
+                    "name": "choice1",
+                    "value": "choice_1"
+                },
+                {
+                    "name": "choice2",
+                    "value": "choice_2"
+                },
+                {
+                    "name": "choice3",
+                    "value": "choice_3"
+                }
+            ]
+        },
+        {
+            "name": "option2",
+            "description": "The second option.",
+            "type": 3
+        }
+    ]
+}
