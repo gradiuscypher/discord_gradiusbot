@@ -3,8 +3,8 @@
     "description": "Demo slash command with options.",
     "options": [
         {
-            "name": "option1",
-            "description": "The first option.",
+            "name": "choicelist",
+            "description": "A list of choices to pick from.",
             "type": 3,
             "required": "True",
             "choices": [
@@ -23,9 +23,14 @@
             ]
         },
         {
-            "name": "option2",
-            "description": "The second option.",
+            "name": "freeform",
+            "description": "Freeform text entry.",
             "type": 3
+        },
+        {
+            "name": "ephemeral",
+            "description": "Should the message be a normal or ephemeral message",
+            "type": 5
         }
     ]
 }
