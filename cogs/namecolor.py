@@ -32,20 +32,20 @@ class ButtonBuilder(commands.Cog):
                             new_role = interaction.guild.get_role(int(role_id))
 
                             if new_role:
-                                respose_embed = discord.Embed(color=discord.Color.green(), title="Enjoy your new name color!")
-                                respose_embed.add_field(name="New Color", value=f"<@&{new_role.id}>")
+                                response_embed = discord.Embed(color=discord.Color.green(), title="Enjoy your new name color!")
+                                response_embed.add_field(name="New Color", value=f"<@&{new_role.id}>")
                                 if old_role:
-                                    respose_embed.add_field(name="Old Color", value=f"<@&{old_role.id}>")
+                                    response_embed.add_field(name="Old Color", value=f"<@&{old_role.id}>")
 
                                 await interaction.user.add_roles(new_role)
-                                await interaction.response.send_message(embeds=[respose_embed], ephemeral=True)
+                                await interaction.response.send_message(embeds=[response_embed], ephemeral=True)
                             else:
-                                respose_embed = discord.Embed(color=discord.Color.red(), title="Something went wrong, contact gradius")
-                                await interaction.response.send_message(embeds=[respose_embed], ephemeral=True)
+                                response_embed = discord.Embed(color=discord.Color.red(), title="Something went wrong, contact gradius")
+                                await interaction.response.send_message(embeds=[response_embed], ephemeral=True)
 
                         else:
-                            respose_embed = discord.Embed(color=discord.Color.red(), title="You cannot grant yourself this role")
-                            await interaction.response.send_message(embeds=[respose_embed], ephemeral=True)
+                            response_embed = discord.Embed(color=discord.Color.red(), title="You cannot grant yourself this role")
+                            await interaction.response.send_message(embeds=[response_embed], ephemeral=True)
 
             if interaction.data['options'][0]['name'] == 'clear':
                 # remove any old namecolor roles
@@ -53,9 +53,20 @@ class ButtonBuilder(commands.Cog):
                     if 'namecolor_' in user_role.name:
                         old_role = user_role
                         await interaction.user.remove_roles(user_role)
-                        respose_embed = discord.Embed(color=discord.Color.green(), title="Cleaned up your namecolors!")
-                        await interaction.response.send_message(embeds=[respose_embed], ephemeral=True)
+                        response_embed = discord.Embed(color=discord.Color.green(), title="Cleaned up your namecolors!")
+                        await interaction.response.send_message(embeds=[response_embed], ephemeral=True)
 
+            if interaction.data['options'][0]['name'] == 'list':
+                # remove any old namecolor roles
+                response_embed = discord.Embed(color=discord.Color.green(), title="Available Namecolors")
+                response_body = ""
+
+                for guild_role in interaction.guild.roles:
+                    if 'namecolor_' in guild_role.name:
+                        response_body += f"\n<@&{guild_role.id}>"
+
+                response_embed.description = response_body
+                await interaction.response.send_message(embeds=[response_embed], ephemeral=True)
 
 
 def setup(bot):
