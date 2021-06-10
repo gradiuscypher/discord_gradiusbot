@@ -1,6 +1,6 @@
 {
     "name": "namecolor",
-    "description": "Configure the color your name shows as in Discord.",
+    "description": "Configure the color your name shows as in Discord",
     "options": [
         {
             "name": "add",
@@ -9,11 +9,16 @@
             "options": [
                 {
                     "name": "choicelist",
-                    "description": "A list of choices to pick from.",
+                    "description": "A list of choices to pick from",
                     "type": 8,
                     "required": true
                 }
             ]
+        },
+        {
+            "name": "list",
+            "description": "Lists all available namecolor roles",
+            "type": 1
         },
         {
             "name": "clear",
