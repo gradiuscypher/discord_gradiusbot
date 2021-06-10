@@ -22,7 +22,7 @@ def cli():
 @click.argument("bot_token", type=click.STRING)
 @click.argument("command_file", type=click.STRING)
 @click.option("--guild_id", type=click.INT, help="The Guild ID for the command. Ommit to make a global command.")
-def put(application_id, bot_token, command_file, guild_id=None):
+def post(application_id, bot_token, command_file, guild_id=None):
     with open(f'json_commands/{command_file}', 'r') as command_json:
         headers = {
             "Authorization": f"Bot {bot_token}"
