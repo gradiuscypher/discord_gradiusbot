@@ -65,5 +65,5 @@ typing-inspect==0.6.0
 urllib3==1.25.10
 wcwidth==0.2.5
 webencodings==0.5.1
-websockets==8.1
+websockets==9.1
 yarl==1.6.0
