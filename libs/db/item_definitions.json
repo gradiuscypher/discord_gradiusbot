@@ -1,0 +1,35 @@
+[
+    {
+      "system_name": "CREDIT",
+      "name": "Credit",
+      "description": "Credits used to trade for goods and services.",
+      "script": "",
+      "attributes": [
+        {
+          "usable": "False"
+        }
+      ]
+    },
+    {
+      "system_name": "NAMECOLOR_SWITCHER",
+      "name": "Namecolor",
+      "description": "Allows user to change their namecolor.",
+      "script": "namecolor",
+      "attributes": [
+        {
+          "usable": "True"
+        }
+      ]
+    },
+    {
+      "system_name": "LOOTBOX",
+      "name": "Lootbox",
+      "description": "Full of treasure!",
+      "script": "lootbox",
+      "attributes": [
+        {
+          "usable": "True"
+        }
+      ]
+    }
+]
