@@ -6,7 +6,8 @@
       "script": "",
       "attributes": [
         {
-          "usable": "False"
+          "usable": false,
+          "keepatzero": true
         }
       ]
     },
@@ -17,7 +18,8 @@
       "script": "namecolor",
       "attributes": [
         {
-          "usable": "True"
+          "usable": true,
+          "keepatzero": false
         }
       ]
     },
@@ -28,7 +30,7 @@
       "script": "lootbox",
       "attributes": [
         {
-          "usable": "True"
+          "usable": true
         }
       ]
     }
