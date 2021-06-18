@@ -16,7 +16,7 @@ class ItemManager:
             item_json = json.loads(item_file.read())
 
         for item in item_json:
-            new_item = Item(system_name=item['system_name'], name=item['name'], description=item['description'], script=item['script'])
+            new_item = Item(system_name=item['system_name'], name=item['name'], description=item['description'], script=item['script'], usable=item['usable'])
             session.add(new_item)
             session.commit()
 
@@ -72,12 +72,19 @@ class Item(Base):
     name = Column(String)
     description = Column(String)
     script = Column(String)
+    usable = Column(Boolean)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def get_attribute(self, attribute_name):
-        return session.query(ItemAttribute).filter(ItemAttribute.item_id==self.id, ItemAttribute.name==attribute_name).first()
+        target_attribute = session.query(ItemAttribute).filter(ItemAttribute.item_id==self.id, ItemAttribute.name==attribute_name).first()
+
+        if target_attribute:
+            return target_attribute.value
+
+        else:
+            return None
 
 
 class ItemAttribute(Base):

@@ -4,9 +4,9 @@
       "name": "Credit",
       "description": "Credits used to trade for goods and services.",
       "script": "",
+      "usable": false,
       "attributes": [
         {
-          "usable": false,
           "keepatzero": true
         }
       ]
@@ -16,9 +16,9 @@
       "name": "Namecolor",
       "description": "Allows user to change their namecolor.",
       "script": "namecolor",
+      "usable": true,
       "attributes": [
         {
-          "usable": true,
           "keepatzero": false
         }
       ]
@@ -28,9 +28,9 @@
       "name": "Lootbox",
       "description": "Full of treasure!",
       "script": "lootbox",
+      "usable": true,
       "attributes": [
         {
-          "usable": true
         }
       ]
     }

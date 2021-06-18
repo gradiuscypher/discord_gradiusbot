@@ -7,7 +7,6 @@ from discord import components
 from discord import embeds
 from discord.ext import commands
 
-# TODO: get_attribute should return value, not object, also need to check use of keepatzero in .remove_item()
 
 # setup logging
 logger = logging.getLogger("gradiusbot")
@@ -24,8 +23,6 @@ class ButtonBuilder(commands.Cog):
     @commands.Cog.listener()
     async def on_interaction(self, interaction):
         if interaction.data['name'] == 'inventory':
-            # method = getattr(libs.scripts.items, 'namecolor')
-            # await method(attr_1="Attr1", attr_2=2, interaction=interaction)
             if interaction.data['options'][0]['name'] == 'list':
                 user_inven = ItemManager().get_inventory(interaction.user.id)
 
@@ -45,16 +42,13 @@ class ButtonBuilder(commands.Cog):
                 target_item = user_inven.get_inventory_item(target_item_id)
 
                 if target_item and target_item.count > 0:
-                    usable_item = target_item.item.get_attribute('usable')
-                    if usable_item and bool(usable_item.value):
+                    if target_item.item.usable:
                         method = getattr(libs.scripts.items, target_item.item.script)
                         await method(attr_1="Attr1", attr_2=2, interaction=interaction)
                     else:
                         await interaction.response.send_message(NOT_USABLE, ephemeral=True)
                 else:
                     await interaction.response.send_message(NO_SUCH_ITEM, ephemeral=True)
-
-
 
 
 def setup(bot):

@@ -6,3 +6,5 @@ A branch where strange things can happen and we play with very weird code.
 
 # Random stuff I'm going to forget if I need it at some point
 `pip install git+https://github.com/Rapptz/discord.py.git@master`
+
+# Current TODO
