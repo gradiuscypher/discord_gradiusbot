@@ -8,5 +8,5 @@ async def namecolor(**kwargs):
 
 async def lootbox(**kwargs):
     interaction = kwargs['interaction']
-    await interaction.response.send_message("LOOTBOX", ephemeral=False)
+    await interaction.response.send_message("LOOTBOX", ephemeral=True)
     print("LOOTBOX")
