@@ -16,7 +16,7 @@ NO_SUCH_ITEM = "Either you do not have this item, or it does not exist."
 NOT_USABLE = "This item is not usable."
 
 
-class ButtonBuilder(commands.Cog):
+class Inventory(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
     
@@ -52,4 +52,4 @@ class ButtonBuilder(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(ButtonBuilder(bot))
+    bot.add_cog(Inventory(bot))
