@@ -12,3 +12,5 @@ A branch where strange things can happen and we play with very weird code.
 * Consider changing the Item definition format from JSON to a python file potentially
 * Put together help message
 * Pagination helper: https://discordpy.readthedocs.io/en/latest/api.html#discord.Client.wait_for
+* /inventory should have a filter argument to only show specific items
+* fade out page navigation when you hit the end
