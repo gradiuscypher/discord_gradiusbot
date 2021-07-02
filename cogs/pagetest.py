@@ -5,6 +5,7 @@ import random
 from discord import components
 from discord.enums import ButtonStyle
 from discord.ext import commands
+from libs import paginator
 
 # setup logging
 logger = logging.getLogger("gradiusbot")
@@ -95,10 +96,19 @@ class ButtonBuilder(commands.Cog):
         view.add_item(button)
 
         await ctx.send(embed=embed, view=view)
+
+    @commands.command()
+    async def pagetest(self, ctx):
+        test_list = [f"ITEM_{num}" for num in range(0,80)]
+        paginated_list = paginator.split_to_pages(test_list)
+        page_view = paginator.paged_button_view(paginated_list)
+
+        await ctx.send("Test", view=page_view)
     
     @commands.Cog.listener()
     async def on_interaction(self, interaction):
         print(interaction.data)
+        print(interaction.message.id)
 
 
 def setup(bot):
