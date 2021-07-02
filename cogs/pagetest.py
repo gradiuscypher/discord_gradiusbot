@@ -101,7 +101,7 @@ class ButtonBuilder(commands.Cog):
     async def pagetest(self, ctx):
         test_list = [f"ITEM_{num}" for num in range(0,80)]
         paginated_list = paginator.split_to_pages(test_list)
-        page_view = paginator.paged_button_view(paginated_list)
+        page_view = paginator.paged_button_view(paginated_list, target_page=1)
 
         await ctx.send("Test", view=page_view)
     

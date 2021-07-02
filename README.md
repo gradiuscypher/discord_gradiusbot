@@ -14,4 +14,5 @@ A branch where strange things can happen and we play with very weird code.
 * Pagination helper: https://discordpy.readthedocs.io/en/latest/api.html#discord.Client.wait_for
 * /inventory should have a filter argument to only show specific items
 * fade out page navigation when you hit the end
-* pagination should validate the user pressing the button
+* script for filling the DB with test data and multiple test items
+* should figure out what this is useful for: https://discordpy.readthedocs.io/en/master/api.html#discord.Client.add_view
