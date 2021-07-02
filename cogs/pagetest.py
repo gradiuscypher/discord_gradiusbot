@@ -40,10 +40,16 @@ class ButtonBuilder(commands.Cog):
             # short_button_text3
         ]
 
-        for num in range(0,20):
+        for num in range(0,15):
             button = discord.ui.Button(custom_id=f"id{num}", label=random.choice(texts), style=random.choice(styles))
             view.add_item(button)
-
+        option_list = [
+            discord.SelectOption(label='Select1', value='value_1', description='a longer description 11111', default=True),
+            discord.SelectOption(label='Select2', value='value_2', description='a longer description 22222', default=False),
+            discord.SelectOption(label='Select3', value='value_3', description='a longer description 33333', default=False)
+        ]
+        select = discord.ui.Select(custom_id="select", options=option_list)
+        view.add_item(select)
         
         button = discord.ui.Button(custom_id=f"id{num}", label="Prev", style=discord.ButtonStyle.green)
         view.add_item(button)
@@ -60,6 +66,35 @@ class ButtonBuilder(commands.Cog):
 
 
         await ctx.send(short_button_text, view=view)
+
+    @commands.command()
+    async def itemdemo(self, ctx):
+        view = discord.ui.View()
+        embed = discord.Embed(title='Test Item 123', description='This is the long form item description that you get.')
+        option_list = [
+            discord.SelectOption(label='Select1', value='value_1', description='a longer description 11111', default=False),
+            discord.SelectOption(label='Select2', value='value_2', description='a longer description 22222', default=False),
+            discord.SelectOption(label='Select3', value='value_3', description='a longer description 33333', default=False)
+        ]
+        embed.set_footer(text="This is the item footer.")
+        embed.set_image(url='https://cdn.discordapp.com/attachments/353241001583837191/860381675661295616/unnamed_1.png')
+        embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/353241001583837191/860382001424760832/gradius_profile.jpg')
+        embed.set_author(name="Author Name", url="https://www.google.com", icon_url='https://cdn.discordapp.com/attachments/353241001583837191/860382001424760832/gradius_profile.jpg')
+
+        select = discord.ui.Select(custom_id="select", options=option_list, placeholder="Who are you trading with?")
+        view.add_item(select)
+
+        button = discord.ui.Button(custom_id=f"id_prev", label="Use", style=discord.ButtonStyle.green, emoji='✔️')
+        view.add_item(button)
+
+        button = discord.ui.Button(custom_id=f"id_blank", label="Trash", style=discord.ButtonStyle.red, disabled=False, emoji='🗑')
+        view.add_item(button)
+        button = discord.ui.Button(custom_id=f"id_page", label="Trade", style=discord.ButtonStyle.blurple, disabled=True, emoji='🤝')
+        view.add_item(button)
+        button = discord.ui.Button(custom_id=f"id_blank2", label="Store", style=discord.ButtonStyle.grey, disabled=False, emoji='📦')
+        view.add_item(button)
+
+        await ctx.send(embed=embed, view=view)
     
     @commands.Cog.listener()
     async def on_interaction(self, interaction):
