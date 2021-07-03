@@ -22,7 +22,8 @@ def paged_button_view(item_list, page_size=1, target_page=0, button_length=30):
     for item in paginated_list[target_page]:
         # TODO: can we get buttons to line up better?
         # buffered_name = (item.center(button_length, ' ')[:button_length]) if len(item) < button_length else item[:button_length-3]+'...'
-        button = discord.ui.Button(custom_id=item, label=item, style=discord.ButtonStyle.blurple)
+        button = discord.ui.Button(custom_id=item.split(':')[1], label=item.split(':')[0], style=discord.ButtonStyle.blurple)
+        button.callback = render_item_view
         view.add_item(button)
 
     # Add Navigation buttons
@@ -51,9 +52,13 @@ async def update_inventory_view(interaction):
 def render_inventory_view(user_id, target_page=0):
     try:
         user_inven = ItemManager().get_inventory(user_id)
-        item_list = [f"{i.count} x {i.item.name}" for i in user_inven.items]
+        item_list = [f"{i.count} x {i.item.name}:iteminstance_{i.id}" for i in user_inven.items]
         return paged_button_view(item_list, target_page=target_page)
 
     except:
         logger.error(traceback.format_exc())
         return None
+
+
+async def render_item_view(interaction):
+    print(interaction.data)
