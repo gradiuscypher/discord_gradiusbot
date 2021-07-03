@@ -103,6 +103,9 @@ class ItemInstance(Base):
     system_name = Column(String)
     count = Column(Integer)
 
+    def get_item_instance(self, item_instance_id):
+        return session.query(ItemInstance).filter(ItemInstance.id==item_instance_id).first()
+
 
 class Inventory(Base):
     __tablename__ = 'inventory'

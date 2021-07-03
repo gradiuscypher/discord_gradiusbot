@@ -4,7 +4,7 @@ import traceback
 from discord.components import Button
 
 from discord.ui import view
-from libs.db.inventory import ItemManager
+from libs.db.inventory import ItemManager, ItemInstance
 
 # setup logging
 logger = logging.getLogger("gradiusbot")
@@ -52,7 +52,7 @@ async def update_inventory_view(interaction):
 def render_inventory_view(user_id, target_page=0):
     try:
         user_inven = ItemManager().get_inventory(user_id)
-        item_list = [f"{i.count} x {i.item.name}:iteminstance_{i.id}" for i in user_inven.items]
+        item_list = [f"{i.count} x {i.item.name}:{i.id}" for i in user_inven.items]
         return paged_button_view(item_list, target_page=target_page)
 
     except:
@@ -61,4 +61,5 @@ def render_inventory_view(user_id, target_page=0):
 
 
 async def render_item_view(interaction):
-    print(interaction.data)
+    item_instance = ItemInstance().get_item_instance(interaction.data['custom_id'])
+    print(item_instance.system_name)

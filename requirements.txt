@@ -6,6 +6,8 @@ certifi==2020.12.5
 chardet==4.0.0
 click==8.0.1
 decorator==5.0.9
+discord.py==2.0.0a3350+g3d0dd5bc
+greenlet==1.1.0
 idna==2.10
 ipython==7.24.0
 ipython-genutils==0.2.0
@@ -19,6 +21,7 @@ prompt-toolkit==3.0.18
 ptyprocess==0.7.0
 Pygments==2.9.0
 requests==2.25.1
+SQLAlchemy==1.4.20
 traitlets==5.0.5
 typing-extensions==3.10.0.0
 urllib3==1.26.5
