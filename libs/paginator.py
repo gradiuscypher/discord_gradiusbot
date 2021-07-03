@@ -26,16 +26,16 @@ def paged_button_view(item_list, page_size=1, target_page=0, button_length=30):
         view.add_item(button)
 
     # Add Navigation buttons
-    button = discord.ui.Button(custom_id=f"prev_{target_page-1}", label="Prev", style=discord.ButtonStyle.green, row=4)
+    button = discord.ui.Button(custom_id=f"prev_{target_page-1}", label="Prev", style=discord.ButtonStyle.green, row=4, disabled=(target_page-1 < 0))
     button.callback = update_inventory_view
     view.add_item(button)
     button = discord.ui.Button(custom_id=f"blank", label="    ", style=discord.ButtonStyle.grey, disabled=True, row=4)
     view.add_item(button)
-    button = discord.ui.Button(custom_id=f"page_number", label=f"{target_page+1}/{len(paginated_list)}", style=discord.ButtonStyle.green, disabled=True, row=4)
+    button = discord.ui.Button(custom_id=f"page_number", label=f"{target_page+1}/{len(paginated_list)}", style=discord.ButtonStyle.grey, disabled=True, row=4)
     view.add_item(button)
     button = discord.ui.Button(custom_id=f"blank", label="    ", style=discord.ButtonStyle.grey, disabled=True, row=4)
     view.add_item(button)
-    button = discord.ui.Button(custom_id=f"next_{target_page+1}", label="Next", style=discord.ButtonStyle.green, row=4)
+    button = discord.ui.Button(custom_id=f"next_{target_page+1}", label="Next", style=discord.ButtonStyle.green, row=4, disabled=(target_page+1 >= len(paginated_list)))
     button.callback = update_inventory_view
     view.add_item(button)
 

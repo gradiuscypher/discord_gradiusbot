@@ -53,9 +53,6 @@ class Inventory(commands.Cog):
                     else:
                         await interaction.response.send_message(NO_SUCH_ITEM, ephemeral=True)
 
-        else:
-            logger.warn(f"Unhandled interaction type: {interaction.type}")
-
 
 def setup(bot):
     bot.add_cog(Inventory(bot))
