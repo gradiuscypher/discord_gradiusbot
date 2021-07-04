@@ -62,4 +62,14 @@ def render_inventory_view(user_id, target_page=0):
 
 async def render_item_view(interaction):
     item_instance = ItemInstance().get_item_instance(interaction.data['custom_id'])
-    print(item_instance.system_name)
+    view = discord.ui.View()
+    embed = discord.Embed(title=f'**{item_instance.item.name}**', description=f'{item_instance.item.description}')
+    embed.set_thumbnail(url="https://media.discordapp.net/attachments/413480748109004800/861111966175854622/box.png")
+
+    button = discord.ui.Button(custom_id=f"use", label="Use", style=discord.ButtonStyle.green, emoji='✔️')
+    view.add_item(button)
+    button = discord.ui.Button(custom_id=f"close_0", label="Back", style=discord.ButtonStyle.grey, disabled=False, emoji='👈')
+    button.callback = update_inventory_view
+    view.add_item(button)
+
+    await interaction.response.edit_message(content="", view=view, embed=embed)
