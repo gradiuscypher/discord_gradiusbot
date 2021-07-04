@@ -15,3 +15,4 @@ A branch where strange things can happen and we play with very weird code.
 * /inventory should have a filter argument to only show specific items
 * script for filling the DB with test data and multiple test items
 * should figure out what this is useful for: https://discordpy.readthedocs.io/en/master/api.html#discord.Client.add_view
+* Players houses are channels that they can set up with their own items and layouts, represented by buttons. Other players can visit those houses.

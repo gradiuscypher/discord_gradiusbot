@@ -2,6 +2,7 @@ import discord
 import logging
 import traceback
 from discord.components import Button
+import libs.scripts.items
 
 from discord.ui import view
 from libs.db.inventory import ItemManager, ItemInstance
@@ -12,7 +13,7 @@ logger = logging.getLogger("gradiusbot")
 def split_to_pages(item_list, page_size=20):
     return [item_list[i:i+page_size] for i in range(0, len(item_list), page_size)]
 
-def paged_button_view(item_list, page_size=1, target_page=0, button_length=30):
+def paged_button_view(item_list, page_size=20, target_page=0, button_length=30):
     view = discord.ui.View()
     paginated_list = split_to_pages(item_list, page_size=page_size)
 
@@ -66,10 +67,21 @@ async def render_item_view(interaction):
     embed = discord.Embed(title=f'**{item_instance.item.name}**', description=f'{item_instance.item.description}')
     embed.set_thumbnail(url="https://media.discordapp.net/attachments/413480748109004800/861111966175854622/box.png")
 
-    button = discord.ui.Button(custom_id=f"use", label="Use", style=discord.ButtonStyle.green, emoji='✔️')
-    view.add_item(button)
+    if item_instance.item.usable:
+        button = discord.ui.Button(custom_id=interaction.data['custom_id'], label="Use", style=discord.ButtonStyle.green, emoji='✔️')
+        button.callback = run_item_script
+        view.add_item(button)
+
     button = discord.ui.Button(custom_id=f"close_0", label="Back", style=discord.ButtonStyle.grey, disabled=False, emoji='👈')
     button.callback = update_inventory_view
     view.add_item(button)
 
     await interaction.response.edit_message(content="", view=view, embed=embed)
+
+
+async def run_item_script(interaction):
+    target_item = ItemInstance().get_item_instance(interaction.data['custom_id'])
+    
+    if target_item.item.usable:
+        method = getattr(libs.scripts.items, target_item.item.script)
+        await method(attr_1="Attr1", attr_2=2, interaction=interaction)
