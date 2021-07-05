@@ -33,5 +33,16 @@
         {
         }
       ]
+    },
+    {
+      "system_name": "FIREWORK",
+      "name": "Illegal Fireworks",
+      "description": "When used, has a small chance to send an @everyone, @here, or a role ping.",
+      "script": "fireworks",
+      "usable": true,
+      "attributes": [
+        {
+        }
+      ]
     }
 ]

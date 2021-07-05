@@ -84,4 +84,4 @@ async def run_item_script(interaction):
     
     if target_item.item.usable:
         method = getattr(libs.scripts.items, target_item.item.script)
-        await method(attr_1="Attr1", attr_2=2, interaction=interaction)
+        await method(interaction=interaction)
