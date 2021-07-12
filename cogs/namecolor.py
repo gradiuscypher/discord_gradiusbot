@@ -15,7 +15,7 @@ class ButtonBuilder(commands.Cog):
     
     @commands.Cog.listener()
     async def on_interaction(self, interaction):
-        if interaction.data['name'] == 'namecolor':
+        if interaction.type == discord.InteractionType.application_command and interaction.data['name'] == 'namecolor':
             if interaction.data['options'][0]['name'] == 'add':
                 if 'resolved' in interaction.data.keys():
                     for role_id in interaction.data['resolved']['roles']:
