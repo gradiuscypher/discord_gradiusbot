@@ -75,6 +75,7 @@ class RoleSelectorSelect(Select['RoleSelectorView']):
 class RoleSelectorView(View):
     def __init__(self, target_roles, user_roles, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.timeout = 300
         
         # create the option list from roles in the server that start with .
         option_list = []
