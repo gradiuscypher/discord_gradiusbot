@@ -22,6 +22,9 @@ class RoleSelectorButton(Button['RoleSelectorView']):
         added_roles = []
         removed_roles = []
 
+        # TODO: add some sort of waiting animation
+        await interaction.response.defer(ephemeral=True)
+
         try:
             # add selected roles
             for role_id in selected_values:
@@ -53,15 +56,16 @@ class RoleSelectorButton(Button['RoleSelectorView']):
                     role_name = f"{role.name.replace('.', '')}"
                     role_string += role_name + '\n'
                 embed_message.add_field(name='Disabled Roles', value=role_string)
-            
-            await interaction.response.edit_message(embed=embed_message, view=None, content='**Role Manager**')
+
+            # TODO: need to get message ID and do a followup.edit to edit the webhook
+            await interaction.followup.send(embed=embed_message, view=None, content='**Role Manager**', ephemeral=True)
 
         except:
             logger.error(traceback.format_exc())
 
             # report fail
             embed_message = Embed(color=Color.red(), title='Unable to modify your roles', description='Please let gradius know something broke with the Role Selector')
-            await interaction.response.edit_message(embed=embed_message, view=None, content='**Role Manager**')
+            await interaction.followup.send(embed=embed_message, view=None, content='**Role Manager**', ephemeral=True)
 
 
 class RoleSelectorSelect(Select['RoleSelectorView']):
@@ -75,7 +79,7 @@ class RoleSelectorSelect(Select['RoleSelectorView']):
 class RoleSelectorView(View):
     def __init__(self, target_roles, user_roles, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.timeout = 300
+        self.timeout = None
         
         # create the option list from roles in the server that start with .
         option_list = []
@@ -99,7 +103,6 @@ class RoleSelector(commands.Cog):
         if interaction.type == discord.InteractionType.application_command and interaction.data['name'] == 'roles':
             view = RoleSelectorView(interaction.guild.roles, interaction.user.roles)
             await interaction.response.send_message("**Role Manager**", view=view, ephemeral=True)
-            await view.wait()
 
 
 def setup(bot):
