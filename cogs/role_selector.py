@@ -53,7 +53,7 @@ class RoleSelectorButton(Button['RoleSelectorView']):
                     role_name = f"{role.name.replace('.', '')}"
                     role_string += role_name + '\n'
                 embed_message.add_field(name='Disabled Roles', value=role_string)
-
+            
             await interaction.response.edit_message(embed=embed_message, view=None, content='**Role Manager**')
 
         except:
@@ -97,7 +97,9 @@ class RoleSelector(commands.Cog):
     @commands.Cog.listener()
     async def on_interaction(self, interaction):
         if interaction.type == discord.InteractionType.application_command and interaction.data['name'] == 'roles':
-            await interaction.response.send_message("**Role Manager**", view=RoleSelectorView(interaction.guild.roles, interaction.user.roles), ephemeral=True)
+            view = RoleSelectorView(interaction.guild.roles, interaction.user.roles)
+            await interaction.response.send_message("**Role Manager**", view=view, ephemeral=True)
+            await view.wait()
 
 
 def setup(bot):
