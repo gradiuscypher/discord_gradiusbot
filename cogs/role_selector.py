@@ -23,7 +23,6 @@ class RoleSelectorButton(Button['RoleSelectorView']):
         added_roles = []
         removed_roles = []
 
-        # TODO: add some sort of waiting animation
         thinking_embed = Embed(color=Color.yellow(), title="Thinking...", description="Currently processing your request. Please hold tight!")
         thinking_embed.set_image(url='https://cdn.discordapp.com/attachments/173494195728809985/864356454168133632/thinking_sloth.gif')
         thinking_embed.set_footer(text="This could take a little while, there might be a lot of roles...")
