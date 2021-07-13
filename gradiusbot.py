@@ -8,10 +8,9 @@ ref: https://github.com/Rapptz/discord.py/blob/v1.7.2/examples/basic_bot.py
 """
 
 import discord
-import json
 import logging
-from configparser import RawConfigParser
 from discord.ext import commands
+from config import token, cogs
 
 # Setup Logging
 logger = logging.getLogger('gradiusbot')
@@ -31,12 +30,6 @@ logger.addHandler(ch)
 # setup intents
 intents = discord.Intents.all()
 
-# setup the config
-config = RawConfigParser()
-config.read('config.conf')
-token = config.get('discord', 'token')
-cog_list = json.loads(config.get('discord', 'cogs'))
-
 
 # run the bot
 if __name__ == '__main__':
@@ -46,7 +39,7 @@ if __name__ == '__main__':
     async def on_ready():
         print(f"Logged in as <{bot.user.id}> {bot.user.name}")
 
-    for cog_name in cog_list:
+    for cog_name in cogs:
         bot.load_extension('cogs.' + cog_name)
         print(f"Loading {cog_name}")
     bot.run(token)

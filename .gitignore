@@ -2,9 +2,6 @@
 .idea/
 .vscode/
 venv3/
-venv/
-services/
-images/
 *.conf
 *.db
 *.db-journal
@@ -14,12 +11,8 @@ images/
 *.pickle
 roles.json
 gradiusbot.json
-gapps-auth.json
-token.json
 namecolors.json
-roles_msg_id.tmp
-pilots.csv
-gcloud.json
+config.py
 
 #Gradius Wants
 !item_definitions.sqlite

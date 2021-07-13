@@ -1,7 +1,7 @@
-from os import remove
 import discord.utils
 import logging
 import traceback
+from config import role_metadata
 from discord import Interaction, SelectOption, ButtonStyle, Embed, Color
 from discord.ext import commands
 from discord.ui import Button, Select, View
@@ -15,6 +15,7 @@ class RoleSelectorButton(Button['RoleSelectorView']):
         super().__init__(*args, **kwargs)
 
     async def callback(self, interaction: Interaction):
+        await interaction.response.defer(ephemeral=True)
         select_menu = discord.utils.get(self.view.children, custom_id='select_menu')
         selected_values = [int(option) for option in select_menu.values]
         # TODO: I wonder if this could be done more efficently with python sets
@@ -23,7 +24,10 @@ class RoleSelectorButton(Button['RoleSelectorView']):
         removed_roles = []
 
         # TODO: add some sort of waiting animation
-        await interaction.response.defer(ephemeral=True)
+        thinking_embed = Embed(color=Color.yellow(), title="Thinking...", description="Currently processing your request. Please hold tight!")
+        thinking_embed.set_image(url='https://cdn.discordapp.com/attachments/173494195728809985/864356454168133632/thinking_sloth.gif')
+        thinking_embed.set_footer(text="This could take a little while, there might be a lot of roles...")
+        await interaction.edit_original_message(embed=thinking_embed, view=None)
 
         try:
             # add selected roles
@@ -42,30 +46,31 @@ class RoleSelectorButton(Button['RoleSelectorView']):
             
             # report success
             embed_message = Embed(color=Color.green(), title='Successfully modified your roles')
+            embed_message.set_image(url="https://cdn.discordapp.com/attachments/173494195728809985/864359712244891678/dreams.gif")
 
             if len(added_roles) > 0:
                 role_string = ''
                 for role in added_roles:
                     role_name = f"{role.name.replace('.', '')}"
                     role_string += role_name + '\n'
-                embed_message.add_field(name='Enabled Roles', value=role_string)
+                embed_message.add_field(name='== Enabled Roles ==', value=role_string)
 
             if len(removed_roles) > 0:
                 role_string = ''
                 for role in removed_roles:
                     role_name = f"{role.name.replace('.', '')}"
                     role_string += role_name + '\n'
-                embed_message.add_field(name='Disabled Roles', value=role_string)
+                embed_message.add_field(name='== Disabled Roles ==', value=role_string)
 
             # TODO: need to get message ID and do a followup.edit to edit the webhook
-            await interaction.followup.send(embed=embed_message, view=None, content='**Role Manager**', ephemeral=True)
+            await interaction.edit_original_message(embed=embed_message, view=None, content='**Role Manager**')
 
         except:
             logger.error(traceback.format_exc())
 
             # report fail
             embed_message = Embed(color=Color.red(), title='Unable to modify your roles', description='Please let gradius know something broke with the Role Selector')
-            await interaction.followup.send(embed=embed_message, view=None, content='**Role Manager**', ephemeral=True)
+            await interaction.edit_original_message(embed=embed_message, view=None, content='**Role Manager**')
 
 
 class RoleSelectorSelect(Select['RoleSelectorView']):
@@ -86,7 +91,9 @@ class RoleSelectorView(View):
         for role in target_roles:
             if role.name.startswith('.'):
                 role_name = f'{role.name.replace(".", "")}'
-                option_list.append(SelectOption(label=role_name, value=role.id, default=role in user_roles, description="Pingable by anyone" if role.mentionable else "Can't be pinged"))
+                description_string = ("[Pingable] " if role.mentionable else "")
+                description_string += role_metadata[role_name.lower()] if role_name.lower() in role_metadata.keys() else ""
+                option_list.append(SelectOption(label=role_name, value=role.id, default=role in user_roles, description=description_string))
         self.selector = RoleSelectorSelect(options=option_list)
         self.add_item(self.selector)
 
