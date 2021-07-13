@@ -62,7 +62,6 @@ class RoleSelectorButton(Button['RoleSelectorView']):
                     role_string += role_name + '\n'
                 embed_message.add_field(name='== Disabled Roles ==', value=role_string)
 
-            # TODO: need to get message ID and do a followup.edit to edit the webhook
             await interaction.edit_original_message(embed=embed_message, view=None, content='**Role Manager**')
 
         except:
