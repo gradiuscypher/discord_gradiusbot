@@ -46,7 +46,6 @@ class RoleCta(commands.Cog):
                 if os.path.exists('role_cta.pickle'):
                     with open('role_cta.pickle', 'rb') as role_pickle:
                         role_cta_list = pickle.load(role_pickle)
-                        print("before", role_cta_list)
                         role_cta_list.append(role_id)
                     with open('role_cta.pickle', 'wb') as role_pickle:
                         pickle.dump(role_cta_list, role_pickle)
