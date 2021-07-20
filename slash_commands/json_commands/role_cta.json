@@ -1,0 +1,13 @@
+{
+    "name": "cta",
+    "description": "Generate a role call to action button for the user to click so they can join.",
+    "default_permission": false,
+    "options": [
+        {
+            "name": "role",
+            "description": "The role to prompt to join in the CTA",
+            "type": 8,
+            "required": true
+        }
+    ]
+}

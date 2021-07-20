@@ -10,6 +10,7 @@ global_url = "https://discord.com/api/v8/applications/{application_id}/commands"
 guild_url = "https://discord.com/api/v8/applications/{application_id}/guilds/{guild_id}/commands"
 global_command_url = "https://discord.com/api/v8/applications/{application_id}/commands/{command_id}"
 guild_command_url = "https://discord.com/api/v8/applications/{application_id}/guilds/{guild_id}/commands/{command_id}"
+permission_url = "https://discord.com/api/v8/applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions"
 
 
 @click.group()
@@ -100,6 +101,27 @@ def patch(application_id, command_id, bot_token, command_file, guild_id=None):
                 url = global_command_url.format(application_id=application_id, command_id=command_id, guild_id=guild_id)
 
             r = requests.patch(url, headers=headers, json=json.loads(command_json.read()))
+            print(r.status_code)
+            pprint(r.json())
+        except:
+            print(traceback.format_exc())
+
+
+# ref: https://discord.com/developers/docs/interactions/slash-commands#get-guild-application-command-permissions
+@cli.command()
+@click.argument("guild_id", type=click.INT)
+@click.argument("application_id", type=click.INT)
+@click.argument("command_id", type=click.INT)
+@click.argument("bot_token", type=click.STRING)
+@click.argument("permission_file", type=click.STRING)
+def permission(guild_id, application_id, command_id, bot_token, permission_file):
+    with open(f'json_permissions/{permission_file}', 'r') as command_json:
+        headers = {
+            "Authorization": f"Bot {bot_token}"
+        }
+        try:
+            url = permission_url.format(application_id=application_id, command_id=command_id, guild_id=guild_id)
+            r = requests.put(url, headers=headers, json=json.loads(command_json.read()))
             print(r.status_code)
             pprint(r.json())
         except:
