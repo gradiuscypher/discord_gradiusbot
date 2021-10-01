@@ -15,7 +15,7 @@ RUN apt update && apt install -y git
 ADD . /discord_gradiusbot
 
 # Set the working directory
-WORKDIR discord_gradiusbot
+WORKDIR /discord_gradiusbot
 
 # touch the logfile so we can mount it
 RUN touch /discord_gradiusbot/gradiusbot.log
@@ -26,4 +26,4 @@ RUN pip install git+https://github.com/Rapptz/discord.py.git@master
 RUN pip install -r requirements.txt
 
 # Run gradiusbot.py with the config file passed as a volume
-CMD ["python", "gradiusbot.py", "config.conf"]
+CMD ["python", "gradiusbot.py"]

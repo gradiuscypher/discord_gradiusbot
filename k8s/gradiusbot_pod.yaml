@@ -1,0 +1,16 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: gradiusbot-rnd
+spec:
+  containers:
+    - name: gradiusbot-rnd
+      image: gradiusbot-rnd
+      volumeMounts:
+        - name: config-vol
+          mountPath: /discord_gradiusbot
+  restartPolicy: Never
+  volumes:
+    - name: config-vol
+      configMap:
+        name: gradiusbot-rnd

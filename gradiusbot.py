@@ -8,11 +8,11 @@ ref: https://github.com/Rapptz/discord.py/blob/v1.7.2/examples/basic_bot.py
 """
 
 import discord
+import json
 import logging
 import os.path
 import pickle
 from discord.ext import commands
-from config import token, cogs
 from cogs.role_cta_button import RoleCtaView
 
 # Setup Logging
@@ -33,6 +33,12 @@ logger.addHandler(ch)
 # setup intents
 intents = discord.Intents.all()
 
+# load the config json
+with open('config.json') as conf_file:
+    conf_json = json.loads(conf_file.read())
+
+cogs = conf_json['cogs']
+token = conf_json['token']
 
 # run the bot
 if __name__ == '__main__':

@@ -13,6 +13,8 @@ roles.json
 gradiusbot.json
 namecolors.json
 config.py
+configmap.yaml
+config.json
 
 #Gradius Wants
 !item_definitions.sqlite
