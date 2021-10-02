@@ -5,10 +5,13 @@ metadata:
 spec:
   containers:
     - name: gradiusbot-rnd
-      image: gradiusbot-rnd
+      image: gradiuscypher/gradiusbot-rnd:arm64
+      imagePullPolicy: Always
       volumeMounts:
         - name: config-vol
-          mountPath: /discord_gradiusbot
+          mountPath: /discord_gradiusbot/conf
+  imagePullSecrets:
+    - name: regcred
   restartPolicy: Never
   volumes:
     - name: config-vol

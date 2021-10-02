@@ -12,7 +12,11 @@ RUN apt update && apt install -y git
 # RUN git clone --branch master --single-branch https://github.com/gradiuscypher/discord_gradiusbot.git --depth=1
 
 # Copy the local files to the app directory
-ADD . /discord_gradiusbot
+COPY cogs /discord_gradiusbot/cogs
+COPY libs /discord_gradiusbot/libs
+COPY slash_commands /discord_gradiusbot/slash_commands
+COPY gradiusbot.py /discord_gradiusbot
+COPY requirements.txt /discord_gradiusbot
 
 # Set the working directory
 WORKDIR /discord_gradiusbot

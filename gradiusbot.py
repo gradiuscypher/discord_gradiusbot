@@ -34,7 +34,7 @@ logger.addHandler(ch)
 intents = discord.Intents.all()
 
 # load the config json
-with open('config.json') as conf_file:
+with open('conf/config.json') as conf_file:
     conf_json = json.loads(conf_file.read())
 
 cogs = conf_json['cogs']
