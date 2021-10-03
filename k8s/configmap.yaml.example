@@ -1,0 +1,12 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: gradiusbot-rnd
+data:
+  config.json: |
+    {
+      "token": "",
+      "cogs": [
+        "echo"
+      ]
+    }
