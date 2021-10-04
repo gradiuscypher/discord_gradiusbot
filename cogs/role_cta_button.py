@@ -43,16 +43,16 @@ class RoleCta(commands.Cog):
 
             if target_role.name.startswith('.'):
                 # check if our pickle of role cta exists
-                if os.path.exists('role_cta.pickle'):
-                    with open('role_cta.pickle', 'rb') as role_pickle:
+                if os.path.exists('persist/role_cta.pickle'):
+                    with open('persist/role_cta.pickle', 'rb') as role_pickle:
                         role_cta_list = pickle.load(role_pickle)
                         role_cta_list.append(role_id)
-                    with open('role_cta.pickle', 'wb') as role_pickle:
+                    with open('persist/role_cta.pickle', 'wb') as role_pickle:
                         pickle.dump(role_cta_list, role_pickle)
 
                 # if not, create it and add to it
                 else:
-                    with open('role_cta.pickle', 'wb') as role_pickle:
+                    with open('persist/role_cta.pickle', 'wb') as role_pickle:
                         role_cta_list = [role_id]
                         pickle.dump(role_cta_list, role_pickle)
 

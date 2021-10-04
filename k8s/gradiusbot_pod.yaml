@@ -1,3 +1,4 @@
+---
 kind: Pod
 apiVersion: v1
 metadata:
@@ -10,6 +11,8 @@ spec:
       volumeMounts:
         - name: config-vol
           mountPath: /discord_gradiusbot/conf
+        - name: persist
+          mountPath: /discord_gradiusbot/persist
   imagePullSecrets:
     - name: regcred
   restartPolicy: Never
@@ -17,3 +20,6 @@ spec:
     - name: config-vol
       configMap:
         name: gradiusbot-rnd
+    - name: persist
+      persistentVolumeClaim:
+        claimName: gradiusbot-persist

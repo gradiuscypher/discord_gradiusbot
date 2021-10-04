@@ -6,7 +6,7 @@ from discord import Interaction, SelectOption, ButtonStyle, Embed, Color
 from discord.ext import commands
 from discord.ui import Button, Select, View
 
-with open('config.json') as json_file:
+with open('conf/config.json') as json_file:
     json_config = json.loads(json_file.read())
 
 logger = logging.getLogger("gradiusbot")
