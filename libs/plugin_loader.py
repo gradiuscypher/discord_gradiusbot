@@ -1,5 +1,4 @@
 import os
-import json
 import logging
 from importlib import import_module
 
@@ -47,19 +46,19 @@ class PluginLoader:
 
     def load_plugins(self, config):
         self.config = config
-        self.public_plugin_config = json.loads(self.config.get('gradiusbot', 'public_plugins'))
-        self.private_plugin_config = json.loads(self.config.get('gradiusbot', 'private_plugins'))
-        self.scheduled_tasks_config = json.loads(self.config.get('gradiusbot', 'scheduled_tasks'))
+        self.public_plugin_config = config['public_plugins']
+        self.private_plugin_config = config['private_plugins']
+        self.scheduled_tasks_config = config['scheduled_tasks']
 
         # Event Plugin Config
-        self.message_event_plugin_config = json.loads(self.config.get('gradiusbot', 'event_plugins.messages'))
-        self.reaction_event_plugin_config = json.loads(self.config.get('gradiusbot', 'event_plugins.reactions'))
-        self.private_event_plugin_config = json.loads(self.config.get('gradiusbot', 'event_plugins.private'))
-        self.guild_event_plugin_config = json.loads(self.config.get('gradiusbot', 'event_plugins.guild'))
-        self.member_event_plugin_config = json.loads(self.config.get('gradiusbot', 'event_plugins.member'))
-        self.client_event_plugin_config = json.loads(self.config.get('gradiusbot', 'event_plugins.client'))
-        self.relationships_event_plugin_config = json.loads(self.config.get('gradiusbot', 'event_plugins.relationships'))
-        self.group_event_plugin_config = json.loads(self.config.get('gradiusbot', 'event_plugins.group'))
+        self.message_event_plugin_config = config['event_plugins']['messages']
+        self.reaction_event_plugin_config = config['event_plugins']['reactions']
+        self.private_event_plugin_config = config['event_plugins']['private']
+        self.guild_event_plugin_config = config['event_plugins']['guild']
+        self.member_event_plugin_config = config['event_plugins']['member']
+        self.client_event_plugin_config = config['event_plugins']['client']
+        self.relationships_event_plugin_config = config['event_plugins']['relationships']
+        self.group_event_plugin_config = config['event_plugins']['group']
 
         # Load public plugins
         count = 0

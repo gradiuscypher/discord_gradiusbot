@@ -15,10 +15,16 @@ RUN apt update && apt install -y git
 # RUN git clone --branch master --single-branch https://github.com/gradiuscypher/discord_gradiusbot.git --depth=1
 
 # Copy the local files to the app directory
-ADD . /discord_gradiusbot
+COPY event_plugins/ /discord_gradiusbot/private_plugins
+COPY libs/ /discord_gradiusbot/libs
+COPY private_plugins/ /discord_gradiusbot/private_plugins
+COPY public_plugins/ /discord_gradiusbot/public_plugins
+COPY scheduled_tasks/ /discord_gradiusbot/scheduled_tasks
+COPY gradiusbot.py /discord_gradiusbot/gradiusbot.py
+COPY requirements.txt /discord_gradiusbot/requirements.txt
 
 # Set the working directory
-WORKDIR discord_gradiusbot
+WORKDIR /discord_gradiusbot
 
 # touch the logfile so we can mount it
 RUN touch /discord_gradiusbot/gradiusbot.json
