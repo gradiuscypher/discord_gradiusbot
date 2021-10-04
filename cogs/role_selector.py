@@ -1,11 +1,13 @@
 import discord.utils
+import json
 import logging
 import traceback
-from config import role_metadata
 from discord import Interaction, SelectOption, ButtonStyle, Embed, Color
 from discord.ext import commands
 from discord.ui import Button, Select, View
 
+with open('config.json') as json_file:
+    json_config = json.loads(json_file.read())
 
 logger = logging.getLogger("gradiusbot")
 
@@ -90,7 +92,7 @@ class RoleSelectorView(View):
             if role.name.startswith('.'):
                 role_name = f'{role.name.replace(".", "")}'
                 description_string = ("[Pingable] " if role.mentionable else "")
-                description_string += role_metadata[role_name.lower()] if role_name.lower() in role_metadata.keys() else ""
+                description_string += json_config['role_metadata'][role_name.lower()] if role_name.lower() in json_config['role_metadata'].keys() else ""
                 option_list.append(SelectOption(label=role_name, value=role.id, default=role in user_roles, description=description_string))
         self.selector = RoleSelectorSelect(options=option_list)
         self.add_item(self.selector)
