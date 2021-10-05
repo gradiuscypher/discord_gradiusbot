@@ -11,6 +11,7 @@ images/
 *.sqlite
 *.log
 *.pickle
+*configmap.yaml
 roles.json
 gradiusbot.json
 gapps-auth.json

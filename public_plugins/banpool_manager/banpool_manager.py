@@ -1,5 +1,6 @@
 import asyncio
 import discord
+import json
 import logging
 import re
 import traceback
@@ -63,10 +64,16 @@ def chunks(l, n):
     for i in range(0, len(l), n):
         yield l[i:i + n]
 
+# Setup Config
+try:
+    with open('conf/config.json') as json_file:
+        config_json = json.loads(json_file.read())
+except:
+    print(traceback.format_exc())
+
 
 async def action(**kwargs):
     message = kwargs['message']
-    config = kwargs['config']
     client = kwargs['client']
 
     """
@@ -88,11 +95,11 @@ async def action(**kwargs):
     """
 
     # get config values
-    admin_server_id = config.getint('banpool', 'admin_server_id')
-    admin_group = config.get('banpool', 'admin_group')
-    admin_chan = config.get('banpool', 'admin_chan')
-    community_server_id = config.getint('banpool', 'community_server_id')
-    community_server_chan_id = config.getint('banpool', 'community_server_chan_id')
+    admin_server_id = config_json['banpool']['admin_server_id']
+    admin_group = config_json['banpool']['admin_group']
+    admin_chan = config_json['banpool']['admin_chan']
+    community_server_id = config_json['banpool']['community_server_id']
+    community_server_chan_id = config_json['banpool']['community_server_chan_id']
 
     server_id = message.guild.id
     source_chan = message.channel.name

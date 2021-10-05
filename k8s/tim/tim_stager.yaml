@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tim-stager
+  namespace: default
+spec:
+  containers:
+  - name: tim-stager
+    image: nginx
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+    - name: config-vol
+      mountPath: /discord_gradiusbot/conf
+    - name: tim-vol
+      mountPath: /discord_gradiusbot/persist
+    ports:
+    - containerPort: 80
+  volumes:
+  - name: tim-vol
+    persistentVolumeClaim:
+      claimName: tim-persist
+  - name: config-vol
+    configMap:
+      name: tim-configmap

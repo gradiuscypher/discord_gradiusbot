@@ -1,5 +1,6 @@
 import asyncio
 import discord
+import json
 import logging
 import traceback
 from discord import Embed, Color
@@ -15,17 +16,23 @@ logger.setLevel(logging.DEBUG)
 
 logger.info("[Event Plugin] <banpool_events.py>: This plugin manages banpool related events.")
 
+# Setup Config
+try:
+    with open('conf/config.json') as json_file:
+        config_json = json.loads(json_file.read())
+except:
+    print(traceback.format_exc())
+
 
 @asyncio.coroutine
 async def action(**kwargs):
     event_type = kwargs['event_type']
-    config = kwargs['config']
     client = kwargs['client']
 
     if event_type == 'member.unban':
         # Grab configuration values
-        admin_server_id = config.getint('banpool', 'admin_server_id')
-        admin_chan_name = config.get('banpool', 'admin_chan')
+        admin_server_id = config_json['banpool']['admin_server_id']
+        admin_chan_name = config_json['banpool']['admin_chan']
         admin_server = discord.utils.get(client.guilds, id=admin_server_id)
         admin_chan = discord.utils.get(admin_server.channels, name=admin_chan_name)
 
@@ -63,8 +70,8 @@ async def action(**kwargs):
 
     if event_type == 'member.join':
         # Grab configuration values
-        admin_server_id = config.getint('banpool', 'admin_server_id')
-        admin_chan_name = config.get('banpool', 'admin_chan')
+        admin_server_id = config_json['banpool']['admin_server_id']
+        admin_chan_name = config_json['banpool']['admin_chan']
 
         admin_server = discord.utils.get(client.guilds, id=admin_server_id)
         admin_chan = discord.utils.get(admin_server.channels, name=admin_chan_name)

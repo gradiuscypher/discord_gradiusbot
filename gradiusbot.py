@@ -10,7 +10,7 @@ from asyncio import ensure_future
 
 # Setup Config
 try:
-    with open('config.json') as json_file:
+    with open('conf/config.json') as json_file:
         config_json = json.loads(json_file.read())
 except:
     print(traceback.format_exc())

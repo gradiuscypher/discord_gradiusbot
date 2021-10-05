@@ -1,5 +1,6 @@
 import asyncio
 import discord
+import json
 import logging
 import traceback
 from concurrent.futures import CancelledError
@@ -17,12 +18,18 @@ logger.setLevel(logging.DEBUG)
 
 logger.info("[Scheduled Task] <banpool_tasks.py>: Scheduled tasks for the banpool.")
 
+# Setup Config
+try:
+    with open('conf/config.json') as json_file:
+        config_json = json.loads(json_file.read())
+except:
+    print(traceback.format_exc())
 
 async def action(client, config):
-    admin_server_id = config.getint('banpool', 'admin_server_id')
-    admin_chan_name = config.get('banpool', 'admin_chan')
-    task_length = config.getint('banpool', 'task_length')
-    mute_alerts = config.getboolean('banpool', 'mute_alerts')
+    admin_server_id = config_json['banpool']['admin_server_id']
+    admin_chan_name = config_json['banpool']['admin_chan']
+    task_length = config_json['banpool']['task_length']
+    mute_alerts = config_json['banpool']['mute_alerts']
 
     @loop(seconds=task_length)
     async def banpool_tasks():
