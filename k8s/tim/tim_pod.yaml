@@ -6,7 +6,7 @@ metadata:
 spec:
   containers:
     - name: tim
-      image: gradiuscypher/tim:arm64
+      image: gradiuscypher/tim:test
       imagePullPolicy: Always
       volumeMounts:
         - name: config-vol

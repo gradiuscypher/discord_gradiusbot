@@ -3,7 +3,7 @@
 # docker run -d -it --name gradiusbot -v "$(pwd)"/config.conf:/discord_gradiusbot/botconfig.conf gradiusbot
 
 # Set the base image to Python3 
-FROM python:latest
+FROM python:3.8-bullseye
 
 # File author
 MAINTAINER gradiuscypher
