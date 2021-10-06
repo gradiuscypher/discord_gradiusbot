@@ -48,8 +48,13 @@ async def action(**kwargs):
     split_content = message.content.split()
 
     if guild_admin_role_id:
-        if utils.get(message.author.roles, id=guild_admin_role_id):
-            is_admin_role = True
+        try:
+            if utils.get(message.author.roles, id=guild_admin_role_id):
+                is_admin_role = True
+        except:
+            logger.debug(f"BANPOOL_CONFIG DEBUG: guild.name:{message.guild.name} guild.id: {message.guild.id} author.name:{message.author.name} message.channel.name: {message.channel.name} message.author.id:{message.author.id} message.content:{message.content}")
+            print(traceback.format_exc())
+
 
     if len(split_content) > 0 and split_content[0] == '!bpc':
         if message.channel.permissions_for(message.author).administrator or is_admin_role:
