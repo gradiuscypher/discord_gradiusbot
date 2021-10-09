@@ -15,7 +15,7 @@ spec:
           mountPath: /discord_gradiusbot/persist
   imagePullSecrets:
     - name: regcred
-  restartPolicy: Never
+  restartPolicy: Always
   volumes:
     - name: config-vol
       configMap:
