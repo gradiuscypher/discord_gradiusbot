@@ -19,7 +19,7 @@ html5lib==1.1
 idna==2.10
 idna-ssl==1.1.0
 ipaddr==2.2.0
-ipython==7.28.0
+ipython==7.31.1
 ipython-genutils==0.2.0
 jedi==0.18.0
 libcst==0.3.12
