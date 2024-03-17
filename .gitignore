@@ -1,9 +1,9 @@
 #Gradius Ignores
+.env
+.venv/
 .idea/
-venv3/
-venv/
-services/
-images/
+.vscode/
+.ruff_cache/
 *.conf
 *.db
 *.db-journal
@@ -12,17 +12,6 @@ images/
 *.log
 *.pickle
 *configmap.yaml
-roles.json
-gradiusbot.json
-gapps-auth.json
-token.json
-namecolors.json
-roles_msg_id.tmp
-pilots.csv
-gcloud.json
-config.json
-config.py
-configmap.yaml
 
 #Gradius Wants
 !item_definitions.sqlite
