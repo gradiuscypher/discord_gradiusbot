@@ -30,7 +30,6 @@ async def on_ready():
 
 @bot.event
 async def on_message(message: discord.Message):
-    print(loaded_modules)
     if message.author != bot.user:
         if isinstance(message.channel, TextChannel):
             await MessageRouter.route(loaded_modules, MessageType.message, message)

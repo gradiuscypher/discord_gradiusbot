@@ -14,12 +14,12 @@ someone_id = os.getenv("SOMEONE_ID", None)
 async def lol(message: Message):
     if (
         message.content in ["lol", "lol.", "lmao", "lmao."]
-        and random.randint(0, 100) >= 95
+        and random.randint(0, 100) >= 99
     ):
         await message.channel.send("lol")
 
 
 @MessageRouter("memes", MessageType.message)
 async def someone(message: Message):
-    if "someone" in message.content and random.randint(0, 100) >= 90 and someone_id:
+    if "someone" in message.content and random.randint(0, 100) >= 95 and someone_id:
         await message.reply(f"<@{someone_id}> is this true?")
