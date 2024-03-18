@@ -39,11 +39,5 @@ async def on_message(message: discord.Message):
             await MessageRouter.route(loaded_modules, MessageType.dm, message)
 
 
-@bot.slash_command(name="enable", description="Enable things")
-async def enable(ctx):
-    loaded_modules.append("examples")
-    await ctx.respond("Enabled!")
-
-
 if __name__ == "__main__":
     bot.run(os.getenv("TOKEN"))  # run the bot with the token
