@@ -1,5 +1,6 @@
 #!.venv/bin/python3 gradiusbot.py
 
+import json
 import os
 
 import discord
@@ -9,10 +10,17 @@ from dotenv import load_dotenv
 from libs.router import MessageRouter, MessageType
 
 # import various routes to use their decorators
-from libs.routes import message_routes  # noqa
+from libs.routes import examples, memes  # noqa
 
 load_dotenv()  # load all the variables from the env file
 bot = discord.Bot(intents=discord.Intents.all())
+
+# load enabled modules
+loaded_modules = os.getenv("LOADED_MODULES")
+if loaded_modules:
+    loaded_modules = json.loads(loaded_modules)
+else:
+    loaded_modules = ["core"]
 
 
 @bot.event
@@ -22,16 +30,19 @@ async def on_ready():
 
 @bot.event
 async def on_message(message: discord.Message):
-    if isinstance(message.channel, TextChannel):
-        await MessageRouter.route(MessageType.message, message)
+    print(loaded_modules)
+    if message.author != bot.user:
+        if isinstance(message.channel, TextChannel):
+            await MessageRouter.route(loaded_modules, MessageType.message, message)
 
-    elif isinstance(message.channel, DMChannel):
-        await MessageRouter.route(MessageType.dm, message)
+        elif isinstance(message.channel, DMChannel):
+            await MessageRouter.route(loaded_modules, MessageType.dm, message)
 
 
-@bot.slash_command(name="hello", description="Say hello to the bot")
-async def hello(ctx):
-    await ctx.respond("Hey!")
+@bot.slash_command(name="enable", description="Enable things")
+async def enable(ctx):
+    loaded_modules.append("examples")
+    await ctx.respond("Enabled!")
 
 
 if __name__ == "__main__":
