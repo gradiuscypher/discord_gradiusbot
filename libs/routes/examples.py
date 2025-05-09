@@ -22,3 +22,11 @@ async def dm_test_one(message: Message):
 @MessageRouter("examples", MessageType.dm)
 async def dm_test_two(message: Message):
     print(f"dm_test_two: {message.content}")
+
+
+@MessageRouter("example2", MessageType.message)
+async def example_names(message: Message):
+    """
+    This module shows that you can have multiple modules with different names in the same file.
+    """
+    print(f"Example2 Module: {message.content}")

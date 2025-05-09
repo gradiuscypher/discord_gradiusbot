@@ -1,4 +1,4 @@
-#!.venv/bin/python3 gradiusbot.py
+#!/usr/bin/env python3
 
 import json
 import os
@@ -13,15 +13,14 @@ from libs.router import MessageRouter, MessageType
 from libs.routes import examples, memes  # noqa
 
 load_dotenv()  # load all the variables from the env file
-bot = discord.Bot(intents=discord.Intents.all())
+bot = discord.Client(intents=discord.Intents.all())
 
 # load enabled modules
-loaded_modules = os.getenv("LOADED_MODULES")
-if loaded_modules:
-    loaded_modules = json.loads(loaded_modules)
-else:
-    loaded_modules = ["core"]
+module_env = os.getenv("LOADED_MODULES")
+loaded_modules = ["core"]
 
+if module_env:
+    loaded_modules = json.loads(module_env)
 
 @bot.event
 async def on_ready():
@@ -39,4 +38,9 @@ async def on_message(message: discord.Message):
 
 
 if __name__ == "__main__":
-    bot.run(os.getenv("TOKEN"))  # run the bot with the token
+    token = os.getenv("TOKEN")
+
+    if token:
+        bot.run(token)  # run the bot with the token
+    else:
+        raise ValueError("TOKEN is not set")

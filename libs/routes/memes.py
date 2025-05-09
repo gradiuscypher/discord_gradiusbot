@@ -21,5 +21,5 @@ async def lol(message: Message):
 
 @MessageRouter("memes", MessageType.message)
 async def someone(message: Message):
-    if "someone" in message.content and random.randint(0, 100) >= 95 and someone_id:
+    if "someone" in message.content and random.randint(0, 1000) >= 999 and someone_id:
         await message.reply(f"<@{someone_id}> is this true?")
