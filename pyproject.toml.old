@@ -1,3 +1,0 @@
-[tool.ruff.lint]
-# Disable fix for unused imports (`F401`).
-unfixable = ["F401"]

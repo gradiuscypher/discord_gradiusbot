@@ -7,6 +7,7 @@ requires-python = ">=3.13"
 dependencies = [
     "discord-py>=2.5.2",
     "python-dotenv>=1.1.0",
+    "ty>=0.0.1a27",
 ]
 
 [dependency-groups]
@@ -14,3 +15,13 @@ dev = [
     "mypy>=1.15.0",
     "ruff>=0.11.8",
 ]
+
+[tool.ruff]
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["D", "T201", "E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101"]
