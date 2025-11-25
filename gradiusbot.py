@@ -1,4 +1,4 @@
-#! uv run python3
+#!/usr/bin/env -S uv run
 
 import contextlib
 import json
@@ -27,6 +27,7 @@ loaded_modules = ["core"]
 
 if module_env:
     loaded_modules = json.loads(module_env)
+
 
 @bot.event
 async def on_ready() -> None:
