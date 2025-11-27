@@ -15,4 +15,3 @@ async def example_periodic_task() -> None:
 async def example_hourly_task() -> None:
     """Example task that runs every 10 seconds."""
     print("Example hourly task is running!")
-

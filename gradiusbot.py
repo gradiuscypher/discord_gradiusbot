@@ -19,7 +19,7 @@ bot = discord.Client(intents=discord.Intents.all())
 
 # import task modules to register their tasks
 with contextlib.suppress(ImportError):
-    from libs.routes import tasks  # noqa: F401
+    from libs.routes import message_cleanup, tasks  # noqa: F401
 
 # load enabled modules
 module_env = os.getenv("LOADED_MODULES")
