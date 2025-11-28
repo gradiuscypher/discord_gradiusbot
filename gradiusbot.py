@@ -20,7 +20,8 @@ logging.basicConfig(
 
 
 load_dotenv()  # load all the variables from the env file
-intents = discord.Intents.all()
+intents = discord.Intents.default()
+intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 
