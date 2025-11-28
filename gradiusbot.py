@@ -1,6 +1,7 @@
 #!/usr/bin/env -S uv run
 
 import json
+import logging
 import os
 from pathlib import Path
 
@@ -9,6 +10,14 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 NOT_SET_WARNING = "Discord token environment variable is not set."
+
+# Configure logging
+logging.basicConfig(
+    level=logging.DEBUG,  # Set to DEBUG to see all messages
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+
 
 load_dotenv()  # load all the variables from the env file
 intents = discord.Intents.all()
