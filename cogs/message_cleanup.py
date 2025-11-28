@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 CHANNEL_ID = int(os.getenv("TARGET_CLEAN_CHANNEL"))
 MESSAGE_ALLOWLIST = saved_messages
 CLEANUP_HOURS = 72
-CLEANUP_SECONDS = 3600
+TASK_TIME = 3600
 UPDATE_MESSAGE_COUNT = 10
 
 print(MESSAGE_ALLOWLIST)
@@ -34,7 +34,7 @@ class MessageCleanup(commands.Cog):
         self.bot = bot
         self.cleanup.start()
 
-    @tasks.loop(minutes=1)
+    @tasks.loop(seconds=TASK_TIME)
     async def cleanup(self) -> None:
         logger.info("Starting message cleanup...")
         channel = self.bot.get_channel(CHANNEL_ID)
