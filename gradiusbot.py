@@ -17,6 +17,9 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
+# Show discord.py's rate limit bucket waits ("exhausted. Pre-emptively rate
+# limiting...") so long pauses during message cleanup are visible.
+logging.getLogger("discord.http").setLevel(logging.DEBUG)
 
 
 load_dotenv()  # load all the variables from the env file
@@ -92,6 +95,8 @@ if __name__ == "__main__":
     token = os.getenv("TOKEN")
 
     if token:
-        bot.run(token)  # run the bot with the token
+        # log_handler=None: use the basicConfig handler above instead of
+        # discord.py's own (which duplicates every line and resets root to INFO)
+        bot.run(token, log_handler=None)
     else:
         raise ValueError(NOT_SET_WARNING)

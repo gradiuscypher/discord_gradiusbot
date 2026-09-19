@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import time
 from datetime import UTC, datetime, timedelta
 
 import discord
@@ -13,9 +14,10 @@ load_dotenv()  # load all the variables from the env file
 saved_messages_str = os.getenv("SAVED_MESSAGES")
 
 if saved_messages_str:
-    saved_messages: list[int] = json.loads(saved_messages_str)
+    # IDs may be given as strings in the env; message.id is an int
+    saved_messages: set[int] = {int(x) for x in json.loads(saved_messages_str)}
 else:
-    saved_messages: list[int] = []
+    saved_messages: set[int] = set()
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +55,7 @@ class MessageCleanup(commands.Cog):
         cutoff_time = datetime.now(UTC) - timedelta(hours=CLEANUP_HOURS)
         deleted_count = 0
         processed_count = 0
+        started = time.monotonic()
 
         # Fetch messages older than cutoff time
         async for message in channel.history(
@@ -62,12 +65,15 @@ class MessageCleanup(commands.Cog):
         ):
             processed_count += 1
 
-            # Report status every 50 messages
+            # Report status periodically. Deleting messages older than two
+            # weeks is limited to 30 per ~2 minutes per channel, so long gaps
+            # between these lines are expected (discord.py sleeps silently).
             if processed_count % UPDATE_MESSAGE_COUNT == 0:
                 logger.info(
-                    "Progress: Processed %s messages, deleted %s",
+                    "Progress: Processed %s messages, deleted %s (%.0fs elapsed)",
                     processed_count,
                     deleted_count,
+                    time.monotonic() - started,
                 )
 
             # Skip allowlisted messages
@@ -94,10 +100,11 @@ class MessageCleanup(commands.Cog):
                 logger.exception("Failed to delete message %s", message.id)
 
         logger.info(
-            "Cleanup complete: Processed %s messages, deleted %s from channel %s",
+            "Cleanup complete: Processed %s messages, deleted %s from channel %s in %.0fs",
             processed_count,
             deleted_count,
             CHANNEL_ID,
+            time.monotonic() - started,
         )
 
 
